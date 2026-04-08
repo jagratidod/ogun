@@ -1,0 +1,18 @@
+{
+  "targets": [
+    { "id": "TGT-001", "name": "Distributor Q2 Revenue", "type": "Distributor", "value": 5000000, "points": 5000, "status": "Active", "deadline": "2026-06-30" },
+    { "id": "TGT-002", "name": "Retailer Mixer Grinder Push", "type": "Retailer", "value": 150000, "points": 1500, "status": "Active", "deadline": "2026-04-30" },
+    { "id": "TGT-003", "name": "Service Desk Satisfaction", "type": "Staff", "value": 95, "points": 1000, "status": "Active", "deadline": "2026-05-15" }
+  ],
+  "pointsHistory": [
+    { "id": "PTH-001", "entity": "Priya Kitchen World", "type": "Retailer", "points": 2500, "reason": "Target TGT-002 Achieved", "date": "2026-04-05" },
+    { "id": "PTH-002", "entity": "Arjun Patel", "type": "Distributor", "points": 5000, "reason": "Monthly Sales Bonus", "date": "2026-04-01" },
+    { "id": "PTH-003", "entity": "Smart Kitchen Hub", "type": "Retailer", "points": 1200, "reason": "Product Feedback Bonus", "date": "2026-03-28" }
+  ],
+  "leaderboard": [
+    { "name": "Priya Kitchen World", "points": 12450, "rank": 1 },
+    { "name": "Smart Kitchen Hub", "points": 9800, "rank": 2 },
+    { "name": "HomeChef Appliances", "points": 8200, "rank": 3 },
+    { "name": "Kitchen Express", "points": 7450, "rank": 4 }
+  ]
+}

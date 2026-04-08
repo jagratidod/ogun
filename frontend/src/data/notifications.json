@@ -1,0 +1,34 @@
+ [
+  {
+    "id": "NOT001",
+    "type": "order",
+    "title": "New Order Placed",
+    "message": "Retailer 'Priya Kitchen World' placed a new order worth ₹1,25,000",
+    "time": "2026-04-06T10:30:00",
+    "read": false
+  },
+  {
+    "id": "NOT002",
+    "type": "stock",
+    "title": "Low Stock Alert",
+    "message": "TurboMix Pro 750W is below minimum quantity (12 units remaining)",
+    "time": "2026-04-06T09:45:00",
+    "read": false
+  },
+  {
+    "id": "NOT003",
+    "type": "service",
+    "title": "New Service Request",
+    "message": "Customer 'Rahul Verma' raised a new repair request SRV-156",
+    "time": "2026-04-06T09:15:00",
+    "read": false
+  },
+  {
+    "id": "NOT004",
+    "type": "payment",
+    "title": "Payment Received",
+    "message": "Confirmed payment of ₹75,000 from HomeChef Appliances",
+    "time": "2026-04-05T16:30:00",
+    "read": true
+  }
+]

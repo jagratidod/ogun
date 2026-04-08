@@ -1,0 +1,11 @@
+// Exporting all Retailer modules from consolidated pages
+export { default as NewSalePage } from './pages/NewSalePage';
+export { default as RestockRequestPage } from './pages/RestockRequestPage';
+export { default as RetailerAnalyticsPage } from './pages/RetailerAnalyticsPage';
+export { default as RetailerCustomersPage } from './pages/RetailerCustomersPage';
+export { default as RetailerDashboardPage } from './pages/RetailerDashboardPage';
+export { default as RetailerLedgerPage } from './pages/RetailerLedgerPage';
+export { default as RetailerRewardsPage } from './pages/RetailerRewardsPage';
+export { default as RetailerSettingsPage } from './pages/RetailerSettingsPage';
+export { default as RetailerStockPage } from './pages/RetailerStockPage';
+export { default as SalesHistoryPage } from './pages/SalesHistoryPage';

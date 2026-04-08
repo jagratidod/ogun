@@ -1,0 +1,74 @@
+[
+  {
+    "id": "PRD001",
+    "name": "QuickMix 500W Grinder",
+    "sku": "QM-500",
+    "category": "Mixer Grinder",
+    "price": 3499,
+    "mrp": 4999,
+    "stock": 120,
+    "minStock": 50,
+    "status": "Available",
+    "image": "https://placehold.co/100x100?text=Mixer"
+  },
+  {
+    "id": "PRD002",
+    "name": "SmartCook Induction Cooktop",
+    "sku": "SC-IND-01",
+    "category": "Induction Cooktop",
+    "price": 2899,
+    "mrp": 3999,
+    "stock": 85,
+    "minStock": 30,
+    "status": "Available",
+    "image": "https://placehold.co/100x100?text=Induction"
+  },
+  {
+    "id": "PRD003",
+    "name": "TurboMix Pro 750W",
+    "sku": "TMP-750",
+    "category": "Mixer Grinder",
+    "price": 4899,
+    "mrp": 6499,
+    "stock": 12,
+    "minStock": 20,
+    "status": "Low Stock",
+    "image": "https://placehold.co/100x100?text=TurboMix"
+  },
+  {
+    "id": "PRD012",
+    "name": "AquaPure RO 8L",
+    "sku": "APR-8L",
+    "category": "Water Purifier",
+    "price": 12500,
+    "mrp": 15999,
+    "stock": 8,
+    "minStock": 15,
+    "status": "Low Stock",
+    "image": "https://placehold.co/100x100?text=AquaPure"
+  },
+  {
+    "id": "PRD008",
+    "name": "FlameGuard Chimney 90cm",
+    "sku": "FGC-90",
+    "category": "Chimney",
+    "price": 18500,
+    "mrp": 24999,
+    "stock": 5,
+    "minStock": 15,
+    "status": "Low Stock",
+    "image": "https://placehold.co/100x100?text=Chimney"
+  },
+  {
+    "id": "PRD015",
+    "name": "CrispAir Fryer 4.5L",
+    "sku": "CAF-45",
+    "category": "Air Fryer",
+    "price": 5499,
+    "mrp": 7999,
+    "stock": 0,
+    "minStock": 10,
+    "status": "Out of Stock",
+    "image": "https://placehold.co/100x100?text=Air+Fryer"
+  }
+]

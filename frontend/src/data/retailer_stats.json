@@ -1,0 +1,13 @@
+{
+  "kpis": {
+    "dailySales": 45600,
+    "totalCustomers": 124,
+    "stockValue": 125000,
+    "loyaltyPoints": 1250,
+    "pendingRestock": 1
+  },
+  "recentSales": [
+    { "id": "SL-998", "customer": "Rahul Verma", "amount": 12500, "date": "10:30 AM" },
+    { "id": "SL-997", "customer": "Anita Singh", "amount": 8400, "date": "09:15 AM" }
+  ]
+}

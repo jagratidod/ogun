@@ -1,0 +1,9 @@
+// Exporting all Customer modules from consolidated pages
+export { default as CustomerHomePage } from './pages/CustomerHomePage';
+export { default as CustomerSettingsPage } from './pages/CustomerSettingsPage';
+export { default as MyProductsPage } from './pages/MyProductsPage';
+export { default as MyServiceRequestsPage } from './pages/MyServiceRequestsPage';
+export { default as ProductDetailPage } from './pages/ProductDetailPage';
+export { default as RaiseComplaintPage } from './pages/RaiseComplaintPage';
+export { default as RegisterProductPage } from './pages/RegisterProductPage';
+export { default as ServiceRequestDetailPage } from './pages/ServiceRequestDetailPage';

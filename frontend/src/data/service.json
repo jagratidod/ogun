@@ -1,0 +1,36 @@
+[
+  {
+    "id": "SRV-156",
+    "customer": "Rahul Verma",
+    "product": "TurboMix Pro 750W",
+    "issue": "Motor noise and burning smell",
+    "status": "Assigned",
+    "priority": "High",
+    "technician": "Ramesh Kumar",
+    "date": "2026-04-06T10:30:00",
+    "history": [
+      { "status": "Open", "time": "2026-04-06T10:30:00", "note": "Customer raised online complaint" },
+      { "status": "Assigned", "time": "2026-04-06T11:15:00", "note": "Assigned to Service Center Mumbai" }
+    ]
+  },
+  {
+    "id": "SRV-155",
+    "customer": "Anita Singh",
+    "product": "SmartCook Induction",
+    "issue": "E2 Error code display",
+    "status": "In Progress",
+    "priority": "Medium",
+    "technician": "Suresh Pal",
+    "date": "2026-04-05T14:45:00"
+  },
+  {
+    "id": "SRV-152",
+    "customer": "Amit Shah",
+    "product": "QuickMix 500W",
+    "issue": "Broken jar blade",
+    "status": "Closed",
+    "priority": "Low",
+    "technician": "Karan Varma",
+    "date": "2026-04-04T12:00:00"
+  }
+]

@@ -1,0 +1,19 @@
+{
+  "kpis": {
+    "totalRetailers": 124,
+    "pendingOrders": 8,
+    "monthlySales": 4560000,
+    "stockValue": 850000,
+    "rewardsPoints": 5000
+  },
+  "salesTrend": [
+    { "month": "Jan", "sales": 3800000 },
+    { "month": "Feb", "sales": 4100000 },
+    { "month": "Mar", "sales": 4400000 },
+    { "month": "Apr", "sales": 4560000 }
+  ],
+  "recentOrders": [
+    { "id": "ORD-342", "retailer": "Priya Kitchen World", "amount": 125000, "status": "Processing", "date": "10:30 AM" },
+    { "id": "ORD-341", "retailer": "HomeChef Appliances", "amount": 75600, "status": "Shipped", "date": "09:45 AM" }
+  ]
+}

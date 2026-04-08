@@ -1,0 +1,25 @@
+{
+  "ledger": [
+    { "id": "TRX-001", "date": "2026-04-06T10:30:00", "description": "Payment from Priya Kitchen World (ORD-2026-342)", "type": "credit", "amount": 125000, "balance": 1850400 },
+    { "id": "TRX-002", "date": "2026-04-06T11:45:00", "description": "Salary Disbursement - March 2026", "type": "debit", "amount": 450000, "balance": 1400400 },
+    { "id": "TRX-003", "date": "2026-04-05T15:20:00", "description": "Vendor Payment - Raw Materials", "type": "debit", "amount": 85000, "balance": 1485400 },
+    { "id": "TRX-004", "date": "2026-04-05T09:10:00", "description": "Payment from Smart Kitchen Hub (ORD-2026-340)", "type": "credit", "amount": 185000, "balance": 1570400 }
+  ],
+  "invoices": [
+    { "id": "INV-2026-891", "orderId": "ORD-2026-342", "customer": "Priya Kitchen World", "date": "2026-04-06", "dueDate": "2026-04-21", "amount": 125000, "status": "Paid" },
+    { "id": "INV-2026-890", "orderId": "ORD-2026-341", "customer": "HomeChef Appliances", "date": "2026-04-06", "dueDate": "2026-04-21", "amount": 75600, "status": "Pending" },
+    { "id": "INV-2026-889", "orderId": "ORD-2026-340", "customer": "Smart Kitchen Hub", "date": "2026-04-05", "dueDate": "2026-04-20", "amount": 185000, "status": "Paid" }
+  ],
+  "payments": [
+    { "id": "PAY-001", "invoiceId": "INV-2026-891", "method": "Bank Transfer", "date": "2026-04-06", "amount": 125000, "status": "Completed" },
+    { "id": "PAY-002", "invoiceId": "INV-2026-889", "method": "UPI", "date": "2026-04-05", "amount": 185000, "status": "Completed" }
+  ],
+  "financials": {
+    "cashInHand": 2450000,
+    "receivables": 450000,
+    "payables": 120000,
+    "monthlyRevenue": 12560000,
+    "monthlyExpense": 8450000,
+    "netProfit": 4110000
+  }
+}

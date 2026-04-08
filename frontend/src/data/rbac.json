@@ -1,0 +1,91 @@
+{
+  "roles": [
+    {
+      "id": "ROL001",
+      "name": "Super Admin",
+      "description": "Full access to all modules and system settings",
+      "userCount": 2,
+      "permissionsCount": 156,
+      "isSystem": true
+    },
+    {
+      "id": "ROL002",
+      "name": "Sales Manager",
+      "description": "Manage orders, inventory, and sales reports",
+      "userCount": 5,
+      "permissionsCount": 42,
+      "isSystem": false
+    },
+    {
+      "id": "ROL003",
+      "name": "Service Head",
+      "description": "Manage service tickets, technicians, and warranty",
+      "userCount": 3,
+      "permissionsCount": 28,
+      "isSystem": false
+    },
+    {
+      "id": "ROL004",
+      "name": "Accountant",
+      "description": "Manage ledgers, invoices, and payments",
+      "userCount": 4,
+      "permissionsCount": 35,
+      "isSystem": false
+    },
+    {
+      "id": "ROL005",
+      "name": "HR Manager",
+      "description": "Manage employees, payroll, and leave requests",
+      "userCount": 2,
+      "permissionsCount": 40,
+      "isSystem": false
+    }
+  ],
+  "permissions": [
+    { "id": "PRM001", "module": "Dashboard", "action": "View", "description": "Access dashboard metrics" },
+    { "id": "PRM002", "module": "Inventory", "action": "Create", "description": "Add new products" },
+    { "id": "PRM003", "module": "Inventory", "action": "Edit", "description": "Update product details" },
+    { "id": "PRM004", "module": "Inventory", "action": "Delete", "description": "Remove products" },
+    { "id": "PRM005", "module": "Orders", "action": "Approve", "description": "Approve restock requests" },
+    { "id": "PRM006", "module": "Accounts", "action": "View", "description": "View financial reports" },
+    { "id": "PRM007", "module": "HR", "action": "Manage", "description": "Manage employee database" }
+  ],
+  "users": [
+    {
+      "id": "USR001",
+      "name": "Vikram Sharma",
+      "email": "vikram@ogun.in",
+      "role": "Super Admin",
+      "status": "active",
+      "department": "Management",
+      "lastLogin": "2026-04-06T10:30:00"
+    },
+    {
+      "id": "USR002",
+      "name": "Amit Goel",
+      "email": "amit@ogun.in",
+      "role": "Sales Manager",
+      "status": "active",
+      "department": "Sales",
+      "lastLogin": "2026-04-06T09:15:00"
+    },
+    {
+      "id": "USR003",
+      "name": "Sneha Kapoor",
+      "email": "sneha@ogun.in",
+      "role": "Accountant",
+      "status": "active",
+      "department": "Finance",
+      "lastLogin": "2026-04-05T17:45:00"
+    },
+    {
+      "id": "USR004",
+      "name": "Rajesh Varma",
+      "email": "rajesh@ogun.in",
+      "role": "Service Head",
+      "status": "inactive",
+      "department": "Service",
+      "lastLogin": "2026-03-28T14:20:00"
+    }
+  ]
+}

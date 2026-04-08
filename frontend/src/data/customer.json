@@ -1,0 +1,19 @@
+{
+  "profile": {
+    "name": "Rahul Verma",
+    "loyalty": "Gold Partner",
+    "points": 1240,
+    "registeredProducts": 3,
+    "activeComplaints": 1
+  },
+  "banners": [
+    { "id": "B1", "title": "Summer Service Fest", "subtitle": "Get free inspection on all OGUN Appliances", "color": "teal" },
+    { "id": "B2", "title": "Refer & Earn", "subtitle": "Refer a friend and get 500 points", "color": "pink" }
+  ],
+  "products": [
+    { "id": "P1", "name": "TurboMix Pro 750W", "warrantyExp": "2026-12-15", "status": "In Warranty" },
+    { "id": "P2", "name": "SmartCook Induction", "warrantyExp": "2025-08-20", "status": "In Warranty" },
+    { "id": "P3", "name": "Aura Silent Chimney", "warrantyExp": "2027-05-10", "status": "In Warranty" }
+  ]
+}
+

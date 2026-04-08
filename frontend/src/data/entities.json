@@ -1,0 +1,15 @@
+{
+  "distributors": [
+    { "id": "DS-001", "name": "Arjun Patel", "region": "North India", "retailers": 124, "status": "Active", "joined": "2024-01-15" },
+    { "id": "DS-002", "name": "Suresh Reddy", "region": "South India", "retailers": 98, "status": "Active", "joined": "2024-02-20" }
+  ],
+  "retailers": [
+    { "id": "RT-101", "name": "Priya Kitchen World", "distributor": "Arjun Patel", "orders": 45, "status": "Active", "joined": "2024-03-10" },
+    { "id": "RT-102", "name": "Smart Kitchen Hub", "distributor": "Arjun Patel", "orders": 32, "status": "Active", "joined": "2024-03-15" },
+    { "id": "RT-103", "name": "HomeChef Appliances", "distributor": "Suresh Reddy", "orders": 28, "status": "Active", "joined": "2024-03-20" }
+  ],
+  "customers": [
+    { "id": "CU-1001", "name": "Rahul Verma", "city": "Mumbai", "orders": 3, "loyalty": "Gold", "joined": "2025-01-10" },
+    { "id": "CU-1002", "name": "Anita Singh", "city": "Delhi", "orders": 5, "loyalty": "Platinum", "joined": "2025-02-15" }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "employees": [
+    { "id": "EMP001", "name": "Vikram Sharma", "role": "CEO", "department": "Management", "status": "active", "salary": 250000, "joined": "2024-01-10" },
+    { "id": "EMP002", "name": "Amit Goel", "role": "Sales Head", "department": "Sales", "status": "active", "salary": 180000, "joined": "2024-02-15" },
+    { "id": "EMP003", "name": "Sneha Kapoor", "role": "Sr. Accountant", "department": "Finance", "status": "active", "salary": 120000, "joined": "2024-03-01" },
+    { "id": "EMP004", "name": "Rajesh Varma", "role": "Service Manager", "department": "Service", "status": "active", "salary": 120000, "joined": "2024-03-20" },
+    { "id": "EMP005", "name": "Neha Sharma", "role": "Sales Exec", "department": "Sales", "status": "active", "salary": 55000, "joined": "2026-04-05" }
+  ],
+  "departments": [
+    { "id": "DEP001", "name": "Management", "employees": 2, "head": "Vikram Sharma" },
+    { "id": "DEP002", "name": "Sales", "employees": 12, "head": "Amit Goel" },
+    { "id": "DEP003", "name": "Finance", "employees": 5, "head": "Sneha Kapoor" },
+    { "id": "DEP004", "name": "Service", "employees": 24, "head": "Rajesh Varma" },
+    { "id": "DEP005", "name": "Logistics", "employees": 8, "head": "Karan Malhotra" }
+  ],
+  "leaveRequests": [
+    { "id": "LV-089", "employee": "Sneha Kapoor", "type": "Sick Leave", "from": "2026-04-06", "to": "2026-04-07", "days": 2, "status": "Approved" },
+    { "id": "LV-090", "employee": "Amit Goel", "type": "Casual Leave", "from": "2026-04-10", "to": "2026-04-12", "days": 3, "status": "Requested" },
+    { "id": "LV-091", "employee": "Rajesh Varma", "type": "Privileged Leave", "from": "2026-04-15", "to": "2026-04-20", "days": 6, "status": "Requested" }
+  ],
+  "payrollSummary": {
+    "totalMonthlyPayable": 4560000,
+    "lastPaidDate": "2026-04-03",
+    "pendingSalaries": 0,
+    "deductionsTotal": 245000,
+    "bonusesTotal": 185000
+  }
+}
