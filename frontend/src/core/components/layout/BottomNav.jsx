@@ -5,7 +5,7 @@ export default function BottomNav({ items }) {
   const location = useLocation();
 
   return (
-    <nav className="bottom-nav safe-area-bottom">
+    <nav className="bottom-nav safe-area-bottom bg-surface-primary/80 backdrop-blur-xl border-t border-border">
       <div className="flex items-center justify-around px-2 py-1">
         {items.map((item) => {
           const isActive = item.exact

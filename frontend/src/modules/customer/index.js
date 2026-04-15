@@ -7,3 +7,5 @@ export { default as ProductDetailPage } from './pages/ProductDetailPage';
 export { default as RaiseComplaintPage } from './pages/RaiseComplaintPage';
 export { default as RegisterProductPage } from './pages/RegisterProductPage';
 export { default as ServiceRequestDetailPage } from './pages/ServiceRequestDetailPage';
+export { default as CustomerLoginPage } from './pages/CustomerLoginPage';
+export { default as CustomerSocialPage } from './pages/CustomerSocialPage';

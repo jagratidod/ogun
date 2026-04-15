@@ -23,7 +23,7 @@ import {
   LeaveCalendarPage, RewardsDashboardPage, TargetConfigPage, 
   PointsHistoryPage, ServiceRequestsPage, ServiceDetailPage, 
   ServiceAnalyticsPage, DistributorListPage, RetailerListPage, 
-  CustomerListPage, ReportsPage, AdminSettingsPage, PayslipsPage, DeductionsPage, OfferLettersPage
+  CustomerListPage, ReportsPage, AdminSettingsPage, PayslipsPage, DeductionsPage, OfferLettersPage, SocialGridManagerPage
 } from '../modules/admin';
 
 import { 
@@ -40,11 +40,18 @@ import {
   RetailerSettingsPage 
 } from '../modules/retailer';
 
-import { 
-  CustomerHomePage, RegisterProductPage, MyProductsPage, 
-  ProductDetailPage, RaiseComplaintPage, MyServiceRequestsPage, 
-  ServiceRequestDetailPage, CustomerSettingsPage 
-} from '../modules/customer';
+import CustomerHomePage from '../modules/customer/pages/CustomerHomePage';
+import RegisterProductPage from '../modules/customer/pages/RegisterProductPage';
+import MyProductsPage from '../modules/customer/pages/MyProductsPage';
+import ProductDetailPage from '../modules/customer/pages/ProductDetailPage';
+import RaiseComplaintPage from '../modules/customer/pages/RaiseComplaintPage';
+import MyServiceRequestsPage from '../modules/customer/pages/MyServiceRequestsPage';
+import ServiceRequestDetailPage from '../modules/customer/pages/ServiceRequestDetailPage';
+import CustomerSettingsPage from '../modules/customer/pages/CustomerSettingsPage';
+import CustomerLoginPage from '../modules/customer/pages/CustomerLoginPage';
+import CustomerSocialPage from '../modules/customer/pages/CustomerSocialPage';
+
+import SplashPage from '../modules/shared/SplashPage';
 
 // ─── Placeholder component generator ──────────────────
 function Stub(title) {
@@ -91,6 +98,7 @@ const CustomerList = () => <CustomerListPage />;
 const CustomerDetailPage = Stub('Customer Detail'); // Still a stub
 const Reports = () => <ReportsPage />;
 const AdminSettings = () => <AdminSettingsPage />;
+const SocialGridManager = () => <SocialGridManagerPage />;
 
 // ─── Distributor real pages ───────────────────────────
 const DistDashboard = () => <DistributorDashboardPage />;
@@ -127,6 +135,8 @@ const RaiseComplaint = () => <RaiseComplaintPage />;
 const MyServiceReqs = () => <MyServiceRequestsPage />;
 const ServiceReqDetail = () => <ServiceRequestDetailPage />;
 const CustomerSettings = () => <CustomerSettingsPage />;
+const CustomerSocial = () => <CustomerSocialPage />;
+
 
 function RootRedirect() {
   const { isAuthenticated, user } = useAuthContext();
@@ -144,11 +154,17 @@ export default function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Root redirect */}
-        <Route path="/" element={<RootRedirect />} />
+        {/* Root Role Selection Page (4 modules) */}
+        <Route path="/" element={<LoginPage />} />
+        
+        {/* Splash Page for Customer Flow */}
+        <Route path="/splash" element={<SplashPage />} />
+        
+        {/* Auth Check Redirect */}
+        <Route path="/home" element={<RootRedirect />} />
 
         {/* Auth */}
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/login" element={<CustomerLoginPage />} />
 
         {/* ═══ ADMIN ROUTES ═══ */}
         <Route path="/admin" element={
@@ -193,6 +209,7 @@ export default function AppRouter() {
           <Route path="service" element={<ServiceRequests />} />
           <Route path="service/:id" element={<ServiceDetail />} />
           <Route path="service/analytics" element={<ServiceAnalytics />} />
+          <Route path="content/social-grid" element={<SocialGridManager />} />
           <Route path="reports" element={<Reports />} />
           <Route path="settings" element={<AdminSettings />} />
         </Route>
@@ -249,6 +266,7 @@ export default function AppRouter() {
           <Route path="service/raise" element={<RaiseComplaint />} />
           <Route path="service" element={<MyServiceReqs />} />
           <Route path="service/:id" element={<ServiceReqDetail />} />
+          <Route path="social" element={<CustomerSocial />} />
           <Route path="settings" element={<CustomerSettings />} />
         </Route>
 

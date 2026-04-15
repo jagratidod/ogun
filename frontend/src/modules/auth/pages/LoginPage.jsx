@@ -41,7 +41,7 @@ const roleCards = [
     icon: RiUserLine,
     color: 'from-brand-purple to-purple-700',
     bgGlow: 'shadow-[0_0_20px_rgba(122,46,142,0.15)]',
-    redirect: '/customer',
+    redirect: '/splash',
   },
 ];
 
@@ -51,8 +51,12 @@ export default function LoginPage() {
   const [hoveredRole, setHoveredRole] = useState(null);
 
   const handleLogin = (role, redirect) => {
-    login(role);
-    navigate(redirect);
+    if (role === ROLES.CUSTOMER) {
+      navigate(redirect);
+    } else {
+      login(role);
+      navigate(redirect);
+    }
   };
 
   return (

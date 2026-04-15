@@ -33,3 +33,4 @@ export { default as StockAlerts } from './pages/StockAlerts';
 export { default as StockOverview } from './pages/StockOverview';
 export { default as TargetConfigPage } from './pages/TargetConfigPage';
 export { default as UsersPage } from './pages/UsersPage';
+export { default as SocialGridManagerPage } from './pages/SocialGridManagerPage';

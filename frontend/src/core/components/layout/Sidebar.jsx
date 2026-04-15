@@ -8,6 +8,7 @@ import {
   RiMoneyDollarCircleLine, RiTeamLine, RiWalletLine, RiCalendarCheckLine,
   RiTrophyLine, RiTruckLine, RiStore2Line, RiUserLine,
   RiCustomerServiceLine, RiBarChartBoxLine, RiSettings3Line,
+  RiImage2Line,
   RiArrowLeftSLine, RiArrowRightSLine, RiArrowDownSLine,
   RiMenuLine, RiCloseLine
 } from 'react-icons/ri';
@@ -78,6 +79,11 @@ const adminNav = [
     label: 'Service', icon: RiCustomerServiceLine, children: [
       { label: 'Requests', path: '/admin/service' },
       { label: 'Analytics', path: '/admin/service/analytics' },
+    ],
+  },
+  {
+    label: 'Content', icon: RiImage2Line, children: [
+      { label: 'Social Grid', path: '/admin/content/social-grid' },
     ],
   },
   { label: 'Reports', icon: RiBarChartBoxLine, path: '/admin/reports' },
