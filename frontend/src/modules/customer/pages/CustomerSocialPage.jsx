@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { RiSearchLine, RiArrowLeftLine, RiHeartLine, RiHeartFill, RiShareForwardLine } from 'react-icons/ri';
+import { RiSearch2Fill, RiArrowLeftFill, RiHeartLine, RiHeartFill, RiShareForwardFill } from 'react-icons/ri';
 
 import { toast } from 'react-hot-toast';
 import Modal from '../../../core/components/ui/Modal';
@@ -50,18 +50,18 @@ export default function CustomerSocialPage() {
     return (
       <div className="fixed inset-0 z-50 bg-black flex flex-col animate-slide-up select-none">
         {/* Detail Header */}
-        <div className="absolute top-0 inset-x-0 z-10 p-4 pb-12 flex items-center justify-between text-white bg-gradient-to-b from-black/70 to-transparent">
+        <div className="absolute top-0 inset-x-0 z-10 p-5 flex items-center justify-between text-white bg-gradient-to-b from-black/80 via-black/40 to-transparent">
           <button 
             onClick={() => setSelected(null)}
-            className="w-12 h-12 flex items-center justify-center rounded-full bg-black/20 backdrop-blur-md active:scale-90 transition-transform"
+            className="w-11 h-11 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-xl border border-white/20 active:scale-90 transition-all"
           >
-            <RiArrowLeftLine className="w-7 h-7" />
+            <RiArrowLeftFill className="w-6 h-6" />
           </button>
           <div className="flex flex-col items-center">
-            <span className="text-[10px] font-black uppercase tracking-[3px] opacity-60">Reel Player</span>
-            <span className="text-sm font-black tracking-tight">{selected.label?.slice(0, 15)}...</span>
+            <span className="text-[10px] font-black uppercase tracking-[4px] opacity-60 mb-1">Explore Reel</span>
+            <span className="text-[13px] font-black tracking-tight">{selected.label?.slice(0, 18)}...</span>
           </div>
-          <div className="w-12 h-12" />
+          <div className="w-11 h-11" />
         </div>
 
         {/* Media Container */}
@@ -85,44 +85,44 @@ export default function CustomerSocialPage() {
         </div>
 
         {/* Content Overlay */}
-        <div className="absolute bottom-0 inset-x-0 p-6 pb-10 bg-gradient-to-t from-black/90 via-black/40 to-transparent text-white pointer-events-none">
-          <div className="flex items-end justify-between gap-6">
+        <div className="absolute bottom-0 inset-x-0 p-8 pb-12 bg-gradient-to-t from-black/90 via-black/30 to-transparent text-white pointer-events-none">
+          <div className="flex items-end justify-between gap-6 translate-y-2">
             <div className="flex-1 pointer-events-auto">
-              <p className="text-sm text-white/90 leading-relaxed font-medium line-clamp-3 mb-2">
+              <p className="text-[14px] text-white/90 leading-relaxed font-bold line-clamp-2 mb-3 tracking-tight">
                 {selected.label || 'Experience the future of appliances with Ogun Ecosystem.'}
               </p>
 
-              <div className="flex items-center gap-2 text-[10px] font-bold text-white/50 uppercase tracking-widest">
-                 <span>{selected.views.toLocaleString()} views</span>
+              <div className="flex items-center gap-3 text-[9px] font-black text-white/40 uppercase tracking-[2px]">
+                 <span className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-brand-teal" /> {selected.views.toLocaleString()} views</span>
                  <span>•</span>
-                 <span>12m ago</span>
+                 <span>Just Now</span>
               </div>
             </div>
             
             {/* Action Sidebar */}
-            <div className="flex flex-col items-center gap-7 pb-2 pointer-events-auto">
+            <div className="flex flex-col items-center gap-6 pointer-events-auto">
               <button 
                 onClick={() => toggleLike(selected.id)}
                 className="flex flex-col items-center group active:scale-95 transition-transform"
               >
-                <div className="w-12 h-12 rounded-full bg-black/20 backdrop-blur-md flex items-center justify-center mb-1 group-hover:bg-black/40">
+                <div className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-xl flex items-center justify-center mb-1.5 border border-white/20 group-hover:bg-white/20">
                    {isLiked ? (
                      <RiHeartFill className="w-7 h-7 text-brand-pink animate-pop" />
                    ) : (
                      <RiHeartLine className="w-7 h-7 text-white" />
                    )}
                 </div>
-                <span className="text-[10px] font-black tracking-wider uppercase">{isLiked ? 'Liked' : 'Like'}</span>
+                <span className="text-[9px] font-black tracking-widest uppercase opacity-80">{isLiked ? 'Liked' : 'Like'}</span>
               </button>
               
               <button 
                 onClick={() => handleShare(selected)}
                 className="flex flex-col items-center group active:scale-95 transition-transform"
               >
-                <div className="w-12 h-12 rounded-full bg-black/20 backdrop-blur-md flex items-center justify-center mb-1 group-hover:bg-black/40">
-                   <RiShareForwardLine className="w-7 h-7 text-white" />
+                <div className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-xl flex items-center justify-center mb-1.5 border border-white/20 group-hover:bg-white/20">
+                   <RiShareForwardFill className="w-7 h-7 text-white" />
                 </div>
-                <span className="text-[10px] font-black tracking-wider uppercase">Share</span>
+                <span className="text-[9px] font-black tracking-widest uppercase opacity-80">Share</span>
               </button>
             </div>
           </div>
@@ -131,31 +131,31 @@ export default function CustomerSocialPage() {
     );
   }
 
-
-
   return (
     <div className="min-h-screen bg-white">
-      {/* Search Header - Light Style */}
-      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md px-4 py-3 border-b border-border">
-        <div className="relative group">
-          <RiSearchLine className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-content-tertiary group-focus-within:text-brand-teal transition-colors" />
+      {/* Search Header - Premium Pill Style */}
+      <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl px-4 py-5 border-b border-gray-50">
+        <div className="relative group max-w-2xl mx-auto">
+          <RiSearch2Fill className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-brand-teal transition-colors" />
           <input
             type="text"
-            placeholder="Search with Meta AI"
+            placeholder="Search Explore Feed..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-11 bg-surface-hover rounded-xl pl-12 pr-4 text-sm font-semibold border-none focus:ring-1 focus:ring-brand-teal/20 transition-all placeholder:text-content-tertiary text-content-primary"
+            className="w-full h-14 bg-gray-50/80 rounded-full pl-14 pr-7 text-[14px] font-bold border border-transparent focus:border-brand-teal/20 focus:bg-white focus:shadow-[0_12px_40px_rgba(0,0,0,0.06)] transition-all placeholder:text-gray-300 placeholder:font-normal text-gray-800 outline-none"
           />
         </div>
       </div>
 
-      <div className="pb-20">
+      <div className="pb-24">
         {visibleGridItems.length > 0 ? (
           <SocialGrid items={visibleGridItems} columns={3} onSelect={setSelected} />
         ) : (
-          <div className="py-40 text-center">
-            <RiSearchLine className="w-12 h-12 mx-auto mb-4 text-border" />
-            <p className="text-sm font-bold text-content-tertiary">No results found for "{searchQuery}"</p>
+          <div className="py-48 text-center px-10">
+            <div className="w-20 h-20 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-6">
+               <RiSearch2Fill className="w-10 h-10 text-gray-200" />
+            </div>
+            <p className="text-[12px] font-black text-gray-400 uppercase tracking-widest">No feeds matching your search</p>
           </div>
         )}
       </div>

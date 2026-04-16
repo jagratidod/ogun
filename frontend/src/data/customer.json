@@ -7,13 +7,15 @@
     "activeComplaints": 1
   },
   "banners": [
-    { "id": "B1", "title": "Summer Service Fest", "subtitle": "Get free inspection on all OGUN Appliances", "color": "teal" },
-    { "id": "B2", "title": "Refer & Earn", "subtitle": "Refer a friend and get 500 points", "color": "pink" }
+    { "id": "B1", "title": "Summer Service Fest", "subtitle": "Get free inspection on all OGUN Appliances", "color": "teal", "image": "/banners/summer_service.png" },
+    { "id": "B2", "title": "Refer & Earn", "subtitle": "Refer a friend and get 500 points", "color": "pink", "image": "/banners/refer_earn.png" }
   ],
   "products": [
-    { "id": "P1", "name": "TurboMix Pro 750W", "warrantyExp": "2026-12-15", "status": "In Warranty" },
-    { "id": "P2", "name": "SmartCook Induction", "warrantyExp": "2025-08-20", "status": "In Warranty" },
-    { "id": "P3", "name": "Aura Silent Chimney", "warrantyExp": "2027-05-10", "status": "In Warranty" }
+    { "id": "P1", "name": "TurboMix Pro 750W", "warrantyExp": "2026-12-15", "status": "In Warranty", "image": "/products/mixer.png" },
+    { "id": "P2", "name": "SmartCook Induction", "warrantyExp": "2025-08-20", "status": "In Warranty", "image": "https://images.unsplash.com/photo-1574362848149-11496d93a7c7?auto=format&fit=crop&q=80&w=400" },
+    { "id": "P3", "name": "Aura Silent Chimney", "warrantyExp": "2027-05-10", "status": "In Warranty", "image": "https://images.unsplash.com/photo-1584622781564-1d9876a13d1a?auto=format&fit=crop&q=80&w=400" }
+
   ]
 }
+
 

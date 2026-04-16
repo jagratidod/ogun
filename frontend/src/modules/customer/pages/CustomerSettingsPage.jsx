@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import {
-   RiSettings4Line, RiShieldKeyholeLine, RiNotification3Line,
-   RiPaletteLine, RiGlobalLine, RiSmartphoneLine,
-   RiDatabaseLine, RiInformationLine, RiArrowRightSLine,
-   RiLogoutBoxRLine, RiUserLine, RiStore2Line, RiMapPinLine,
-   RiPhoneLine, RiHeartLine, RiLockPasswordLine, RiUserStarLine,
-   RiCheckDoubleLine
+   RiSettings4Fill, RiShieldKeyholeFill, RiNotification3Fill,
+   RiPaletteFill, RiGlobalFill, RiSmartphoneFill,
+   RiDatabaseFill, RiInformationFill, RiArrowRightSLine,
+   RiLogoutBoxRFill, RiUserFill, RiStore2Fill, RiMapPinFill,
+   RiPhoneFill, RiHeartFill, RiLockPasswordFill, RiUserStarFill,
+   RiCheckDoubleFill
 } from 'react-icons/ri';
 import {
    PageHeader, Card, CardHeader, CardTitle, CardDescription,
@@ -36,11 +36,11 @@ export default function CustomerSettingsPage() {
    };
 
    const menuItems = [
-      { icon: RiUserLine, label: 'Identity Information', desc: 'Name, email, and social profiles' },
-      { icon: RiMapPinLine, label: 'Saved Localities', desc: 'Direct service addresses' },
-      { icon: RiLockPasswordLine, label: 'Security & Access', desc: 'Passwords and biometric' },
-      { icon: RiPaletteLine, label: 'Visual Experience', desc: 'Theme and compact modes' },
-      { icon: RiNotification3Line, label: 'Communication Feed', desc: 'Emails and SMS' }
+      { icon: RiUserFill, label: 'Identity Information', desc: 'Name, email, and social profiles', color: 'text-brand-teal' },
+      { icon: RiMapPinFill, label: 'Saved Localities', desc: 'Direct service addresses', color: 'text-brand-teal' },
+      { icon: RiLockPasswordFill, label: 'Security & Access', desc: 'Passwords and biometric', color: 'text-brand-teal' },
+      { icon: RiPaletteFill, label: 'Visual Experience', desc: 'Theme and compact modes', color: 'text-brand-purple' },
+      { icon: RiNotification3Fill, label: 'Communication Feed', desc: 'Emails and SMS', color: 'text-brand-pink' }
    ];
 
    return (
@@ -49,7 +49,7 @@ export default function CustomerSettingsPage() {
             title="Account Preferences"
             subtitle="Manage your personal profile, security configuration, and app experience"
          >
-            <Button icon={RiLogoutBoxRLine} variant="danger" size="sm" onClick={handleLogout}>Logout</Button>
+            <Button icon={RiLogoutBoxRFill} variant="danger" size="sm" onClick={handleLogout}>Logout</Button>
          </PageHeader>
 
          <div className="flex items-center gap-6 p-6 glass-card border-brand-teal/20 animate-slide-up">
@@ -58,7 +58,7 @@ export default function CustomerSettingsPage() {
                <h4 className="text-lg font-black text-content-primary">Rahul Verma</h4>
                <p className="text-[10px] text-brand-teal font-black uppercase tracking-widest leading-none mt-1">Verified Member #9422</p>
                <div className="flex items-center gap-2 mt-3 cursor-pointer group" onClick={() => toast('Request received. Our team will review your eligibility.')}>
-                  <RiUserStarLine className="text-yellow-400 w-4 h-4" />
+                  <RiUserStarFill className="text-yellow-400 w-4 h-4" />
                   <p className="text-[10px] text-content-tertiary font-bold underline decoration-1 group-hover:text-brand-teal transition-all">Request Pro Profile Upgrade</p>
                </div>
             </div>
@@ -68,7 +68,7 @@ export default function CustomerSettingsPage() {
             {menuItems.map(item => (
                <Card key={item.label} className="group active:scale-95 transition-all outline-none border-border overflow-hidden hover:border-brand-teal cursor-pointer" onClick={() => open(item)}>
                   <div className="p-4 flex items-center gap-4">
-                     <div className="w-10 h-10 rounded-none bg-white flex items-center justify-center text-brand-teal group-hover:shadow-glow transition-all">
+                     <div className={`w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center ${item.color} group-hover:shadow-soft transition-all`}>
                         <item.icon className="w-5 h-5" />
                      </div>
                      <div className="flex-1">
@@ -108,7 +108,7 @@ export default function CustomerSettingsPage() {
                )}
                {activeTab?.label !== 'Identity Information' && activeTab?.label !== 'Security & Access' && (
                   <div className="p-8 text-center bg-white flex flex-col items-center">
-                     <RiSettings4Line className="w-10 h-10 text-brand-teal/30 mb-2 animate-spin-slow" />
+                     <RiSettings4Fill className="w-10 h-10 text-brand-teal/30 mb-2 animate-spin-slow" />
                      <p className="text-xs text-content-secondary">Synchronizing your {activeTab?.label.toLowerCase()} settings with the secure cloud...</p>
                   </div>
                )}
@@ -117,7 +117,7 @@ export default function CustomerSettingsPage() {
 
          <div className="pb-8 space-y-4">
             <div className="flex items-center justify-center gap-3 p-4 rounded-none bg-white border border-border opacity-70">
-               <RiInformationLine className="text-brand-teal w-4 h-4 flex-shrink-0" />
+               <RiInformationFill className="text-brand-teal w-4 h-4 flex-shrink-0" />
                <p className="text-[10px] text-center font-medium leading-relaxed">Changes to registered data may take up to 24 hours to sync with service nodes.</p>
             </div>
          </div>

@@ -144,6 +144,54 @@
   border-right: 1px solid var(--color-border);
 }
 
+@utility badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 0px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+}
+
+@utility badge-success {
+  @apply badge;
+  background-color: color-mix(in srgb, var(--color-state-success) 12%, transparent);
+  color: var(--color-state-success);
+  border: 1px solid color-mix(in srgb, var(--color-state-success) 20%, transparent);
+}
+
+@utility badge-warning {
+  @apply badge;
+  background-color: color-mix(in srgb, var(--color-state-warning) 12%, transparent);
+  color: var(--color-state-warning);
+  border: 1px solid color-mix(in srgb, var(--color-state-warning) 20%, transparent);
+}
+
+@utility badge-danger {
+  @apply badge;
+  background-color: color-mix(in srgb, var(--color-state-danger) 12%, transparent);
+  color: var(--color-state-danger);
+  border: 1px solid color-mix(in srgb, var(--color-state-danger) 20%, transparent);
+}
+
+@utility badge-info {
+  @apply badge;
+  background-color: color-mix(in srgb, var(--color-state-info) 12%, transparent);
+  color: var(--color-state-info);
+  border: 1px solid color-mix(in srgb, var(--color-state-info) 20%, transparent);
+}
+
+@utility badge-teal {
+  @apply badge;
+  background-color: color-mix(in srgb, var(--color-brand-teal) 12%, transparent);
+  color: var(--color-brand-teal);
+  border: 1px solid color-mix(in srgb, var(--color-brand-teal) 20%, transparent);
+}
+
 @utility btn-primary {
   background: linear-gradient(135deg, var(--color-brand-teal), var(--color-brand-teal-dark));
   color: white;
@@ -174,17 +222,32 @@
   background-color: var(--color-surface-input);
   border: 1px solid var(--color-border);
   color: var(--color-content-primary);
-  border-radius: 0;
-  padding: 0.5rem 0.75rem;
+  border-radius: 2px;
+  padding: 0.75rem 1rem;
   font-size: 0.875rem;
-  transition: all 0.2s ease;
-  &::placeholder { color: var(--color-content-tertiary); }
+  font-weight: 500;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+  
+  &::placeholder { 
+    color: var(--color-content-tertiary); 
+    font-weight: 400; 
+  }
+  
   &:focus {
     outline: none;
+    background-color: var(--color-surface-card);
     border-color: var(--color-brand-teal);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand-teal) 15%, transparent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-brand-teal) 10%, transparent);
+    transform: translateY(-1px);
+  }
+  
+  &:hover:not(:focus) {
+    border-color: var(--color-border-light);
+    background-color: color-mix(in srgb, var(--color-surface-input) 95%, black);
   }
 }
+
 
 @utility nav-item {
   display: flex;
@@ -224,12 +287,71 @@
   100% { opacity: 1; }
 }
 
-@layer utilities {
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
+@utility bottom-nav {
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  z-index: 40;
+  height: calc(3.5rem + env(safe-area-inset-bottom, 0px));
+  background-attachment: fixed;
+  background-color: color-mix(in srgb, var(--color-surface-card) 85%, transparent);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--color-border);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
+
+@utility bottom-nav-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.125rem;
+  height: 3.5rem;
+  color: var(--color-content-tertiary);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+  
+  &:hover { color: var(--color-content-secondary); }
+}
+
+@utility bottom-nav-item-active {
+  color: var(--color-brand-teal);
+  
+  & svg {
+    transform: translateY(-2px);
+    filter: drop-shadow(0 0 8px color-mix(in srgb, var(--color-brand-teal) 30%, transparent));
+  }
+  
+  & span { font-weight: 700; color: var(--color-brand-teal); }
+}
+
+@keyframes pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.animate-pop {
+  animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes slide-up {
+  0% { transform: translateY(20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s cubic-bezier(0, 0, 0.2, 1);
+}
+
+@keyframes fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+

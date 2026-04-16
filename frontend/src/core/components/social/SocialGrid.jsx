@@ -1,4 +1,4 @@
-import { RiEyeLine, RiPlayFill } from 'react-icons/ri';
+import { RiEyeFill, RiPlayFill } from 'react-icons/ri';
 
 function formatViews(n) {
   const num = Number(n || 0);
@@ -46,7 +46,7 @@ export default function SocialGrid({ items = [], columns = 3, onSelect }) {
           <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
           
           <div className="absolute bottom-2 left-2 flex items-center gap-1.5 text-white/95">
-            <RiEyeLine className="w-4 h-4 shadow-sm" />
+            <RiEyeFill className="w-4 h-4 shadow-sm" />
             <span className="text-[12px] font-bold tracking-tight drop-shadow-md">{formatViews(item.views)}</span>
           </div>
 

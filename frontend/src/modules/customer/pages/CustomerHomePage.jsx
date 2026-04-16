@@ -1,5 +1,11 @@
 import { useNavigate } from 'react-router-dom';
-import { RiPriceTag3Line, RiTrophyLine, RiAddCircleLine, RiShoppingBasketLine, RiCustomerServiceLine, RiArrowRightSLine, RiShieldStarLine } from 'react-icons/ri';
+import { useState, useEffect, useRef } from 'react';
+import {
+   RiPriceTag3Line, RiTrophyLine, RiAddCircleLine, RiShoppingBasketLine,
+   RiCustomerServiceLine, RiArrowRightSLine, RiShieldStarLine,
+   RiMapPin2Line, RiNotification3Line, RiSearchLine, RiArrowDownSLine,
+   RiShieldCheckFill, RiHandCoinFill, RiMagicFill, RiMicLine, RiInboxFill
+} from 'react-icons/ri';
 import Badge from '../../../core/components/ui/Badge';
 import Button from '../../../core/components/ui/Button';
 import Avatar from '../../../core/components/ui/Avatar';
@@ -10,61 +16,164 @@ import customerData from '../../../data/customer.json';
 export default function CustomerHomePage() {
    const navigate = useNavigate();
    const { profile, banners, products } = customerData;
+   const scrollRef = useRef(null);
+   const [currentIndex, setCurrentIndex] = useState(0);
+
+   useEffect(() => {
+      const interval = setInterval(() => {
+         if (scrollRef.current) {
+            const nextIndex = (currentIndex + 1) % banners.length;
+            const scrollAmount = scrollRef.current.offsetWidth * nextIndex;
+            scrollRef.current.scrollTo({
+               left: scrollAmount,
+               behavior: 'smooth'
+            });
+            setCurrentIndex(nextIndex);
+         }
+      }, 4000);
+      return () => clearInterval(interval);
+   }, [currentIndex, banners.length]);
 
    return (
       <div className="page-container flex flex-col gap-6 max-w-lg mx-auto">
-         {/* Profile Header */}
-         <div className="flex items-center justify-between p-4 glass-card bg-gradient-to-r from-brand-teal to-brand-purple text-white border-0 shadow-glow animate-slide-up">
-            <div className="flex items-center gap-4">
-               <Avatar name={profile.name} size="md" className="border-2 border-white/50" />
-               <div>
-                  <h3 className="text-lg font-black leading-none">{profile.name}</h3>
-                  <div className="flex items-center gap-1.5 mt-1.5">
-                     <RiShieldStarLine className="text-yellow-400 w-3.5 h-3.5" />
-                     <span className="text-[10px] font-black uppercase tracking-widest">{profile.loyalty}</span>
+         {/* Top Section - Boutique Header (Full Screen Start) - Darker Teal Theme */}
+         <div className="-mx-6 -mt-6 px-6 pt-5 pb-2 bg-gradient-to-b from-brand-teal/18 via-brand-teal/5 to-white flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+               {/* Greeting & Logo Group - Optimized Alignment */}
+               <div className="flex items-center gap-3.5 flex-1 pr-2">
+                  <div className="w-12 h-12 flex-shrink-0">
+                     <img src="/remove bg logo .png" alt="Ogun Logo" className="w-full h-full object-contain" />
+                  </div>
+                  <div className="flex flex-col">
+                     <p className="text-[7.5px] text-brand-teal font-black uppercase tracking-[0.4em] leading-none mb-1.5 opacity-70">Good Morning,</p>
+                     <h3 className="text-[15px] font-black text-gray-800 tracking-tight leading-none">{profile.name.split(' ')[0]}</h3>
+                  </div>
+               </div>
+
+               {/* Right Side - Identity / Stats Group */}
+               <div className="flex items-center gap-3">
+                  <div className="flex flex-col items-end pr-3 border-r border-gray-100 h-8 justify-center">
+                     <div className="flex items-center gap-1 mb-1">
+                        <RiShieldStarLine className="text-yellow-500 w-3 h-3" />
+                        <span className="text-[8px] font-black text-gray-400 uppercase tracking-[0.15em] leading-none">{profile.loyalty}</span>
+                     </div>
+                     <div className="flex items-baseline gap-0.5 mt-0.5">
+                        <span className="text-lg font-black text-gray-800 leading-none">{profile.points}</span>
+                        <span className="text-[7px] text-gray-300 font-bold uppercase tracking-wider">pts</span>
+                     </div>
+                  </div>
+
+                  <div className="relative cursor-pointer hover:scale-110 active:scale-95 transition-all p-1 group">
+                     <RiNotification3Line className="text-gray-300 w-6 h-6 group-hover:text-brand-pink transition-colors" />
+                     <span className="absolute top-0.5 right-0.5 w-2 h-2 bg-brand-pink rounded-full border-2 border-white"></span>
                   </div>
                </div>
             </div>
-            <div className="text-right">
-               <p className="text-[9px] font-black uppercase tracking-widest opacity-70">Ogun Points</p>
-               <h4 className="text-xl font-black">{profile.points}</h4>
+
+            {/* Smart Search Bar - Ultra Enhanced Boutique Style - Pink Focus */}
+            <div className="relative group mx-0.5">
+               <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-brand-pink group-focus-within:scale-110 transition-all duration-500">
+                  <RiSearchLine className="w-4.5 h-4.5" />
+               </div>
+               <input
+                  type="text"
+                  placeholder="What can we help you find today?"
+                  className="w-full h-11 pl-12 pr-12 bg-white border border-gray-100/40 rounded-full shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03)] outline-none focus:border-brand-pink/30 focus:shadow-[0_10px_30px_-5px_rgba(238,38,111,0.08)] transition-all text-[11px] font-bold text-gray-700 placeholder:text-gray-300 placeholder:font-normal"
+               />
+               <div className="absolute right-5 top-1/2 -translate-y-1/2 flex items-center gap-2 text-gray-300">
+                  <div className="w-px h-4 bg-gray-100"></div>
+                  <RiMicLine className="w-4.5 h-4.5 cursor-pointer hover:text-brand-pink transition-colors" />
+               </div>
             </div>
          </div>
 
-         {/* Hero Banners / Promotions */}
-         <div className="flex gap-4 overflow-x-auto scrollbar-hide snap-x p-1 -mx-1">
-            {banners.map(b => (
-               <div key={b.id} className={`snap-center min-w-[280px] p-6 rounded-none relative overflow-hidden bg-gradient-to-br ${b.color === 'teal' ? 'from-brand-teal/20 to-brand-teal/10 border-brand-teal/20' : 'from-brand-pink/20 to-brand-pink/10 border-brand-pink/20'} border`}>
-                  <h4 className="text-lg font-black text-content-primary leading-tight">{b.title}</h4>
-                  <p className="text-xs text-content-secondary mt-1 max-w-[180px]">{b.subtitle}</p>
-                  <Button size="sm" className="mt-4" variant={b.color === 'teal' ? 'teal' : 'danger'}>Check Offer</Button>
-                  <div className="absolute -bottom-2 -right-2 opacity-10">
-                     <RiPriceTag3Line className="w-24 h-24" />
+         {/* Hero Banners / Promotions - Full Width Breakout (Moved Up) */}
+         <div className="-mx-6 -mt-3 relative">
+            <div
+               ref={scrollRef}
+               className="flex overflow-x-auto scrollbar-hide snap-x"
+               style={{ scrollSnapType: 'x mandatory' }}
+            >
+               {banners.map(b => (
+                  <div
+                     key={b.id}
+                     className="snap-center min-w-full aspect-[21/9] sm:aspect-[3/1] relative overflow-hidden group border-y border-border"
+                  >
+                     {/* Banner Image Background */}
+                     <img src={b.image} alt={b.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+
+                     {/* Gradient Overlay for Text Legibility */}
+                     <div className={`absolute inset-0 bg-gradient-to-r ${b.color === 'teal' ? 'from-brand-teal/80 via-brand-teal/40 to-transparent' : 'from-brand-pink/80 via-brand-pink/40 to-transparent'}`}></div>
+
+                     {/* Content - Adjusted for wider layout */}
+                     <div className="relative z-10 h-full px-8 flex flex-col justify-center">
+                        <div className="max-w-xs">
+                           <h4 className="text-2xl font-black text-white leading-tight drop-shadow-md">{b.title}</h4>
+                           <p className="text-[11px] text-white/95 mt-1.5 font-medium drop-shadow-sm uppercase tracking-wider">{b.subtitle}</p>
+                           <div className="mt-5">
+                              <Button size="sm" variant="white" className="shadow-lg !rounded-full px-6">Explore Offer</Button>
+                           </div>
+                        </div>
+                     </div>
+
+                     <div className="absolute -bottom-4 -right-4 opacity-10 text-white">
+                        <RiPriceTag3Line className="w-32 h-32" />
+                     </div>
                   </div>
-               </div>
-            ))}
+               ))}
+            </div>
+
+            {/* Scroll Indication Dots */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-20">
+               {banners.map((_, i) => (
+                  <div
+                     key={i}
+                     className={`h-1 rounded-full transition-all duration-300 ${i === currentIndex ? 'w-6 bg-white' : 'w-2 bg-white/40'}`}
+                  />
+               ))}
+            </div>
          </div>
 
-         {/* Main Quick Actions Grid */}
-         <div className="grid grid-cols-2 gap-4">
-            <button
-               onClick={() => navigate('/customer/products/register')}
-               className="glass-card p-5 flex flex-col items-center justify-center text-center group active:scale-95 transition-all outline-none"
-            >
-               <div className="w-12 h-12 rounded-none bg-brand-teal/10 flex items-center justify-center text-brand-teal mb-3 group-hover:shadow-glow transition-all">
-                  <RiAddCircleLine className="w-6 h-6" />
-               </div>
-               <p className="text-xs font-black text-content-primary">Warranty<br />Registration</p>
-            </button>
-            <button
-               onClick={() => navigate('/customer/service/raise')}
-               className="glass-card p-5 flex flex-col items-center justify-center text-center group active:scale-95 transition-all outline-none border-brand-pink/30 bg-brand-pink/5"
-            >
-               <div className="w-12 h-12 rounded-none bg-brand-pink/10 flex items-center justify-center text-brand-pink mb-3 group-hover:shadow-glow transition-all">
-                  <RiCustomerServiceLine className="w-6 h-6" />
-               </div>
-               <p className="text-xs font-black text-content-primary">Raise<br />Complaint</p>
-            </button>
+         {/* Services / Compact Quick Actions Grid */}
+         <div>
+            <div className="flex items-center justify-between px-1 mb-3">
+               <h4 className="text-[13px] font-black text-gray-800 uppercase tracking-wider">Services</h4>
+               <button onClick={() => navigate('/customer/service')} className="text-[10px] font-bold text-gray-400 hover:text-brand-pink transition-colors">
+                  View all
+               </button>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2.5">
+               <button
+                  onClick={() => navigate('/customer/products/register')}
+                  className="bg-white py-3 px-2 flex flex-col items-center justify-center gap-2 rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-md active:scale-95 group/btn"
+               >
+                  <div className="text-brand-teal group-hover/btn:scale-110 transition-transform duration-300">
+                     <RiShieldCheckFill className="w-9 h-9" />
+                  </div>
+                  <p className="text-[9px] font-black text-gray-700 leading-tight">Register</p>
+               </button>
+
+               <button
+                  onClick={() => navigate('/customer/service/raise')}
+                  className="bg-white py-3 px-2 flex flex-col items-center justify-center gap-2 rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-md active:scale-95 group/btn"
+               >
+                  <div className="text-brand-pink group-hover/btn:scale-110 transition-transform duration-300">
+                     <RiHandCoinFill className="w-9 h-9" />
+                  </div>
+                  <p className="text-[9px] font-black text-gray-700 leading-tight">Service</p>
+               </button>
+
+               <button
+                  onClick={() => navigate('/customer/service')}
+                  className="bg-white py-3 px-2 flex flex-col items-center justify-center gap-2 rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-md active:scale-95 group/btn"
+               >
+                  <div className="text-brand-purple group-hover/btn:scale-110 transition-transform duration-300">
+                     <RiMagicFill className="w-9 h-9" />
+                  </div>
+                  <p className="text-[9px] font-black text-gray-700 leading-tight">Expert</p>
+               </button>
+            </div>
          </div>
 
          {/* Registered Products List */}
@@ -78,22 +187,35 @@ export default function CustomerHomePage() {
                   View All ({profile.registeredProducts})
                </button>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-2.5">
                {products.map(prod => (
                   <div
                      key={prod.id}
                      onClick={() => navigate(`/customer/products/${prod.id}`)}
-                     className="p-4 rounded-none bg-white border border-border flex items-center gap-4 group active:bg-white/80 transition-all cursor-pointer"
+                     className="py-2 px-3 rounded-xl bg-white border border-gray-50 flex items-center gap-4 group hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] active:scale-[0.98] transition-all cursor-pointer"
                   >
-                     <div className="w-12 h-12 rounded-none bg-white flex items-center justify-center text-brand-teal group-hover:bg-brand-teal/10 transition-colors">
-                        <RiShoppingBasketLine className="w-6 h-6" />
+                     <div className="w-12 h-12 rounded-lg bg-gray-50 flex items-center justify-center overflow-hidden border border-gray-100 group-hover:border-brand-teal/30 transition-all flex-shrink-0">
+                        {prod.image ? (
+                           <img src={prod.image} alt={prod.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                        ) : (
+                           <RiInboxFill className="w-6 h-6 text-brand-teal/30" />
+                        )}
                      </div>
-                     <div className="flex-1">
-                        <h4 className="text-sm font-bold text-content-primary leading-none mb-1">{prod.name}</h4>
-                        <p className="text-[10px] text-content-tertiary">Warranty Exp: {prod.warrantyExp}</p>
+                     <div className="flex-1 min-w-0">
+                        <h4 className="text-[13px] font-black text-gray-800 leading-tight mb-1 truncate">{prod.name}</h4>
+                        <div className="flex items-center gap-2">
+                           <span className="text-[8px] font-black text-brand-teal uppercase tracking-widest bg-teal-50/50 px-1.5 py-0.5 border border-brand-teal/10">
+                              EXP: {prod.warrantyExp}
+                           </span>
+                        </div>
                      </div>
-                     <Badge variant="teal" size="xs">Active</Badge>
-                     <RiArrowRightSLine className="text-content-tertiary w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                     
+                     <div className="flex items-center gap-1.5 bg-green-50/50 px-2 py-1 rounded-md border border-green-100/50">
+                        <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
+                        <span className="text-[8px] font-black text-green-600 uppercase tracking-widest">Active</span>
+                     </div>
+                     
+                     <RiArrowRightSLine className="text-gray-300 w-5 h-5 group-hover:text-brand-pink group-hover:translate-x-1 transition-all" />
                   </div>
                ))}
             </div>

@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { RiPriceTag3Line, RiShieldLine, RiSmartphoneLine, RiHistoryLine, RiInformationLine, RiPulseLine, RiArrowLeftSLine, RiShoppingBasketLine, RiVerifiedBadgeLine, RiCustomerServiceLine } from 'react-icons/ri';
+import { RiPriceTag3Fill, RiShieldFill, RiSmartphoneFill, RiHistoryFill, RiInformationFill, RiPulseFill, RiArrowLeftSLine, RiShoppingBasketFill, RiVerifiedBadgeFill, RiCustomerService2Fill } from 'react-icons/ri';
+import { toast } from 'react-hot-toast';
 import { Badge, Button, Avatar, Card, CardHeader, CardTitle, CardDescription, PageHeader } from '../../../core';
 import customerData from '../../../data/customer.json';
 
@@ -9,46 +10,51 @@ export default function ProductDetailPage() {
    const prod = customerData.products.find(p => p.id === id) || customerData.products[0];
 
    return (
-      <div className="page-container flex flex-col gap-6 max-w-lg mx-auto">
+      <div className="page-container flex flex-col gap-5 max-w-lg mx-auto">
          <div
             onClick={() => navigate('/customer/products')}
-            className="flex items-center gap-4 py-2 opacity-50 group cursor-pointer hover:opacity-100 transition-all active:scale-95 outline-none"
+            className="flex items-center gap-3 py-2 opacity-50 group cursor-pointer hover:opacity-100 transition-all active:scale-95 outline-none"
          >
-            <RiArrowLeftSLine className="w-6 h-6 text-content-primary group-hover:-translate-x-1 transition-transform" />
-            <span className="text-[10px] font-black uppercase tracking-widest leading-none">Back to My Appliances</span>
+            <RiArrowLeftSLine className="w-5 h-5 text-gray-800 group-hover:-translate-x-1 transition-transform" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] leading-none">Back to My Appliances</span>
          </div>
 
-         <div className="glass-card p-6 border-0 shadow-glow bg-gradient-to-br from-brand-teal to-brand-purple flex flex-col items-center justify-center text-center text-white text-center gap-4">
-            <div className="w-24 h-24 rounded-none bg-white/10 flex items-center justify-center border-4 border-white/20">
-               <RiShoppingBasketLine className="w-12 h-12" />
+         <div className="rounded-[32px] p-8 border-0 shadow-lg bg-gradient-to-br from-brand-teal to-brand-purple flex flex-col items-center justify-center text-center text-white gap-5 relative overflow-hidden">
+            <div className="absolute inset-0 bg-white/5 backdrop-blur-3xl"></div>
+            <div className="w-28 h-28 rounded-2xl bg-white p-1 flex items-center justify-center border-4 border-white/20 overflow-hidden shadow-2xl relative z-10">
+                 {prod.image ? (
+                    <img src={prod.image} alt={prod.name} className="w-full h-full object-cover rounded-xl" />
+                 ) : (
+                    <RiShoppingBasketFill className="w-12 h-12 text-brand-teal" />
+                 )}
             </div>
-            <div className="flex flex-col items-center">
-               <h3 className="text-xl font-black">{prod.name}</h3>
-               <div className="flex items-center gap-2 mt-2">
-                  <RiVerifiedBadgeLine className="text-yellow-400 w-4 h-4" />
-                  <p className="text-[10px] font-black uppercase tracking-widest">{prod.status}</p>
+            <div className="flex flex-col items-center relative z-10">
+               <h3 className="text-2xl font-black tracking-tight leading-none">{prod.name}</h3>
+               <div className="flex items-center gap-2 mt-3 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full border border-white/30">
+                  <RiVerifiedBadgeFill className="text-yellow-400 w-4 h-4" />
+                  <p className="text-[9px] font-black uppercase tracking-widest">{prod.status}</p>
                </div>
             </div>
          </div>
 
-         <Card>
-            <CardHeader>
+         <Card className="rounded-[28px] overflow-hidden">
+            <CardHeader className="pb-2">
                <CardTitle>Warranty Profile</CardTitle>
                <CardDescription>Official coverage details and expiration timeline</CardDescription>
             </CardHeader>
-            <div className="p-6 space-y-4">
+            <div className="p-6 space-y-5">
                {[
-                  { icon: RiShieldLine, label: 'Coverage Active', val: 'Full Parts + Labor' },
-                  { icon: RiHistoryLine, label: 'Expiry Date', val: prod.warrantyExp },
-                  { icon: RiSmartphoneLine, label: 'Policy Serial', val: prod.id }
+                  { icon: RiShieldFill, label: 'Coverage Active', val: 'Full Parts + Labor', color: 'text-brand-teal' },
+                  { icon: RiHistoryFill, label: 'Expiry Date', val: prod.warrantyExp, color: 'text-brand-teal' },
+                  { icon: RiSmartphoneFill, label: 'Policy Serial', val: prod.id, color: 'text-brand-teal' }
                ].map(item => (
-                  <div key={item.label} className="flex items-center gap-4">
-                     <div className="w-10 h-10 rounded-none bg-white flex items-center justify-center text-brand-teal">
+                  <div key={item.label} className="flex items-center gap-4 group">
+                     <div className={`w-11 h-11 rounded-xl bg-gray-50 flex items-center justify-center ${item.color} border border-gray-100 group-hover:bg-white group-hover:shadow-md transition-all`}>
                         <item.icon className="w-5 h-5" />
                      </div>
                      <div>
-                        <p className="text-[9px] text-content-tertiary font-black uppercase tracking-widest mb-1">{item.label}</p>
-                        <h4 className="text-sm font-bold text-content-primary leading-none">{item.val}</h4>
+                        <p className="text-[9px] text-gray-400 font-extrabold uppercase tracking-widest mb-1">{item.label}</p>
+                        <h4 className="text-[13px] font-black text-gray-800 leading-none">{item.val}</h4>
                      </div>
                   </div>
                ))}
@@ -58,37 +64,37 @@ export default function ProductDetailPage() {
          <div className="grid grid-cols-2 gap-4">
             <button
                onClick={() => navigate('/customer/service/raise')}
-               className="glass-card p-6 flex flex-col items-center gap-3 border-brand-teal/20 group hover:border-brand-teal transition-all outline-none"
+               className="bg-white p-6 flex flex-col items-center gap-3 border border-gray-100 rounded-3xl group hover:border-brand-teal/30 hover:shadow-lg transition-all active:scale-95 outline-none"
             >
-               <div className="w-12 h-12 rounded-none bg-brand-teal/10 flex items-center justify-center text-brand-teal group-hover:shadow-glow transition-all">
-                  <RiCustomerServiceLine className="w-6 h-6" />
+               <div className="w-14 h-14 rounded-2xl bg-brand-teal/5 flex items-center justify-center text-brand-teal border border-brand-teal/10 group-hover:animate-pop">
+                  <RiCustomerService2Fill className="w-7 h-7" />
                </div>
-               <p className="text-xs font-black text-content-primary leading-tight">Request Service</p>
+               <p className="text-[11px] font-black text-gray-800 uppercase tracking-wider">Request Service</p>
             </button>
             <button
                onClick={() => toast.success('AMC Upgrade inquiry sent. Our representative will call you.')}
-               className="glass-card p-6 flex flex-col items-center gap-3 border-brand-pink/20 group hover:border-brand-pink transition-all outline-none"
+               className="bg-white p-6 flex flex-col items-center gap-3 border border-gray-100 rounded-3xl group hover:border-brand-pink/30 hover:shadow-lg transition-all active:scale-95 outline-none"
             >
-               <div className="w-12 h-12 rounded-none bg-brand-pink/10 flex items-center justify-center text-brand-pink group-hover:shadow-glow transition-all">
-                  <RiPulseLine className="w-6 h-6" />
+               <div className="w-14 h-14 rounded-2xl bg-brand-pink/5 flex items-center justify-center text-brand-pink border border-brand-pink/10 group-hover:animate-pop">
+                  <RiPulseFill className="w-7 h-7" />
                </div>
-               <p className="text-xs font-black text-content-primary leading-tight">AMC Upgrade</p>
+               <p className="text-[11px] font-black text-gray-800 uppercase tracking-wider">AMC Upgrade</p>
             </button>
          </div>
 
-         <div className="space-y-4">
-            <Button variant="secondary" className="w-full h-12 justify-start px-6 gap-4" icon={RiInformationLine} onClick={() => toast.success('Downloading Official User Manual...')}>
-               Download Digital Manual (PDF)
+         <div className="space-y-3">
+            <Button variant="secondary" className="w-full h-12 justify-start px-6 gap-4 rounded-2xl" icon={RiInformationFill} onClick={() => toast.success('Downloading Official User Manual...')}>
+               Download Digital Manual
             </Button>
-            <Button variant="secondary" className="w-full h-12 justify-start px-6 gap-4" icon={RiShieldLine} onClick={() => toast.success('Fetching Warranty Certificate...')}>
-               Policy Certificate & Terms
+            <Button variant="secondary" className="w-full h-12 justify-start px-6 gap-4 rounded-2xl" icon={RiShieldFill} onClick={() => toast.success('Fetching Warranty Certificate...')}>
+               Warranty Certificate
             </Button>
          </div>
 
-         <div className="pb-8 space-y-4 pt-4">
-            <div className="flex items-center justify-center gap-3 p-4 rounded-none bg-white border border-border opacity-60 italic">
-               <RiInformationLine className="text-brand-teal w-4 h-4 flex-shrink-0" />
-               <p className="text-[10px] text-center font-medium leading-relaxed">Genuine Ogun components are used in all certified repairs for this model.</p>
+         <div className="pb-8 pt-4">
+            <div className="flex items-center justify-center gap-3 p-4 rounded-2xl bg-gray-50/50 border border-dashed border-gray-200 opacity-60">
+               <RiInformationFill className="text-brand-teal w-4 h-4 flex-shrink-0" />
+               <p className="text-[10px] text-center font-bold text-gray-400 leading-relaxed uppercase tracking-wider">Genuine Ogun components are used in all certified repairs</p>
             </div>
          </div>
       </div>

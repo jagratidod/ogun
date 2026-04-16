@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  RiUserLine, RiMailLine, RiShieldFlashLine,
-  RiArrowRightLine, RiArrowLeftLine, RiCheckLine
+  RiUserFill, RiMailFill, RiShieldFlashFill,
+  RiArrowRightFill, RiArrowLeftFill, RiCheckFill
 } from 'react-icons/ri';
 import { useAuthContext } from '../../../core/context/AuthContext';
 import toast from 'react-hot-toast';
@@ -22,7 +22,7 @@ const CustomerLoginPage = () => {
       id: 'name',
       label: 'Full Name',
       placeholder: 'Enter your full name',
-      icon: RiUserLine,
+      icon: RiUserFill,
       type: 'text',
       field: 'name'
     },
@@ -30,7 +30,7 @@ const CustomerLoginPage = () => {
       id: 'email',
       label: 'Email Address',
       placeholder: 'Enter your email',
-      icon: RiMailLine,
+      icon: RiMailFill,
       type: 'email',
       field: 'email'
     },
@@ -38,7 +38,7 @@ const CustomerLoginPage = () => {
       id: 'otp',
       label: 'Verification Code',
       placeholder: 'Enter 6-digit OTP',
-      icon: RiShieldFlashLine,
+      icon: RiShieldFlashFill,
       type: 'number',
       field: 'otp'
     }
@@ -75,10 +75,10 @@ const CustomerLoginPage = () => {
             onClick={() => navigate('/')}
             className="w-9 h-9 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/20 active:scale-90 transition-all"
           >
-            <RiArrowLeftLine className="w-5 h-5" />
+            <RiArrowLeftFill className="w-5 h-5" />
           </button>
           <div className="w-9 h-9 flex items-center justify-center opacity-0 pointer-events-none">
-            <RiUserLine className="w-5 h-5" />
+            <RiUserFill className="w-5 h-5" />
           </div>
         </div>
 
@@ -153,7 +153,7 @@ const CustomerLoginPage = () => {
                     onClick={() => setStep(step - 1)}
                     className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-300 hover:text-[#3FAFB0] transition-colors"
                   >
-                    <RiArrowLeftLine className="w-5 h-5" />
+                    <RiArrowLeftFill className="w-5 h-5" />
                   </button>
                 )}
               </div>
@@ -167,7 +167,7 @@ const CustomerLoginPage = () => {
                 >
                 <span className="relative z-10 flex items-center gap-2">
                     {step === 2 ? 'ENTER' : 'CONTINUE'}
-                    {step < 2 && <RiArrowRightLine className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+                    {step < 2 && <RiArrowRightFill className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
                 </span>
                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
                 </button>
@@ -179,6 +179,21 @@ const CustomerLoginPage = () => {
               </p>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Bottom Wave Section - Mirroring Header Style */}
+      <div className="relative h-[15vh] min-h-[100px] w-full bg-gradient-to-r from-[#5AC2B1] via-[#3FAFB0] to-[#2D8F9C] overflow-hidden mt-auto">
+        {/* Wave at the top of footer */}
+        <div className="absolute top-0 left-0 w-full overflow-hidden leading-none">
+          <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="relative block w-[calc(130%+1.3px)] h-[35px] fill-white">
+            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"></path>
+          </svg>
+        </div>
+        
+        {/* Centered Logo in Footer (Subtle) */}
+        <div className="h-full flex items-center justify-center opacity-10 pb-4">
+             <img src="/remove bg logo .png" alt="Ogun Logo" className="h-12 w-12 object-contain grayscale brightness-200" />
         </div>
       </div>
 

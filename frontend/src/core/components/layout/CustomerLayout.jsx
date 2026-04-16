@@ -1,7 +1,7 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { 
-  RiNotification3Line, RiArrowLeftLine, RiHome4Line, 
-  RiSmartphoneLine, RiCustomerServiceLine, RiUserLine, RiInstagramLine 
+  RiNotification3Fill, RiArrowLeftSLine, RiHome4Fill, 
+  RiStackFill, RiCustomerService2Fill, RiUserFill, RiCompass3Fill 
 } from 'react-icons/ri';
 import BottomNav from './BottomNav';
 import { SidebarProvider } from '../../context/SidebarContext';
@@ -10,12 +10,13 @@ import { useNotificationContext } from '../../context/NotificationContext';
 import { APP_NAME } from '../../utils/constants';
 
 const bottomNavItems = [
-  { label: 'Home', icon: RiHome4Line, path: '/customer', exact: true },
-  { label: 'Explore', icon: RiInstagramLine, path: '/customer/social' },
-  { label: 'Products', icon: RiSmartphoneLine, path: '/customer/products' },
-  { label: 'Service', icon: RiCustomerServiceLine, path: '/customer/service' },
-  { label: 'Profile', icon: RiUserLine, path: '/customer/settings' },
+  { label: 'Home', icon: RiHome4Fill, path: '/customer', exact: true },
+  { label: 'Explore', icon: RiCompass3Fill, path: '/customer/social' },
+  { label: 'Products', icon: RiStackFill, path: '/customer/products' },
+  { label: 'Service', icon: RiCustomerService2Fill, path: '/customer/service' },
+  { label: 'Profile', icon: RiUserFill, path: '/customer/settings' },
 ];
+
 
 export default function CustomerLayout() {
   const { user } = useAuthContext();
@@ -28,32 +29,34 @@ export default function CustomerLayout() {
   return (
     <SidebarProvider>
       <div className="flex flex-col h-screen overflow-hidden bg-white">
-        {/* Simple header */}
-        <header className="sticky top-0 z-30 h-14 bg-white/80 backdrop-blur-xl border-b border-border flex items-center justify-between px-4">
-          <div className="flex items-center gap-2">
-            <button 
-              onClick={() => navigate(-1)} 
-              className="p-1.5 -ml-1 text-content-secondary hover:bg-surface-hover transition-colors"
-              title="Go Back"
-            >
-              <RiArrowLeftLine className="w-5 h-5" />
-            </button>
-            <div className="w-7 h-7 rounded-none bg-gradient-brand flex items-center justify-center">
-              <span className="text-white font-bold text-xs">O</span>
+        {/* Simple header - Hidden on Home Page for custom boutique header */}
+        {!isBasePage && (
+          <header className="sticky top-0 z-30 h-14 bg-white/80 backdrop-blur-xl border-b border-border flex items-center justify-between px-4">
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => navigate(-1)} 
+                className="p-1.5 -ml-1 text-content-secondary hover:bg-surface-hover transition-colors"
+                title="Go Back"
+              >
+                <RiArrowLeftSLine className="w-5 h-5" />
+              </button>
+              <div className="w-7 h-7 rounded-none bg-gradient-brand flex items-center justify-center">
+                <span className="text-white font-bold text-xs">O</span>
+              </div>
+              <span className="text-sm font-semibold text-content-primary tracking-tight font-black uppercase tracking-widest">{APP_NAME}</span>
             </div>
-            <span className="text-sm font-semibold text-content-primary">{APP_NAME}</span>
-          </div>
-          <button className="relative p-2 rounded-none text-content-secondary hover:bg-surface-hover">
-            <RiNotification3Line className="w-5 h-5" />
-            {unreadCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] bg-brand-pink text-white text-[9px] font-bold rounded-none flex items-center justify-center">
-                {unreadCount}
-              </span>
-            )}
-          </button>
-        </header>
+            <button className="relative p-2 rounded-none text-content-secondary hover:bg-surface-hover">
+              <RiNotification3Fill className="w-5 h-5" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] bg-brand-pink text-white text-[9px] font-bold rounded-none flex items-center justify-center">
+                  {unreadCount}
+                </span>
+              )}
+            </button>
+          </header>
+        )}
 
-        <main className="flex-1 overflow-y-auto pb-20">
+        <main className="flex-1 overflow-y-auto pb-24">
           <Outlet />
         </main>
         <BottomNav items={bottomNavItems} />
