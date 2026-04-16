@@ -14,30 +14,30 @@ export default function BottomNav({ items }) {
   }, [location.pathname, items]);
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center px-6 pb-6 pointer-events-none">
-      <nav className="relative w-full max-w-sm h-14 bg-brand-teal-dark/95 backdrop-blur-md rounded-2xl shadow-[0_15px_35px_rgba(45,143,156,0.4)] flex items-center pointer-events-auto">
+    <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pointer-events-none">
+      <nav className="relative w-full h-16 bg-brand-teal-dark shadow-[0_-10px_40px_rgba(0,0,0,0.15)] flex items-center pointer-events-auto px-2">
         
-        {/* The Moving Scoop / Active Indicator */}
+        {/* The Moving Active Indicator */}
         <div 
-          className="absolute h-14 w-[20%] transition-all duration-500 ease-[cubic-bezier(0.68,-0.55,0.265,1.55)]"
-          style={{ transform: `translateX(${activeIndex * 100}%)` }}
+          className="absolute h-16 w-[20%] transition-all duration-500 ease-[cubic-bezier(0.68,-0.55,0.265,1.55)]"
+          style={{ transform: `translateX(${(activeIndex * 100)}%)` }}
         >
-          {/* The Scoop Shape (Inverted corners) */}
-          <div className="absolute -top-[22px] left-1/2 -translate-x-1/2 w-[54px] h-[54px] rounded-full bg-surface-primary flex items-center justify-center border-[4px] border-surface-primary shadow-md overflow-visible">
-            {/* The Light Floating Circle */}
-            <div className="w-full h-full rounded-full bg-brand-teal flex items-center justify-center shadow-lg">
+          {/* The Scoop Circle */}
+          <div className="absolute -top-[24px] left-1/2 -translate-x-1/2 w-[60px] h-[60px] rounded-full bg-surface-primary flex items-center justify-center border-[5px] border-surface-primary shadow-lg overflow-visible">
+            {/* The Active Icon Circle */}
+            <div className="w-full h-full rounded-full bg-brand-teal flex items-center justify-center shadow-inner">
                <div className="text-white">
                   {(() => {
                     const ActiveIcon = items[activeIndex]?.icon;
-                    return ActiveIcon ? <ActiveIcon className="w-6 h-6" /> : null;
+                    return ActiveIcon ? <ActiveIcon className="w-7 h-7" /> : null;
                   })()}
                </div>
             </div>
           </div>
 
           {/* Label under the scoop */}
-          <div className="absolute bottom-[4px] left-1/2 -translate-x-1/2">
-             <span className="text-[8px] font-black text-white/90 uppercase tracking-widest whitespace-nowrap animate-fade-in scale-90">
+          <div className="absolute bottom-[8px] left-1/2 -translate-x-1/2">
+             <span className="text-[9px] font-black text-white uppercase tracking-widest whitespace-nowrap animate-fade-in">
                {items[activeIndex]?.label}
              </span>
           </div>
@@ -55,9 +55,9 @@ export default function BottomNav({ items }) {
             >
               <div className={classNames(
                 "transition-all duration-500",
-                isActive ? "opacity-0 -translate-y-4" : "text-white/30 group-hover:text-white/60"
+                isActive ? "opacity-0 -translate-y-4" : "text-white/40 group-hover:text-white"
               )}>
-                <item.icon className="w-5.5 h-5.5" />
+                <item.icon className="w-6 h-6" />
               </div>
             </NavLink>
           );

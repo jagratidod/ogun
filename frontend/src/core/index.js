@@ -14,6 +14,7 @@ export { default as Card, CardHeader, CardTitle, CardDescription } from './compo
 export { default as Badge } from './components/ui/Badge';
 export { default as Input } from './components/ui/Input';
 export { default as Select } from './components/ui/Select';
+export { default as Combobox } from './components/ui/Combobox';
 export { default as SearchBar } from './components/ui/SearchBar';
 export { default as Avatar } from './components/ui/Avatar';
 export { default as DataTable } from './components/ui/DataTable';

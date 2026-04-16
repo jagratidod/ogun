@@ -10,7 +10,6 @@ import { useSocialGrid } from '../../../core/hooks/useSocialGrid';
 export default function CustomerSocialPage() {
   const { items } = useSocialGrid();
   const [selected, setSelected] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
   const [likedPosts, setLikedPosts] = useState(new Set());
 
   const toggleLike = (id) => {
@@ -41,9 +40,7 @@ export default function CustomerSocialPage() {
     }
   };
 
-  const visibleGridItems = items.filter((i) => 
-    i?.enabled && (searchQuery === '' || i.label?.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const visibleGridItems = items.filter((i) => i?.enabled);
 
   if (selected) {
     const isLiked = likedPosts.has(selected.id);
@@ -133,20 +130,6 @@ export default function CustomerSocialPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Search Header - Premium Pill Style */}
-      <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl px-4 py-5 border-b border-gray-50">
-        <div className="relative group max-w-2xl mx-auto">
-          <RiSearch2Fill className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-brand-teal transition-colors" />
-          <input
-            type="text"
-            placeholder="Search Explore Feed..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-14 bg-gray-50/80 rounded-full pl-14 pr-7 text-[14px] font-bold border border-transparent focus:border-brand-teal/20 focus:bg-white focus:shadow-[0_12px_40px_rgba(0,0,0,0.06)] transition-all placeholder:text-gray-300 placeholder:font-normal text-gray-800 outline-none"
-          />
-        </div>
-      </div>
-
       <div className="pb-24">
         {visibleGridItems.length > 0 ? (
           <SocialGrid items={visibleGridItems} columns={3} onSelect={setSelected} />

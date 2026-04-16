@@ -36,53 +36,52 @@ export default function CustomerHomePage() {
 
    return (
       <div className="page-container flex flex-col gap-6 max-w-lg mx-auto">
-         {/* Top Section - Boutique Header (Full Screen Start) - Darker Teal Theme */}
-         <div className="-mx-6 -mt-6 px-6 pt-5 pb-2 bg-gradient-to-b from-brand-teal/18 via-brand-teal/5 to-white flex flex-col gap-4">
+         {/* Top Section - Boutique Header - Ultra Compact Theme */}
+         <div className="-mx-6 -mt-6 px-6 pt-3.5 pb-2.5 bg-gradient-to-b from-brand-teal/40 via-brand-teal/15 to-white flex flex-col gap-2.5 border-b border-gray-50/50">
             <div className="flex items-center justify-between">
-               {/* Greeting & Logo Group - Optimized Alignment */}
-               <div className="flex items-center gap-3.5 flex-1 pr-2">
-                  <div className="w-12 h-12 flex-shrink-0">
+               {/* Greeting & Logo Group - Ultra Compact */}
+               <div className="flex items-center gap-3 flex-1 pr-2">
+                  <div className="w-10 h-10 flex-shrink-0">
                      <img src="/remove bg logo .png" alt="Ogun Logo" className="w-full h-full object-contain" />
                   </div>
                   <div className="flex flex-col">
-                     <p className="text-[7.5px] text-brand-teal font-black uppercase tracking-[0.4em] leading-none mb-1.5 opacity-70">Good Morning,</p>
-                     <h3 className="text-[15px] font-black text-gray-800 tracking-tight leading-none">{profile.name.split(' ')[0]}</h3>
+                     <p className="text-[7px] text-brand-teal font-black uppercase tracking-[0.4em] leading-none mb-1 opacity-70">Good Morning,</p>
+                     <h3 className="text-[13px] font-black text-gray-800 tracking-tight leading-none">{profile.name.split(' ')[0]}</h3>
                   </div>
                </div>
 
-               {/* Right Side - Identity / Stats Group */}
-               <div className="flex items-center gap-3">
-                  <div className="flex flex-col items-end pr-3 border-r border-gray-100 h-8 justify-center">
-                     <div className="flex items-center gap-1 mb-1">
-                        <RiShieldStarLine className="text-yellow-500 w-3 h-3" />
-                        <span className="text-[8px] font-black text-gray-400 uppercase tracking-[0.15em] leading-none">{profile.loyalty}</span>
+               {/* Right Side - Identity / Stats Group - Ultra Compact */}
+               <div className="flex items-center gap-2">
+                  <div className="flex flex-col items-end pr-2 border-r border-gray-100 h-7 justify-center">
+                     <div className="flex items-center gap-1 mb-0.5">
+                        <RiShieldStarLine className="text-yellow-500 w-2.5 h-2.5" />
+                        <span className="text-[7px] font-black text-gray-400 uppercase tracking-[0.15em] leading-none">{profile.loyalty}</span>
                      </div>
-                     <div className="flex items-baseline gap-0.5 mt-0.5">
-                        <span className="text-lg font-black text-gray-800 leading-none">{profile.points}</span>
-                        <span className="text-[7px] text-gray-300 font-bold uppercase tracking-wider">pts</span>
+                     <div className="flex items-baseline gap-0.5">
+                        <span className="text-sm font-black text-gray-800 leading-none">{profile.points}</span>
+                        <span className="text-[6px] text-gray-300 font-bold uppercase tracking-wider">pts</span>
                      </div>
                   </div>
 
-                  <div className="relative cursor-pointer hover:scale-110 active:scale-95 transition-all p-1 group">
-                     <RiNotification3Line className="text-gray-300 w-6 h-6 group-hover:text-brand-pink transition-colors" />
-                     <span className="absolute top-0.5 right-0.5 w-2 h-2 bg-brand-pink rounded-full border-2 border-white"></span>
+                  <div className="relative cursor-pointer hover:scale-110 active:scale-95 transition-all p-1.5 group">
+                     <RiNotification3Line className="text-gray-300 w-5 h-5 group-hover:text-brand-pink transition-colors" />
+                     <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-brand-pink rounded-full border border-white"></span>
                   </div>
                </div>
             </div>
 
-            {/* Smart Search Bar - Ultra Enhanced Boutique Style - Pink Focus */}
+            {/* Smart Search Bar - Ultra Compact */}
             <div className="relative group mx-0.5">
-               <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-brand-pink group-focus-within:scale-110 transition-all duration-500">
-                  <RiSearchLine className="w-4.5 h-4.5" />
+               <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-brand-pink transition-all">
+                  <RiSearchLine className="w-4 h-4" />
                </div>
                <input
                   type="text"
-                  placeholder="What can we help you find today?"
-                  className="w-full h-11 pl-12 pr-12 bg-white border border-gray-100/40 rounded-full shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03)] outline-none focus:border-brand-pink/30 focus:shadow-[0_10px_30px_-5px_rgba(238,38,111,0.08)] transition-all text-[11px] font-bold text-gray-700 placeholder:text-gray-300 placeholder:font-normal"
+                  placeholder="What can we help you find?"
+                  className="w-full h-9 pl-10 pr-10 bg-white border border-gray-100/40 rounded-full shadow-sm outline-none focus:border-brand-pink/30 transition-all text-[10px] font-bold text-gray-700 placeholder:text-gray-300"
                />
-               <div className="absolute right-5 top-1/2 -translate-y-1/2 flex items-center gap-2 text-gray-300">
-                  <div className="w-px h-4 bg-gray-100"></div>
-                  <RiMicLine className="w-4.5 h-4.5 cursor-pointer hover:text-brand-pink transition-colors" />
+               <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-gray-300">
+                  <RiMicLine className="w-4 h-4 cursor-pointer hover:text-brand-pink" />
                </div>
             </div>
          </div>

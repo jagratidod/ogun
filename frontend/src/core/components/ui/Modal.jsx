@@ -10,7 +10,7 @@ const sizes = {
   full: 'max-w-[90vw]',
 };
 
-export default function Modal({ isOpen, onClose, title, children, size = 'md', footer }) {
+export default function Modal({ isOpen, onClose, title, children, size = 'md', footer, variant = 'center' }) {
   const overlayRef = useRef(null);
 
   useEffect(() => {
@@ -31,27 +31,46 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md', f
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
+      className={classNames(
+        "fixed inset-0 z-[100] flex p-0 bg-black/60 backdrop-blur-sm animate-fade-in",
+        variant === 'bottom' ? "items-end" : "items-center justify-center p-4"
+      )}
       onClick={(e) => e.target === overlayRef.current && onClose()}
     >
       <div className={classNames(
-        'w-full bg-surface-card border border-border rounded-none shadow-dropdown animate-scale-in',
+        'w-full bg-surface-card border-x border-t border-border shadow-dropdown overflow-hidden transition-all duration-500',
+        variant === 'bottom' ? "rounded-t-[40px] animate-slide-from-bottom max-w-2xl mx-auto" : "rounded-3xl animate-scale-in",
         sizes[size]
       )}>
+        {/* Drag Handle for Bottom Sheet */}
+        {variant === 'bottom' && (
+          <div className="flex justify-center pt-3 pb-1">
+            <div className="w-12 h-1.5 rounded-full bg-gray-200" />
+          </div>
+        )}
+
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-          <h2 className="text-lg font-semibold text-content-primary">{title}</h2>
-          <button onClick={onClose} className="p-1.5 rounded-none text-content-tertiary hover:bg-surface-hover hover:text-content-primary transition-colors">
-            <RiCloseLine className="w-5 h-5" />
+        <div className={classNames(
+          "flex items-center justify-between px-6 py-5",
+          variant !== 'bottom' && "border-b border-border"
+        )}>
+          <div>
+            <h2 className="text-lg font-black text-gray-800 tracking-tight">{title}</h2>
+          </div>
+          <button onClick={onClose} className="p-2 rounded-full text-gray-400 hover:bg-gray-50 hover:text-gray-800 transition-all active:scale-95">
+            <RiCloseLine className="w-6 h-6" />
           </button>
         </div>
         {/* Body */}
-        <div className="px-6 py-5 max-h-[60vh] overflow-y-auto">
+        <div className={classNames(
+          "px-6 pb-10 overflow-y-auto",
+          variant === 'bottom' ? "max-h-[85vh]" : "max-h-[60vh] py-5"
+        )}>
           {children}
         </div>
         {/* Footer */}
         {footer && (
-          <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border">
+          <div className="flex items-center justify-end gap-3 px-6 py-6 border-t border-border bg-gray-50/30">
             {footer}
           </div>
         )}

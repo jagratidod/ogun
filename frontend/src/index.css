@@ -1,9 +1,12 @@
 @import "tailwindcss";
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@700;800;900&family=Manrope:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
 
 @layer base {
   :root {
+    --font-heading: 'Outfit', sans-serif;
+    --font-secondary: 'Manrope', sans-serif;
+    --font-body: 'Inter', sans-serif;
     --color-brand-teal-light: #5AC2B1;
     --color-brand-teal: #3FAFB0;
     --color-brand-teal-dark: #2D8F9C;
@@ -66,7 +69,7 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   
   html {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -78,9 +81,32 @@
     overflow-x: hidden;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+
+  p, span, label, input, textarea, button {
+    font-family: var(--font-body);
+  }
+
+  /* Subheadings/Captions */
+  .subheading {
+    font-family: var(--font-secondary);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
 }
 
 @theme {
+  --font-heading: var(--font-heading);
+  --font-secondary: var(--font-secondary);
+  --font-body: var(--font-body);
+  --font-sans: var(--font-body);
+
   --color-brand-teal-light: var(--color-brand-teal-light);
   --color-brand-teal: var(--color-brand-teal);
   --color-brand-teal-dark: var(--color-brand-teal-dark);
@@ -108,7 +134,9 @@
   --color-state-danger: var(--color-state-danger);
   --color-state-info: var(--color-state-info);
 
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-heading: var(--font-heading);
+  --font-body: var(--font-body);
+  --font-sans: var(--font-body);
 
   --shadow-glow: var(--shadow-glow);
   --shadow-card: var(--shadow-card);
@@ -219,7 +247,7 @@
 }
 
 @utility input-field {
-  background-color: var(--color-surface-input);
+  background-color: white;
   border: 1px solid var(--color-border);
   color: var(--color-content-primary);
   border-radius: 2px;
@@ -269,10 +297,10 @@
 }
 
 @utility page-container {
-  padding: 1.5rem;
+  padding: 1.25rem 1.25rem 0.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
   animation: fadeIn 0.3s ease-out;
 }
 
@@ -353,5 +381,14 @@
 
 .animate-fade-in {
   animation: fade-in 0.3s ease-out;
+}
+
+@keyframes slide-from-bottom {
+  0% { transform: translateY(100%); }
+  100% { transform: translateY(0); }
+}
+
+.animate-slide-from-bottom {
+  animation: slide-from-bottom 0.4s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
