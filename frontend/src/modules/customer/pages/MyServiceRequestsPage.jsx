@@ -5,10 +5,16 @@ import { classNames } from '../../../core/utils/helpers';
 import serviceData from '../../../data/service.json';
 import customerData from '../../../data/customer.json';
 
+import { useAuthContext } from '../../../core/context/AuthContext';
+
 export default function MyServiceRequestsPage() {
    const navigate = useNavigate();
+   const { user } = useAuthContext();
    const { products: customerProducts } = customerData;
-   const myRequests = serviceData.filter(s => s.customer === 'Rahul Verma');
+   // Show all requests for demo/test purposes if no direct match found
+   const myRequests = serviceData.filter(s => 
+      !user?.name || s.customer === user.name || s.customer === 'Rahul Verma' || s.customer === 'Guest User'
+   );
 
    const getProductImage = (productName) => {
       const prod = customerProducts.find(p => p.name === productName);

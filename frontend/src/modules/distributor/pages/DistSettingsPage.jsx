@@ -15,7 +15,7 @@ import { useAuthContext } from '../../../core/context/AuthContext';
 import { toast } from 'react-hot-toast';
 
 export default function DistSettingsPage() {
-  const { logout } = useAuthContext();
+  const { logout, user } = useAuthContext();
   const [activeTab, setActiveTab] = useState('Profile');
   const [isSaving, setIsSaving] = useState(false);
 
@@ -50,19 +50,19 @@ export default function DistSettingsPage() {
                </CardHeader>
                <div className="p-6 space-y-6">
                   <div className="flex items-center gap-6">
-                     <Avatar name="Arjun Patel" size="lg" className="rounded-none border border-border" />
+                     <Avatar name={user?.name || 'Distributor'} size="lg" className="rounded-none border border-border" src={user?.avatar} />
                      <div className="flex-1">
-                        <h4 className="text-lg font-bold text-content-primary">Arjun Patel</h4>
-                        <p className="text-xs text-brand-teal font-black uppercase tracking-widest leading-none mt-1">North Region Distributor</p>
-                        <p className="text-xs text-content-tertiary mt-1.5 underline cursor-pointer">Official ID: DS-001</p>
+                        <h4 className="text-lg font-bold text-content-primary">{user?.businessName || user?.name || 'Distributor Partner'}</h4>
+                        <p className="text-xs text-brand-teal font-black uppercase tracking-widest leading-none mt-1">{user?.location || 'Regional Distributor'}</p>
+                        <p className="text-xs text-content-tertiary mt-1.5 underline cursor-pointer">Official ID: {user?._id?.toString().slice(-6).toUpperCase()}</p>
                      </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     <Input label="Full Name / Legal" defaultValue="Arjun Patel (AP Logistics)" />
-                     <Input label="Registered Email" defaultValue="dist.arjun@ogun.in" />
-                     <Input label="Direct Phone" defaultValue="+91 98765-43210" />
-                     <Input label="Office Address" defaultValue="Sector 18, Gurugram, Haryana, India" />
+                     <Input label="Full Name / Legal" defaultValue={user?.name || ''} />
+                     <Input label="Registered Email" defaultValue={user?.email || ''} />
+                     <Input label="Direct Phone" defaultValue={user?.phone || '+91 98765-43210'} />
+                     <Input label="Office Address" defaultValue={user?.location || 'Primary Distribution Hub'} />
                   </div>
                </div>
             </Card>

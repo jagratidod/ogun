@@ -139,7 +139,14 @@ export default function Topbar() {
           >
             <Avatar name={user?.name} size="sm" />
             <div className="hidden md:block text-left">
-              <p className="text-sm font-medium text-content-primary leading-tight">{user?.name}</p>
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-medium text-content-primary leading-tight">{user?.name}</p>
+                {user?.subRole && (
+                  <span className="text-[10px] font-black bg-brand-teal/10 text-brand-teal px-1.5 py-0.5 uppercase tracking-wider">
+                    {user.subRole.replace('_', ' ')}
+                  </span>
+                )}
+              </div>
               <p className="text-xs text-content-tertiary capitalize">{user?.role}</p>
             </div>
           </button>

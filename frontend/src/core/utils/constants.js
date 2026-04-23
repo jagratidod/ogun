@@ -5,6 +5,20 @@ export const ROLES = {
   CUSTOMER: 'customer',
 };
 
+export const SUB_ROLES = {
+  SUPER_ADMIN: 'super_admin',
+  HR_MANAGER: 'hr_manager',
+  SALES_MANAGER: 'sales_manager',
+  ACCOUNTS_MANAGER: 'accounts_manager',
+};
+
+export const ROLE_PERMISSIONS = {
+  [SUB_ROLES.SUPER_ADMIN]: ['all'],
+  [SUB_ROLES.HR_MANAGER]: ['hr', 'payroll', 'leaves'],
+  [SUB_ROLES.SALES_MANAGER]: ['inventory', 'orders', 'distributors', 'retailers', 'customers', 'reports', 'rewards', 'service'],
+  [SUB_ROLES.ACCOUNTS_MANAGER]: ['accounts', 'reports'],
+};
+
 export const ORDER_STATUS = {
   PLACED: 'placed',
   CONFIRMED: 'confirmed',
@@ -67,6 +81,8 @@ export const STATUS_COLORS = {
   inactive: 'badge-danger',
   pending: 'badge-warning',
   completed: 'badge-success',
+  'in transit': 'badge-warning',
+  'out for delivery': 'badge-warning',
   placed: 'badge-info',
   confirmed: 'badge-teal',
   dispatched: 'badge-warning',

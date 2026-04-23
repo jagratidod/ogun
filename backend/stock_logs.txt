@@ -1,0 +1,34 @@
+[2026-04-22T10:49:42.387Z] Processing order ORD-4289B9AF. New Status: Processing. Already Deducted: false
+[2026-04-22T10:49:42.395Z] Deduction triggered for order ORD-4289B9AF
+[2026-04-22T10:49:42.397Z] Searching inventory for User: 69e615c9e97145424e9ac2d3, Product: 69e8a5aad1cff19c107fce08
+[2026-04-22T10:50:06.083Z] Processing order ORD-4289B9AF. New Status: Confirmed. Already Deducted: false
+[2026-04-22T10:50:06.085Z] Deduction triggered for order ORD-4289B9AF
+[2026-04-22T10:50:06.087Z] Searching inventory for User: 69e615c9e97145424e9ac2d3, Product: 69e8a5aad1cff19c107fce08
+[2026-04-22T10:53:50.622Z] START: Order ORD-0AAC15CF, Status: Confirmed, Deducted: false
+[2026-04-22T10:53:50.634Z] Triggering deduction... Items: 1
+[2026-04-22T10:53:50.637Z] - Searching for Product: 69e76c0bf85601f793e04946 under User: 69e61346befd00922818a1e7
+[2026-04-22T10:53:50.676Z] - Not found for user 69e61346befd00922818a1e7. Trying universal search for 69e76c0bf85601f793e04946...
+[2026-04-22T10:53:50.725Z] - ITEM ERROR: next is not a function
+[2026-04-22T10:53:50.727Z] END: Logic finished for ORD-0AAC15CF
+[2026-04-22T10:58:22.879Z] START: Order ORD-5A5CC309, Status: Confirmed, Deducted: false
+[2026-04-22T10:58:22.882Z] Triggering deduction... Items: 1
+[2026-04-22T10:58:22.884Z] - Searching for Product: 69e76822f1580471a865f3a7 under User: 69e716bf365988f5075f5e01
+[2026-04-22T10:58:22.997Z] - SUCCESS: 16 units. 80 -> 64
+[2026-04-22T10:58:22.999Z] END: Logic finished for ORD-5A5CC309
+[2026-04-22T10:59:08.842Z] START: Order ORD-321AA38F, Status: Confirmed, Deducted: false
+[2026-04-22T10:59:08.843Z] Triggering deduction... Items: 1
+[2026-04-22T10:59:08.844Z] - Searching for Product: 69e89d291b7bd2954d8fd713 under User: 69e615c9e97145424e9ac2d3
+[2026-04-22T10:59:08.925Z] - SUCCESS: 5 units. 1000 -> 995
+[2026-04-22T10:59:08.927Z] END: Logic finished for ORD-321AA38F
+[2026-04-22T11:16:35.581Z] START: Order ORD-45E2BD67, Status: Confirmed, Deducted: false
+[2026-04-22T11:16:35.597Z] Triggering deduction... Items: 1
+[2026-04-22T11:16:35.600Z] - Searching for Product: 69e89d291b7bd2954d8fd713 under User: 69e615c9e97145424e9ac2d3
+[2026-04-22T11:16:35.664Z] - SUCCESS: 10 units. 2222 -> 2212
+[2026-04-22T11:16:35.666Z] END: Logic finished for ORD-45E2BD67
+[2026-04-22T11:26:15.236Z] START: Order ORD-9AE852A7, Status: Confirmed, Deducted: false
+[2026-04-22T11:26:15.256Z] Triggering deduction... Items: 2
+[2026-04-22T11:26:15.268Z] - Searching for Product: 69e8a5aad1cff19c107fce08 under User: 69e615c9e97145424e9ac2d3
+[2026-04-22T11:26:15.423Z] - SUCCESS: 6 units. 1111 -> 1105
+[2026-04-22T11:26:15.430Z] - Searching for Product: 69e76822f1580471a865f3a7 under User: 69e615c9e97145424e9ac2d3
+[2026-04-22T11:26:15.521Z] - SUCCESS: 6 units. 99 -> 93
+[2026-04-22T11:26:15.524Z] END: Logic finished for ORD-9AE852A7

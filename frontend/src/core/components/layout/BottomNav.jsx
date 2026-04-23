@@ -23,13 +23,13 @@ export default function BottomNav({ items }) {
           style={{ transform: `translateX(${(activeIndex * 100)}%)` }}
         >
           {/* The Scoop Circle */}
-          <div className="absolute -top-[24px] left-1/2 -translate-x-1/2 w-[60px] h-[60px] rounded-full bg-surface-primary flex items-center justify-center border-[5px] border-surface-primary shadow-lg overflow-visible">
+          <div className="absolute -top-[20px] left-1/2 -translate-x-1/2 w-[52px] h-[52px] rounded-full bg-surface-primary flex items-center justify-center border-[4px] border-surface-primary shadow-lg overflow-visible">
             {/* The Active Icon Circle */}
             <div className="w-full h-full rounded-full bg-brand-teal flex items-center justify-center shadow-inner">
                <div className="text-white">
                   {(() => {
                     const ActiveIcon = items[activeIndex]?.icon;
-                    return ActiveIcon ? <ActiveIcon className="w-7 h-7" /> : null;
+                    return ActiveIcon ? <ActiveIcon className="w-5 h-5" /> : null;
                   })()}
                </div>
             </div>

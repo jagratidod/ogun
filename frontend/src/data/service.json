@@ -14,6 +14,39 @@
     ]
   },
   {
+    "id": "SRV-160",
+    "customer": "Guest User",
+    "product": "Aura Silent Chimney",
+    "issue": "Suction not working properly",
+    "status": "In Progress",
+    "priority": "High",
+    "technician": "Anil Soni",
+    "date": "2026-04-16T15:20:00",
+    "history": [
+      { "status": "Open", "time": "2026-04-16T15:20:00", "note": "Reported via mobile app" }
+    ]
+  },
+  {
+    "id": "SRV-161",
+    "customer": "Guest User",
+    "product": "SmartCook Induction",
+    "issue": "Panel glass cracked",
+    "status": "In Progress",
+    "priority": "Medium",
+    "technician": "Suresh Pal",
+    "date": "2026-04-15T09:45:00"
+  },
+  {
+    "id": "SRV-162",
+    "customer": "Guest User",
+    "product": "TurboMix Pro 750W",
+    "issue": "Speed control knob stuck",
+    "status": "Assigned",
+    "priority": "Low",
+    "technician": "Ramesh Kumar",
+    "date": "2026-04-17T11:00:00"
+  },
+  {
     "id": "SRV-155",
     "customer": "Anita Singh",
     "product": "SmartCook Induction",
@@ -32,5 +65,15 @@
     "priority": "Low",
     "technician": "Karan Varma",
     "date": "2026-04-04T12:00:00"
+  },
+  {
+    "id": "SRV-158",
+    "customer": "Vikram",
+    "product": "TurboMix Pro 750W",
+    "issue": "Overheating issues",
+    "status": "Closed",
+    "priority": "High",
+    "technician": "Anil Soni",
+    "date": "2026-04-10T11:00:00"
   }
 ]

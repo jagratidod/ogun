@@ -3,7 +3,7 @@ import {
   RiSettings4Line, RiShieldKeyholeLine, RiNotification3Line, 
   RiPaletteLine, RiGlobalLine, RiSmartphoneLine, 
   RiDatabaseLine, RiInformationLine, RiArrowRightSLine, 
-  RiLogoutBoxRLine, RiLockPasswordLine, RiTimeLine 
+  RiLogoutBoxRLine, RiLockPasswordLine, RiTimeLine, RiUserLine 
 } from 'react-icons/ri';
 import { 
   PageHeader, Card, CardHeader, CardTitle, CardDescription, 
@@ -13,7 +13,7 @@ import { useAuthContext } from '../../../core/context/AuthContext';
 import { toast } from 'react-hot-toast';
 
 export default function AdminSettingsPage() {
-  const { logout } = useAuthContext();
+  const { user, logout } = useAuthContext();
   const [activeTab, setActiveTab] = useState('General');
   const [isSaving, setIsSaving] = useState(false);
 
@@ -51,23 +51,27 @@ export default function AdminSettingsPage() {
                   <div className="flex items-center gap-6 mb-6">
                      <div className="relative group">
                         <div className="w-24 h-24 rounded-none bg-surface-elevated flex items-center justify-center border border-border group-hover:border-brand-teal transition-all">
-                           <img src="/logo.png" className="w-20 h-20 object-contain transition-all" />
+                           {user?.avatar ? (
+                              <img src={user.avatar} className="w-20 h-20 object-contain transition-all" />
+                            ) : (
+                              <RiUserLine className="w-12 h-12 text-slate-300" />
+                            )}
                         </div>
                         <button className="absolute -bottom-2 -left-2 p-1.5 rounded-none bg-surface-elevated border border-border shadow-xl hover:text-brand-teal transition-colors">
                            <RiPaletteLine className="w-3.5 h-3.5" />
                         </button>
                      </div>
                      <div className="flex-1">
-                        <h4 className="text-lg font-bold text-content-primary">OGUN Kitchen Systems</h4>
-                        <p className="text-xs text-content-tertiary uppercase font-black tracking-widest mt-1">HQ Distribution Hub</p>
+                        <h4 className="text-lg font-bold text-content-primary">{user?.name || 'OGUN Admin'}</h4>
+                        <p className="text-xs text-content-tertiary uppercase font-black tracking-widest mt-1">{user?.role?.replace('_', ' ') || 'HQ Distribution Hub'}</p>
                      </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     <Input label="Business Legal Name" defaultValue="OGUN Kitchen Systems Pvt Ltd" />
-                     <Input label="Corporate Email" defaultValue="info@ogun.in" />
-                     <Input label="Contact Number" defaultValue="+91 22 4567 8901" />
-                     <Input label="Operating Region" defaultValue="Pan India" />
+                     <Input label="Display Name" defaultValue={user?.name} />
+                     <Input label="Login Email" defaultValue={user?.email} />
+                     <Input label="Contact Number" defaultValue={user?.phone || '+91 22 4567 8901'} />
+                     <Input label="Operating Region" defaultValue={user?.location || 'Pan India'} />
                   </div>
                </div>
             </Card>

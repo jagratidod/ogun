@@ -1,149 +1,128 @@
 import { useState } from 'react';
-import {
-   RiSettings4Fill, RiShieldKeyholeFill, RiNotification3Fill,
-   RiPaletteFill, RiGlobalFill, RiSmartphoneFill,
-   RiDatabaseFill, RiInformationFill, RiArrowRightSLine,
-   RiLogoutBoxRFill, RiUserFill, RiStore2Fill, RiMapPinFill,
-   RiPhoneFill, RiHeartFill, RiLockPasswordFill, RiUserStarFill,
-   RiCheckDoubleFill
+import { 
+  RiSettings4Line, RiShieldKeyholeLine, RiNotification3Line, 
+  RiPaletteLine, RiGlobalLine, RiSmartphoneLine, 
+  RiDatabaseLine, RiInformationLine, RiArrowRightSLine, 
+  RiLogoutBoxRLine, RiUserLine, RiStore2Line, RiMapPinLine, 
+  RiPhoneLine, RiHeartLine, RiLockPasswordLine, RiUserStarLine, 
+  RiCheckDoubleLine 
 } from 'react-icons/ri';
-import {
-   PageHeader, Card, CardHeader, CardTitle, CardDescription,
-   Badge, Button, Avatar, Input, Select, Tabs, Modal, useModal
+import { 
+  PageHeader, Card, CardHeader, CardTitle, CardDescription, 
+  Badge, Button, Avatar, Input, Select, Modal, useModal 
 } from '../../../core';
 import { useAuthContext } from '../../../core/context/AuthContext';
 import { toast } from 'react-hot-toast';
 
 export default function CustomerSettingsPage() {
-   const { logout } = useAuthContext();
-   const [loading, setLoading] = useState(false);
-   const { isOpen, open, close, data: activeTab } = useModal();
+  const { user, logout } = useAuthContext();
+  const [loading, setLoading] = useState(false);
+  const { isOpen, open, close, data: activeTab } = useModal();
 
-   const handleLogout = () => {
-      toast.loading('Logging out...');
-      setTimeout(logout, 800);
-   };
+  const handleLogout = () => {
+    toast.loading('Logging out...');
+    setTimeout(logout, 800);
+  };
 
-   const handleSave = () => {
-      setLoading(true);
-      toast.loading('Updating user preferences...');
-      setTimeout(() => {
-         toast.dismiss();
-         toast.success('Settings updated successfully');
-         setLoading(false);
-         close();
-      }, 1500);
-   };
+  const handleSave = () => {
+    setLoading(true);
+    toast.loading('Updating user preferences...');
+    setTimeout(() => {
+       toast.dismiss();
+       toast.success('Settings updated successfully');
+       setLoading(false);
+       close();
+    }, 1500);
+  };
 
-   const menuItems = [
-      { icon: RiUserFill, label: 'Identity Profile', desc: 'Secure contact & naming', color: 'text-brand-teal', bg: 'bg-brand-teal/5' },
-      { icon: RiMapPinFill, label: 'Service Locations', desc: 'Manage registered addresses', color: 'text-brand-teal', bg: 'bg-brand-teal/5' },
-      { icon: RiLockPasswordFill, label: 'Security & Access', desc: 'Encryption & passwords', color: 'text-brand-teal', bg: 'bg-brand-teal/5' },
-      { icon: RiPaletteFill, label: 'App Experience', desc: 'Themes & density modes', color: 'text-brand-purple', bg: 'bg-brand-purple/5' },
-      { icon: RiNotification3Fill, label: 'Alert Protocols', desc: 'Email & SMS preferences', color: 'text-brand-pink', bg: 'bg-brand-pink/5' }
-   ];
+  const menuItems = [
+    { icon: RiUserLine, label: 'Identity Information', desc: 'Name, email, and social profiles' },
+    { icon: RiMapPinLine, label: 'Saved Localities', desc: 'Direct service addresses' },
+    { icon: RiLockPasswordLine, label: 'Security & Access', desc: 'Passwords and biometric' },
+    { icon: RiPaletteLine, label: 'Visual Experience', desc: 'Theme and compact modes' },
+    { icon: RiNotification3Line, label: 'Communication Feed', desc: 'Emails and SMS' }
+  ];
 
-   return (
-      <div className="page-container max-w-lg mx-auto flex flex-col gap-3.5 py-4">
-         <div className="flex items-center justify-between px-1">
-            <div>
-               <h2 className="text-lg font-black text-gray-800 tracking-tight leading-none uppercase font-heading">Account Hub</h2>
-               <p className="text-[9px] font-bold text-gray-400 mt-1 uppercase font-secondary tracking-[0.1em] opacity-60">Identity Portal</p>
-            </div>
-            <button 
-               onClick={handleLogout}
-               className="w-9 h-9 rounded-full bg-red-50 flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-white transition-all active:scale-90 border border-red-100"
-            >
-               <RiLogoutBoxRFill className="w-4 h-4" />
-            </button>
-         </div>
+  return (
+    <div className="page-container max-w-lg mx-auto flex flex-col gap-6">
+      <PageHeader 
+        title="Account Preferences" 
+        subtitle="Manage your personal profile, security configuration, and app experience"
+      >
+        <Button icon={RiLogoutBoxRLine} variant="danger" size="sm" onClick={handleLogout}>Logout</Button>
+      </PageHeader>
 
-         {/* Ultra-Compact Vertical Profile */}
-         <div className="flex items-center gap-4 bg-gray-50/50 p-3 rounded-3xl border border-gray-100 animate-fade-in">
-            <div className="relative">
-               <div className="w-16 h-16 rounded-2xl p-0.5 bg-white border border-gray-100 shadow-sm transition-transform active:scale-95 cursor-pointer">
-                  <div className="w-full h-full rounded-[14px] overflow-hidden border border-white shadow-inner">
-                     <img 
-                        src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=200" 
-                        alt="Profile" 
-                        className="w-full h-full object-cover"
-                     />
-                  </div>
-               </div>
-               <button className="absolute -bottom-1 -right-1 w-6 h-6 rounded-lg bg-brand-teal text-white flex items-center justify-center shadow-lg border-2 border-white hover:scale-110 active:scale-90 transition-all">
-                  <RiCheckDoubleFill className="w-3.5 h-3.5" />
-               </button>
-            </div>
-            
-            <div className="flex-1">
-               <h4 className="text-lg font-black text-gray-800 tracking-tighter leading-none font-heading">Rahul Verma</h4>
-               <p className="text-[9px] text-gray-400 font-bold uppercase tracking-[0.2em] mt-1 font-secondary opacity-70">Elite Tier Partner</p>
-            </div>
-         </div>
-
-         <div className="space-y-2.5">
-            {menuItems.map(item => (
-               <div 
-                  key={item.label} 
-                  className="p-3 rounded-2xl bg-white border border-gray-50 flex items-center gap-3.5 group active:scale-[0.98] transition-all cursor-pointer hover:border-brand-teal/20 hover:shadow-sm" 
-                  onClick={() => open(item)}
-               >
-                  <div className={`w-9 h-9 rounded-xl ${item.bg} flex items-center justify-center ${item.color} group-hover:scale-110 transition-all duration-300`}>
-                     <item.icon className="w-4.5 h-4.5" />
-                  </div>
-                  <div className="flex-1">
-                     <h4 className="text-[12px] font-black text-gray-800 tracking-tight">{item.label}</h4>
-                     <p className="text-[8px] text-gray-400 font-bold uppercase tracking-widest mt-0.5 opacity-60">{item.desc}</p>
-                  </div>
-                  <RiArrowRightSLine className="w-4 h-4 text-gray-300 group-hover:translate-x-1 transition-all" />
-               </div>
-            ))}
-         </div>
-
-         <Modal
-            isOpen={isOpen}
-            onClose={close}
-            variant="bottom"
-            title={activeTab?.label}
-            footer={
-               <div className="flex gap-3 w-full">
-                  <Button variant="secondary" onClick={close} className="flex-1 rounded-full text-xs font-black uppercase">Cancel</Button>
-                  <Button onClick={handleSave} loading={loading} className="flex-1 rounded-full text-xs font-black uppercase bg-brand-teal text-white border-none shadow-lg shadow-brand-teal/20">Sync Settings</Button>
-               </div>
-            }
-         >
-            <div className="space-y-5 pt-2">
-               {activeTab?.label === 'Identity Profile' && (
-                  <>
-                     <Input label="Boutique Member Name" defaultValue="Rahul Verma" />
-                     <Input label="Primary Global Email" defaultValue="rahul.v@gmail.com" />
-                     <Input label="Encrypted Phone" defaultValue="+91 9876543210" disabled />
-                  </>
-               )}
-               {activeTab?.label === 'Security & Access' && (
-                  <>
-                     <Input label="Standard Password" type="password" placeholder="••••••••" />
-                     <Input label="Enhanced Security Key" type="password" placeholder="Min 8 chars" />
-                  </>
-               )}
-               {(activeTab?.label !== 'Identity Profile' && activeTab?.label !== 'Security & Access') && (
-                  <div className="py-10 text-center flex flex-col items-center">
-                     <div className="w-16 h-16 rounded-full bg-brand-teal/5 flex items-center justify-center mb-4">
-                        <RiSettings4Fill className="w-8 h-8 text-brand-teal/30 animate-spin-slow" />
-                     </div>
-                     <p className="text-[11px] font-black uppercase tracking-widest text-gray-800">Synchronizing Vault</p>
-                     <p className="text-[10px] text-gray-400 font-bold mt-1 tracking-tight">Applying your {activeTab?.label.toLowerCase()} preferences...</p>
-                  </div>
-               )}
-            </div>
-         </Modal>
-
-         <div className="mt-auto py-8">
-            <div className="flex items-center justify-center gap-2.5 opacity-30">
-               <RiHeartFill className="text-brand-pink w-3 h-3" />
-               <p className="text-[8px] text-center font-black uppercase tracking-[0.3em] text-gray-400">Ogun Craftsmanship Design</p>
+      <div className="flex items-center gap-6 p-6 glass-card border-brand-teal/20 animate-slide-up relative overflow-hidden group">
+         <Avatar name={user?.name || "Rahul Verma"} size="lg" className="border-2 border-brand-teal ring-4 ring-brand-teal/5 shadow-glow" />
+         <div className="flex-1">
+            <p className="text-[7px] text-brand-pink font-black uppercase tracking-[0.4em] mb-1">Authenticated,</p>
+            <h4 className="text-lg font-black text-content-primary leading-tight">{user?.name || "Rahul Verma"}</h4>
+            <p className="text-[10px] text-brand-teal font-black uppercase tracking-widest leading-none mt-1">Verified Member #9422</p>
+            <div className="flex items-center gap-2 mt-3 cursor-pointer group/link" onClick={() => toast('Request received. Our team will review your eligibility.')}>
+               <RiUserStarLine className="text-[#E0128A] w-4 h-4" />
+               <p className="text-[10px] text-content-tertiary font-bold underline decoration-1 group-hover/link:text-brand-teal transition-all">Request Pro Profile Upgrade</p>
             </div>
          </div>
       </div>
-   );
+
+      <div className="space-y-4">
+         {menuItems.map(item => (
+            <Card key={item.label} className="group active:scale-95 transition-all outline-none border-border overflow-hidden hover:border-brand-teal cursor-pointer" onClick={() => open(item)}>
+               <div className="p-4 flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-none bg-surface-primary flex items-center justify-center text-brand-teal group-hover:shadow-glow transition-all">
+                     <item.icon className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1">
+                     <h4 className="text-xs font-black text-content-primary">{item.label}</h4>
+                     <p className="text-[9px] text-content-tertiary font-bold uppercase tracking-widest">{item.desc}</p>
+                  </div>
+                  <RiArrowRightSLine className="w-5 h-5 text-content-tertiary group-hover:translate-x-1 transition-transform" />
+               </div>
+            </Card>
+         ))}
+      </div>
+
+      <Modal 
+        isOpen={isOpen} 
+        onClose={close} 
+        title={activeTab?.label}
+        variant="bottom"
+        footer={
+           <div className="flex flex-col w-full gap-3">
+              <Button onClick={handleSave} loading={loading} className="w-full bg-[#E0128A] text-white">Save Changes</Button>
+              <Button variant="ghost" onClick={close} className="w-full">Cancel</Button>
+           </div>
+        }
+      >
+        <div className="space-y-4">
+           {activeTab?.label === 'Identity Information' && (
+              <>
+                 <Input label="Full Name" defaultValue={user?.name || "Rahul Verma"} />
+                 <Input label="Contact Email" defaultValue={user?.email || "rahul.v@gmail.com"} />
+                 <Input label="Phone Number" defaultValue="+91 9876543210" disabled />
+              </>
+           )}
+           {activeTab?.label === 'Security & Access' && (
+              <>
+                 <Input label="Current Password" type="password" placeholder="••••••••" />
+                 <Input label="New Password" type="password" placeholder="Min 8 chars" />
+              </>
+           )}
+           {activeTab?.label !== 'Identity Information' && activeTab?.label !== 'Security & Access' && (
+              <div className="p-8 text-center bg-surface-elevated flex flex-col items-center">
+                 <RiSettings4Line className="w-10 h-10 text-brand-teal/30 mb-2 animate-spin-slow" />
+                 <p className="text-xs text-content-secondary">Synchronizing your {activeTab?.label.toLowerCase()} settings with the secure cloud...</p>
+              </div>
+           )}
+        </div>
+      </Modal>
+
+      <div className="pb-8 space-y-4">
+         <div className="flex items-center justify-center gap-3 p-4 rounded-none bg-surface-elevated border border-border opacity-70">
+            <RiInformationLine className="text-brand-teal w-4 h-4 flex-shrink-0" />
+            <p className="text-[10px] text-center font-medium leading-relaxed">Changes to registered data may take up to 24 hours to sync with service nodes.</p>
+         </div>
+      </div>
+    </div>
+  );
 }

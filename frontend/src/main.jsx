@@ -2,15 +2,19 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './core/context/AuthContext';
-import { NotificationProvider } from './core/context/NotificationContext';
+import { SocketProvider } from './core/context/SocketContext';
+import { NotificationProvider, ToastProvider } from './core';
 import App from './App';
 import './index.css';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
-      <NotificationProvider>
-        <App />
+      <SocketProvider>
+        <NotificationProvider>
+          <ToastProvider>
+            <App />
+          </ToastProvider>
         <Toaster
           position="top-right"
           toastOptions={{
@@ -24,7 +28,8 @@ createRoot(document.getElementById('root')).render(
             },
           }}
         />
-      </NotificationProvider>
+        </NotificationProvider>
+      </SocketProvider>
     </AuthProvider>
   </StrictMode>
 );

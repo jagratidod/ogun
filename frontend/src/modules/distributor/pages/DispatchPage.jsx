@@ -1,36 +1,43 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { 
-  RiTruckLine, RiArrowRightLine, RiTimeLine, 
-  RiMapPinLine, RiCheckboxCircleLine, RiUserLine, 
-  RiStore2Line, RiInformationLine, RiPulseLine, RiCheckDoubleLine, RiSave3Line 
+  RiTruckLine, RiArrowRightLine, RiTimeLine,
+  RiCheckboxCircleLine,
+  RiInformationLine, RiPulseLine, RiCheckDoubleLine, RiSave3Line
 } from 'react-icons/ri';
 import { 
   PageHeader, Card, CardHeader, CardTitle, CardDescription, 
-  Badge, Button, EmptyState, Modal, useModal, Input, Select 
+  Badge, Button, Modal, useModal, Input, Select
 } from '../../../core';
 import { toast } from 'react-hot-toast';
+import { useDistributorStore } from '../store/useDistributorStore';
 
 export default function DispatchPage() {
-  const { isOpen, open, close, data: selectedShipment } = useModal();
+  const { isOpen, open, close } = useModal();
   const [loading, setLoading] = useState(false);
+  const { shipments, retailers, actions } = useDistributorStore();
+  const [form, setForm] = useState({
+    retailer: '',
+    items: 0,
+    carrier: 'Local Delivery Service',
+    eta: 'Tomorrow, 10:00 AM',
+  });
 
-  const shipments = [
-    { id: 'SHP-001', retailer: 'Priya Kitchen World', items: 12, status: 'In Transit', carrier: 'Bluedart Service', eta: 'Tomorrow, 10:00 AM' },
-    { id: 'SHP-002', retailer: 'HomeChef Appliances', items: 5, status: 'Out for Delivery', carrier: 'Local Express', eta: 'Today, 2:00 PM' }
-  ];
+  const myShipments = useMemo(() => shipments || [], [shipments]);
 
   const handleManifest = () => {
     setLoading(true);
     toast.loading('Saving cargo manifest...');
     setTimeout(() => {
        toast.dismiss();
+       actions.addManualShipment(form);
        toast.success('Manifest saved and carrier notified.');
        setLoading(false);
        close();
-    }, 1500);
+    }, 800);
   };
 
   const handleManualDelivery = (id) => {
+    actions.forceDeliverShipment(id);
     toast.success(`Shipment ${id} marked as DELIVERED manually.`);
   };
 
@@ -44,7 +51,15 @@ export default function DispatchPage() {
       </PageHeader>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-         {shipments.map(shp => (
+         {myShipments.length === 0 ? (
+           <div className="md:col-span-2">
+             <div className="glass-card p-10 text-center border border-dashed border-border">
+               <RiInformationLine className="w-10 h-10 text-content-tertiary mx-auto mb-3 opacity-60" />
+               <p className="text-sm font-bold text-content-primary">No shipments yet</p>
+               <p className="text-xs text-content-tertiary mt-1">Approve and dispatch a request from Incoming Requests to populate this board.</p>
+             </div>
+           </div>
+         ) : myShipments.map(shp => (
             <Card key={shp.id} className="animate-slide-up group border-border hover:border-brand-teal transition-all">
                <CardHeader className="bg-surface-elevated/40">
                   <div className="flex items-center justify-between w-full">
@@ -88,7 +103,7 @@ export default function DispatchPage() {
                      </div>
                   </div>
 
-                  <div className="pt-4 border-t border-border flex gap-2">
+                 <div className="pt-4 border-t border-border flex gap-2">
                      <Button className="flex-1" variant="secondary" size="sm" icon={RiInformationLine} onClick={() => toast.info(`Live tracking SHP: ${shp.id}`)}>Track Live</Button>
                      <Button variant="ghost" size="sm" icon={RiCheckboxCircleLine} onClick={() => handleManualDelivery(shp.id)}>Force Deliver</Button>
                   </div>
@@ -115,10 +130,32 @@ export default function DispatchPage() {
       >
         <div className="space-y-4">
            <div className="grid grid-cols-2 gap-4">
-              <Select label="Partner Store" options={[{ label: 'Priya Kitchen World', value: 'pk' }, { label: 'HomeChef', value: 'hc' }]} />
-              <Input label="Truck Registration" placeholder="MH-XX-XXXX" />
+              <Select
+                label="Partner Store"
+                value={form.retailer}
+                onChange={(e) => setForm((p) => ({ ...p, retailer: e.target.value }))}
+                options={[
+                  { label: 'Select retailer...', value: '' },
+                  ...retailers.map((r) => ({ label: r.name, value: r.name })),
+                ]}
+              />
+              <Input
+                label="Items (Units)"
+                type="number"
+                value={form.items}
+                onChange={(e) => setForm((p) => ({ ...p, items: Number(e.target.value || 0) }))}
+              />
            </div>
-           <Input label="Carrier Detail" defaultValue="Local Delivery Service" />
+           <Input
+             label="Carrier Detail"
+             value={form.carrier}
+             onChange={(e) => setForm((p) => ({ ...p, carrier: e.target.value }))}
+           />
+           <Input
+             label="ETA"
+             value={form.eta}
+             onChange={(e) => setForm((p) => ({ ...p, eta: e.target.value }))}
+           />
            <div className="p-4 bg-brand-teal/5 border border-brand-teal/10 flex items-center gap-3">
               <RiCheckDoubleLine className="text-brand-teal w-5 h-5 flex-shrink-0" />
               <p className="text-[11px] text-brand-teal leading-normal">Approved retailers for this cargo will be notified instantly for incoming stock.</p>

@@ -10,3 +10,5 @@ export { default as DistributorDashboardPage } from './pages/DistributorDashboar
 export { default as DistributorStockPage } from './pages/DistributorStockPage';
 export { default as IncomingRequestsPage } from './pages/IncomingRequestsPage';
 export { default as MyRetailersPage } from './pages/MyRetailersPage';
+export { default as BrowseAdminProducts } from './pages/BrowseAdminProducts';
+export { default as MyOrdersPage } from './pages/MyOrdersPage';

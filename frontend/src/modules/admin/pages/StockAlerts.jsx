@@ -1,32 +1,49 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { RiAlertLine, RiShoppingCartLine, RiArrowRightUpLine, RiErrorWarningLine, RiCalendarCheckLine } from 'react-icons/ri';
-import { PageHeader, Card, CardHeader, CardTitle, CardDescription, DataTable, Badge, Button, EmptyState, formatCurrency } from '../../../core';
-import productsData from '../../../data/products.json';
+import { PageHeader, Card, CardHeader, CardTitle, CardDescription, DataTable, Badge, Button, EmptyState, formatCurrency, TableSkeleton } from '../../../core';
+import inventoryService from '../../../core/services/inventoryService';
 import { toast } from 'react-hot-toast';
 
 export default function StockAlertsPage() {
-  const [alerts, setAlerts] = useState(productsData.filter(p => p.stock <= p.minStock));
+  const [alerts, setAlerts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchAlerts = async () => {
+    try {
+      setLoading(true);
+      const res = await inventoryService.getAlerts();
+      setAlerts(res.data || []);
+    } catch (error) {
+      toast.error('Failed to fetch stock alerts');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAlerts();
+  }, []);
 
   const handlePlacePO = (product) => {
-     // Simulated Action: Place a Purchase Order
-     toast.success(`Purchase Order placed for ${product.name}. Stock will be updated shortly.`);
-     setAlerts(prev => prev.filter(a => a.id !== product.id));
+     toast.success(`Purchase Order initiated for ${product.name}. Stock update pending.`);
   };
 
   const columns = [
-    { key: 'name', label: 'Product Name', render: (val, row) => (
+    { key: 'product', label: 'Product Details', render: (val) => (
       <div>
-        <h4 className="text-sm font-semibold text-content-primary leading-tight">{val}</h4>
-        <span className="text-[10px] text-content-tertiary">SKU: {row.sku}</span>
+        <h4 className="text-sm font-semibold text-content-primary leading-tight">{val?.name}</h4>
+        <span className="text-[10px] text-content-tertiary">SKU: {val?.sku}</span>
       </div>
     )},
-    { key: 'category', label: 'Category' },
-    { key: 'stock', label: 'Quantity Left', align: 'center', render: (val) => (
+    { key: 'product', label: 'Category', render: (val) => (
+      <Badge variant="teal">{val?.category}</Badge>
+    )},
+    { key: 'quantity', label: 'Quantity Left', align: 'center', render: (val) => (
        <span className={`text-sm font-bold ${val === 0 ? 'text-state-danger' : 'text-state-warning'}`}>
           {val} units
        </span>
     )},
-    { key: 'minStock', label: 'Threshold', align: 'center', render: (val) => (
+    { key: 'minStockThreshold', label: 'Threshold', align: 'center', render: (val) => (
        <span className="text-sm text-content-tertiary">{val} units</span>
     )},
     { key: 'status', label: 'Alert Type', render: (val) => (
@@ -36,17 +53,22 @@ export default function StockAlertsPage() {
     )},
     { key: 'actions', label: 'Actions', align: 'right', render: (_, row) => (
        <div className="flex justify-end gap-2">
-          <Button variant="secondary" size="sm" icon={RiShoppingCartLine} onClick={() => handlePlacePO(row)}>Place PO</Button>
-          <Button variant="ghost" size="sm" icon={RiArrowRightUpLine}>Details</Button>
+          <Button variant="secondary" size="sm" icon={RiShoppingCartLine} onClick={() => handlePlacePO(row.product)}>Replenish</Button>
+          <Button variant="ghost" size="sm" icon={RiArrowRightUpLine}>View History</Button>
        </div>
     )}
   ];
+
+  if (loading) return <div className="page-container"><TableSkeleton /></div>;
+
+  const outOfStockCount = alerts.filter(a => a.quantity === 0).length;
+  const lowStockCount = alerts.filter(a => a.quantity > 0).length;
 
   return (
     <div className="page-container">
       <PageHeader 
         title="Stock Alerts" 
-        subtitle="Critical items requiring immediate replenishment"
+        subtitle="Critical inventory items requiring immediate attention"
       />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -57,7 +79,7 @@ export default function StockAlertsPage() {
              </div>
              <div>
                 <p className="text-xs text-content-tertiary font-bold uppercase tracking-wider">Out of Stock</p>
-                <h4 className="text-2xl font-bold text-content-primary">{alerts.filter(p => p.stock === 0).length} items</h4>
+                <h4 className="text-2xl font-bold text-content-primary">{outOfStockCount} items</h4>
              </div>
           </div>
         </div>
@@ -68,7 +90,7 @@ export default function StockAlertsPage() {
              </div>
              <div>
                 <p className="text-xs text-content-tertiary font-bold uppercase tracking-wider">Low Inventory</p>
-                <h4 className="text-2xl font-bold text-content-primary">{alerts.filter(p => p.stock > 0).length} items</h4>
+                <h4 className="text-2xl font-bold text-content-primary">{lowStockCount} items</h4>
              </div>
           </div>
         </div>
@@ -78,9 +100,9 @@ export default function StockAlertsPage() {
                 <RiCalendarCheckLine className="text-brand-teal w-6 h-6" />
              </div>
              <div>
-                <p className="text-xs text-content-tertiary font-bold uppercase tracking-wider">Incoming Shipment</p>
-                <h4 className="text-2xl font-bold text-content-primary">3 shipments</h4>
-                <span className="text-[10px] text-content-tertiary">Due in 2-4 days</span>
+                <p className="text-xs text-content-tertiary font-bold uppercase tracking-wider">Last Sync</p>
+                <h4 className="text-sm font-bold text-content-primary">{new Date().toLocaleTimeString()}</h4>
+                <span className="text-[10px] text-content-tertiary">Real-time alerts active</span>
              </div>
           </div>
         </div>
@@ -89,15 +111,15 @@ export default function StockAlertsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Active Inventory Alarms</CardTitle>
-          <CardDescription>Items that are below their minimum configured stock threshold</CardDescription>
+          <CardDescription>Items currently below the safety threshold in your warehouse</CardDescription>
         </CardHeader>
         {alerts.length > 0 ? (
            <DataTable columns={columns} data={alerts} />
         ) : (
            <EmptyState 
              icon={RiErrorWarningLine} 
-             title="No Active Alerts" 
-             description="All products are well within their stocking thresholds."
+             title="Inventory Healthy" 
+             description="All products are currently above their safety thresholds."
            />
         )}
       </Card>

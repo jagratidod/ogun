@@ -9,9 +9,9 @@ import {
 
 const bottomNavItems = [
   { label: 'Home', icon: RiDashboardLine, path: '/retailer', exact: true },
+  { label: 'Market', icon: RiShoppingBagLine, path: '/retailer/marketplace' },
   { label: 'Sell', icon: RiShoppingBagLine, path: '/retailer/sales' },
   { label: 'Stock', icon: RiBox3Line, path: '/retailer/stock' },
-  { label: 'Rewards', icon: RiTrophyLine, path: '/retailer/rewards' },
   { label: 'Profile', icon: RiUserLine, path: '/retailer/settings' },
 ];
 

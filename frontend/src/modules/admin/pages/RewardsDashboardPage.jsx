@@ -1,12 +1,22 @@
-import { RiTrophyLine, RiTrophyFill, RiMedalLine, RiHandHeartLine, RiGroupLine, RiHistoryLine, RiSettings4Line, RiSearchLine, RiArrowRightUpLine } from 'react-icons/ri';
+import { RiTrophyLine, RiTrophyFill, RiMedalLine, RiHandHeartLine, RiGroupLine, RiHistoryLine, RiSettings4Line, RiSearchLine, RiArrowRightUpLine, RiFlashlightLine, RiMoneyDollarCircleLine, RiTimeLine, RiCheckboxCircleLine, RiCloseCircleLine } from 'react-icons/ri';
 import { PageHeader, Card, CardHeader, CardTitle, CardDescription, DataTable, Badge, Button, Avatar, MetricCard, BarChart, useSearch } from '../../../core';
 import rewardsData from '../../../data/rewards.json';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 export default function RewardsDashboardPage() {
-  const { leaderboard, targets } = rewardsData;
+  const { leaderboard, targets, systemConfig, entities } = rewardsData;
+  const [pointsEnabled, setPointsEnabled] = useState(systemConfig.pointsEnabled);
+
+  const togglePointsSystem = () => {
+    setPointsEnabled(!pointsEnabled);
+    toast.success(`Points System ${!pointsEnabled ? 'Enabled' : 'Disabled'} Successfully`);
+  };
+
+  const totalPoints = entities.reduce((acc, curr) => acc + curr.totalPoints, 0);
+  const totalRupeeValue = totalPoints * systemConfig.pointToRupeeRatio;
 
   const top3 = leaderboard.slice(0, 3);
-  const others = leaderboard.slice(3);
 
   const columns = [
     { key: 'rank', label: 'Rank', width: '80px', align: 'center', render: (val) => (
@@ -19,13 +29,17 @@ export default function RewardsDashboardPage() {
        </div>
     )},
     { key: 'points', label: 'Points Balance', align: 'right', render: (val) => (
-       <div className="flex items-center justify-end gap-2">
-          <RiTrophyLine className="text-state-warning w-4 h-4" />
-          <span className="font-bold text-content-primary">{val.toLocaleString()}</span>
+       <div className="flex flex-col items-end">
+          <div className="flex items-center gap-2">
+             <RiTrophyLine className="text-state-warning w-4 h-4" />
+             <span className="font-bold text-content-primary">{val.toLocaleString()}</span>
+          </div>
+          <span className="text-[10px] text-brand-teal font-black">₹{(val * systemConfig.pointToRupeeRatio).toLocaleString()}</span>
        </div>
     )},
+    { key: 'tier', label: 'Tier', render: (val) => <Badge variant="teal">{val}</Badge> },
     { key: 'actions', label: 'Actions', align: 'right', render: () => (
-       <Button variant="ghost" size="sm" icon={RiArrowRightUpLine}>Profile</Button>
+       <Button variant="ghost" size="sm" icon={RiArrowRightUpLine}>Audit</Button>
     )}
   ];
 
@@ -35,8 +49,23 @@ export default function RewardsDashboardPage() {
         title="Rewards Dashboard" 
         subtitle="Managing platform-wide retailer and distributor loyalty programs"
       >
-        <Button icon={RiTrophyLine}>Disburse Rewards</Button>
+        <div className="flex items-center gap-4">
+          <div className={`flex items-center gap-2 px-4 py-2 rounded-full border ${pointsEnabled ? 'bg-state-success/10 border-state-success/20 text-state-success' : 'bg-state-danger/10 border-state-danger/20 text-state-danger'}`}>
+            <RiFlashlightLine className="w-4 h-4" />
+            <span className="text-xs font-black uppercase tracking-widest">{pointsEnabled ? 'System Active' : 'System Paused'}</span>
+          </div>
+          <Button icon={pointsEnabled ? RiCloseCircleLine : RiCheckboxCircleLine} variant={pointsEnabled ? 'secondary' : 'primary'} onClick={togglePointsSystem}>
+            {pointsEnabled ? 'Stop System' : 'Start System'}
+          </Button>
+        </div>
       </PageHeader>
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 mt-2">
+          <MetricCard title="Total Points Awarded" value={totalPoints.toLocaleString()} trend={+12} icon={RiTrophyLine} />
+          <MetricCard title="Monetary Liability" value={`₹${totalRupeeValue.toLocaleString()}`} trend={+12} icon={RiMoneyDollarCircleLine} />
+          <MetricCard title="Active Partners" value={entities.length} trend={+2} icon={RiGroupLine} />
+          <MetricCard title="Expiring (30d)" value="1,250" trend={-5} icon={RiTimeLine} />
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
          {top3.map((entry, idx) => (
@@ -49,8 +78,16 @@ export default function RewardsDashboardPage() {
               </div>
               <div className="mt-4 relative z-10">
                  <h4 className="text-lg font-bold text-content-primary truncate">{entry.name}</h4>
-                 <p className="text-xs text-content-tertiary font-bold uppercase tracking-widest mt-1">Total Points</p>
-                 <h2 className="text-3xl font-black text-brand-teal mt-0.5">{entry.points.toLocaleString()}</h2>
+                 <div className="flex items-center justify-between mt-1">
+                    <div>
+                      <p className="text-[10px] text-content-tertiary font-bold uppercase tracking-widest leading-none">Total Points</p>
+                      <h2 className="text-3xl font-black text-brand-teal mt-1">{entry.points.toLocaleString()}</h2>
+                    </div>
+                    <div className="text-right">
+                       <p className="text-[10px] text-content-tertiary font-bold uppercase tracking-widest leading-none">Value</p>
+                       <h4 className="text-xl font-black text-brand-teal mt-1 tracking-tighter">₹{(entry.points * systemConfig.pointToRupeeRatio).toLocaleString()}</h4>
+                    </div>
+                 </div>
               </div>
               <div className="absolute -bottom-4 -right-4 opacity-10">
                  <RiTrophyLine className="w-32 h-32" />
@@ -64,13 +101,13 @@ export default function RewardsDashboardPage() {
             <Card>
                <CardHeader>
                   <CardTitle>Leaderboard Standings</CardTitle>
-                  <CardDescription>Highest point accumulation across our registered entity network</CardDescription>
+                  <CardDescription>Highest point accumulation across our registered entity network (₹ view enabled)</CardDescription>
                </CardHeader>
                <DataTable columns={columns} data={leaderboard} />
             </Card>
 
             <div className="glass-card p-6">
-               <h3 className="section-title mb-6">Regional Rewards Distribution</h3>
+               <h3 className="section-title mb-6">Regional Rewards Distribution (Total Points)</h3>
                <BarChart 
                  data={[
                    { name: 'Mumbai', val: 45600 },
@@ -91,7 +128,7 @@ export default function RewardsDashboardPage() {
             <Card>
                <CardHeader>
                   <div className="flex items-center justify-between w-full">
-                     <CardTitle>Active Targets</CardTitle>
+                     <CardTitle>Active Programs</CardTitle>
                      <Button variant="ghost" size="sm" icon={RiSettings4Line}>Manage</Button>
                   </div>
                </CardHeader>
@@ -102,16 +139,17 @@ export default function RewardsDashboardPage() {
                           <p className="text-sm font-semibold text-content-primary group-hover:text-brand-teal transition-colors">{tgt.name}</p>
                           <Badge size="xs" variant="teal">{tgt.type}</Badge>
                        </div>
-                       <div className="flex items-center justify-between">
-                          <span className="text-[10px] text-content-tertiary font-bold">{tgt.points} POINTS</span>
+                       <div className="flex items-center justify-between mb-2">
+                          <span className="text-[10px] text-content-tertiary font-bold">{tgt.points} POINTS (₹{(tgt.points * systemConfig.pointToRupeeRatio).toLocaleString()})</span>
                           <span className="text-[10px] text-content-tertiary">Due {tgt.deadline}</span>
                        </div>
-                       <div className="w-full h-1 bg-surface-primary rounded-none mt-2.5 overflow-hidden">
-                          <div className="h-full bg-brand-teal rounded-none" style={{ width: '65%' }} />
+                       <div className="w-full h-1 bg-surface-primary rounded-none overflow-hidden">
+                          <div className="h-full bg-brand-teal rounded-none" style={{ width: `${(tgt.current / tgt.value) * 100}%` }} />
                        </div>
+                       <p className="text-[9px] text-content-tertiary text-right mt-1 font-bold">{((tgt.current / tgt.value) * 100).toFixed(1)}% Completed</p>
                     </div>
                   ))}
-                  <Button className="w-full mt-2" variant="secondary" icon={RiTrophyLine}>View All Targets</Button>
+                  <Button className="w-full mt-2" variant="secondary" icon={RiTrophyLine}>View All Milestone Data</Button>
                </div>
             </Card>
 
@@ -121,10 +159,10 @@ export default function RewardsDashboardPage() {
                      <RiHandHeartLine className="text-brand-pink w-8 h-8" />
                   </div>
                   <div>
-                    <h4 className="text-lg font-bold text-content-primary">Quarterly Reward Gala</h4>
-                    <p className="text-xs text-content-secondary mt-1">Announcement for top performers coming soon in May 2026. Keep pushing targets!</p>
+                    <h4 className="text-lg font-bold text-content-primary">Pending Redemptions</h4>
+                    <p className="text-xs text-content-secondary mt-1 tracking-tight">8 Retailers requested Cash Incentives in the last 24 hours. Approval needed.</p>
                   </div>
-                  <Button className="w-full">System Broadcast</Button>
+                  <Button className="w-full" variant="secondary">Go to Redemption Queue</Button>
                </div>
             </Card>
          </div>

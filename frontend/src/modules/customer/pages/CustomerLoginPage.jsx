@@ -9,8 +9,9 @@ import toast from 'react-hot-toast';
 
 const CustomerLoginPage = () => {
   const navigate = useNavigate();
-  const { login } = useAuthContext();
+  const { requestOTP, verifyOTP } = useAuthContext();
   const [step, setStep] = useState(0); // 0: Name, 1: Email, 2: OTP
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -44,23 +45,45 @@ const CustomerLoginPage = () => {
     }
   ];
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (step === 0 && !formData.name) return toast.error('Please enter your name');
-    if (step === 1 && !formData.email) return toast.error('Please enter your email');
+    
+    if (step === 1) {
+      if (!formData.email) return toast.error('Please enter your email');
+      
+      setLoading(true);
+      const { success, message } = await requestOTP(formData.email, 'customer');
+      setLoading(false);
+      
+      if (success) {
+        toast.success(message || 'OTP sent to your email!');
+        setStep(2);
+      } else {
+        toast.error(message || 'Failed to send OTP');
+      }
+      return;
+    }
 
     if (step < 2) {
-      if (step === 1) toast.success('OTP sent to your email!');
       setStep(step + 1);
     } else {
       handleFinalLogin();
     }
   };
 
-  const handleFinalLogin = () => {
-    if (!formData.otp || formData.otp.length !== 6) return toast.error('Enter valid 6-digit OTP');
-    toast.success('Login Successful!');
-    login('customer');
-    navigate('/customer');
+  const handleFinalLogin = async () => {
+    if (!formData.otp || formData.otp.length < 6) return toast.error('Enter valid 6-digit OTP');
+    
+    setLoading(true);
+    const { success, role, message } = await verifyOTP(formData.email, formData.otp, 'customer', formData.name);
+    setLoading(false);
+
+    if (success) {
+      toast.success('Login Successful!');
+      navigate('/customer');
+    } else {
+      toast.error(message || 'Verification failed');
+    }
   };
 
   const currentStep = steps[step];
@@ -71,7 +94,7 @@ const CustomerLoginPage = () => {
       <div className="relative h-[20vh] min-h-[140px] w-full bg-gradient-to-r from-[#5AC2B1] via-[#3FAFB0] to-[#2D8F9C] overflow-visible flex items-center justify-center">
         {/* Navigation Bar */}
         <div className="absolute inset-0 flex justify-between items-start px-5 pt-8 z-20">
-          <button 
+          <button
             onClick={() => navigate('/')}
             className="w-9 h-9 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/20 active:scale-90 transition-all"
           >
@@ -101,13 +124,13 @@ const CustomerLoginPage = () => {
       <div className="flex flex-col items-center -mt-[25px] sm:-mt-[40px] px-6 relative z-30 transition-all duration-500">
         <div className="relative max-w-[340px] w-full flex items-center justify-center">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] aspect-square bg-[#3FAFB0]/5 blur-3xl rounded-full"></div>
-          <img 
-            src="/init page .png" 
-            alt="Appliances" 
-            className="w-full h-auto object-contain relative z-10 drop-shadow-[0_10px_20px_rgba(0,0,0,0.06)]" 
+          <img
+            src="/init page .png"
+            alt="Appliances"
+            className="w-full h-auto object-contain relative z-10 drop-shadow-[0_10px_20px_rgba(0,0,0,0.06)]"
           />
         </div>
-        
+
         <div className="mt-5 text-center px-4">
           <h1 className="text-xl font-black text-[#2D8F9C] tracking-tighter uppercase leading-none">GET STARTED</h1>
           <p className="text-gray-300 text-[9px] font-black tracking-[0.2em] mt-1.5 opacity-60 uppercase">ONE-STOP SMART SERVICE</p>
@@ -120,11 +143,10 @@ const CustomerLoginPage = () => {
           {/* Progress Indicator */}
           <div className="flex gap-1.5 mb-7 justify-center">
             {steps.map((_, i) => (
-              <div 
-                key={i} 
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  i === step ? 'w-8 bg-[#E0128A]' : 'w-2 bg-gray-100'
-                }`} 
+              <div
+                key={i}
+                className={`h-1.5 rounded-full transition-all duration-300 ${i === step ? 'w-8 bg-[#E0128A]' : 'w-2 bg-gray-100'
+                  }`}
               />
             ))}
           </div>
@@ -147,9 +169,9 @@ const CustomerLoginPage = () => {
                   onKeyDown={(e) => e.key === 'Enter' && handleNext()}
                   className="w-full h-12 pl-14 pr-5 bg-white border border-gray-100 rounded-[18px] outline-none focus:border-[#3FAFB0] focus:shadow-[0_8px_20px_rgba(63,175,176,0.08)] transition-all text-[15px] font-bold placeholder:text-gray-100 placeholder:font-normal"
                 />
-                
+
                 {step > 0 && (
-                  <button 
+                  <button
                     onClick={() => setStep(step - 1)}
                     className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-300 hover:text-[#3FAFB0] transition-colors"
                   >
@@ -161,19 +183,35 @@ const CustomerLoginPage = () => {
 
             {/* Compact Action Button */}
             <div className="flex justify-center">
-                <button
+              <button
                 onClick={handleNext}
-                className="w-full h-12 bg-gradient-to-r from-[#2D8F9C] to-[#5AC2B1] rounded-[18px] flex items-center justify-center gap-3 text-white font-black text-lg shadow-xl shadow-[#3FAFB0]/15 active:scale-[0.98] transition-all group overflow-hidden relative"
-                >
+                disabled={loading}
+                className={`w-full h-12 bg-gradient-to-r from-[#2D8F9C] to-[#5AC2B1] rounded-[18px] flex items-center justify-center gap-3 text-white font-black text-lg shadow-xl shadow-[#3FAFB0]/15 active:scale-[0.98] transition-all group overflow-hidden relative ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+              >
                 <span className="relative z-10 flex items-center gap-2">
-                    {step === 2 ? 'ENTER' : 'CONTINUE'}
-                    {step < 2 && <RiArrowRightFill className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+                  {loading ? 'PROCESSING...' : step === 2 ? 'ENTER' : 'CONTINUE'}
+                  {!loading && step < 2 && <RiArrowRightFill className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
                 </span>
-                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
-                </button>
+                {!loading && <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>}
+              </button>
             </div>
 
-            <div className="text-center mt-4">
+            <div className="text-center mt-4 space-y-2">
+              <div className="flex items-center justify-center gap-4">
+                <button
+                  onClick={() => navigate('/customer/forgot-password')}
+                  className="text-[11px] font-black text-gray-300 hover:text-[#E0128A] uppercase tracking-widest transition-colors"
+                >
+                  Forgot Password?
+                </button>
+                <span className="text-gray-100 text-[10px]">|</span>
+                <button
+                  onClick={() => navigate('/customer/register')}
+                  className="text-[11px] font-black text-[#E0128A] hover:underline uppercase tracking-widest"
+                >
+                  Create Account
+                </button>
+              </div>
               <p className="text-gray-200 text-[9px] tracking-[0.2em] font-black uppercase opacity-70">
                 Ogun • Premium Experience
               </p>
@@ -190,10 +228,10 @@ const CustomerLoginPage = () => {
             <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"></path>
           </svg>
         </div>
-        
+
         {/* Centered Logo in Footer (Subtle) */}
         <div className="h-full flex items-center justify-center opacity-10 pb-4">
-             <img src="/remove bg logo .png" alt="Ogun Logo" className="h-12 w-12 object-contain grayscale brightness-200" />
+          <img src="/remove bg logo .png" alt="Ogun Logo" className="h-12 w-12 object-contain grayscale brightness-200" />
         </div>
       </div>
 

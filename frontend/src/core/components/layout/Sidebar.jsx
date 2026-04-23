@@ -2,7 +2,8 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { classNames } from '../../utils/helpers';
 import { useSidebarContext } from '../../context/SidebarContext';
-import { APP_NAME } from '../../utils/constants';
+import { APP_NAME, SUB_ROLES } from '../../utils/constants';
+import { useAuthContext } from '../../context/AuthContext';
 import {
   RiDashboardLine, RiShieldKeyholeLine, RiBox3Line, RiShoppingCartLine,
   RiMoneyDollarCircleLine, RiTeamLine, RiWalletLine, RiCalendarCheckLine,
@@ -16,28 +17,28 @@ import {
 const adminNav = [
   { label: 'Dashboard', icon: RiDashboardLine, path: '/admin' },
   {
-    label: 'Access Control', icon: RiShieldKeyholeLine, children: [
+    label: 'Access Control', icon: RiShieldKeyholeLine, permission: 'rbac', children: [
       { label: 'Roles', path: '/admin/rbac/roles' },
       { label: 'Permissions', path: '/admin/rbac/permissions' },
       { label: 'Users', path: '/admin/rbac/users' },
     ],
   },
   {
-    label: 'Inventory', icon: RiBox3Line, children: [
+    label: 'Inventory', icon: RiBox3Line, permission: 'inventory', children: [
       { label: 'Products', path: '/admin/inventory/products' },
       { label: 'Stock Overview', path: '/admin/inventory/stock' },
       { label: 'Stock Alerts', path: '/admin/inventory/alerts' },
     ],
   },
   {
-    label: 'Orders', icon: RiShoppingCartLine, children: [
+    label: 'Orders', icon: RiShoppingCartLine, permission: 'orders', children: [
       { label: 'All Orders', path: '/admin/orders' },
       { label: 'Restock Requests', path: '/admin/orders/restock' },
       { label: 'Order Flow', path: '/admin/orders/flow' },
     ],
   },
   {
-    label: 'Accounts', icon: RiMoneyDollarCircleLine, children: [
+    label: 'Accounts', icon: RiMoneyDollarCircleLine, permission: 'accounts', children: [
       { label: 'Ledger', path: '/admin/accounts/ledger' },
       { label: 'Invoices', path: '/admin/accounts/invoices' },
       { label: 'Payments', path: '/admin/accounts/payments' },
@@ -45,14 +46,14 @@ const adminNav = [
     ],
   },
   {
-    label: 'HR', icon: RiTeamLine, children: [
+    label: 'HR', icon: RiTeamLine, permission: 'hr', children: [
       { label: 'Employees', path: '/admin/hr/employees' },
       { label: 'Offer Letters', path: '/admin/hr/offer-letters' },
       { label: 'Departments', path: '/admin/hr/departments' },
     ],
   },
   {
-    label: 'Payroll', icon: RiWalletLine, children: [
+    label: 'Payroll', icon: RiWalletLine, permission: 'payroll', children: [
       { label: 'Dashboard', path: '/admin/payroll' },
       { label: 'Process Salary', path: '/admin/payroll/process' },
       { label: 'Payslips', path: '/admin/payroll/payslips' },
@@ -60,47 +61,48 @@ const adminNav = [
     ],
   },
   {
-    label: 'Leaves', icon: RiCalendarCheckLine, children: [
+    label: 'Leaves', icon: RiCalendarCheckLine, permission: 'leaves', children: [
       { label: 'Requests', path: '/admin/leaves' },
       { label: 'Calendar', path: '/admin/leaves/calendar' },
     ],
   },
   {
-    label: 'Rewards', icon: RiTrophyLine, children: [
+    label: 'Rewards', icon: RiTrophyLine, permission: 'rewards', children: [
       { label: 'Dashboard', path: '/admin/rewards' },
       { label: 'Target Config', path: '/admin/rewards/targets' },
       { label: 'Points History', path: '/admin/rewards/history' },
     ],
   },
-  { label: 'Distributors', icon: RiTruckLine, path: '/admin/distributors' },
-  { label: 'Retailers', icon: RiStore2Line, path: '/admin/retailers' },
-  { label: 'Customers', icon: RiUserLine, path: '/admin/customers' },
+  { label: 'Distributors', icon: RiTruckLine, path: '/admin/distributors', permission: 'distributors' },
+  { label: 'Retailers', icon: RiStore2Line, path: '/admin/retailers', permission: 'retailers' },
+  { label: 'Customers', icon: RiUserLine, path: '/admin/customers', permission: 'customers' },
   {
-    label: 'Service', icon: RiCustomerServiceLine, children: [
+    label: 'Service', icon: RiCustomerServiceLine, permission: 'service', children: [
       { label: 'Requests', path: '/admin/service' },
       { label: 'Analytics', path: '/admin/service/analytics' },
     ],
   },
   {
-    label: 'Content', icon: RiImage2Line, children: [
+    label: 'Content', icon: RiImage2Line, permission: 'content', children: [
       { label: 'Social Grid', path: '/admin/content/social-grid' },
     ],
   },
-  { label: 'Reports', icon: RiBarChartBoxLine, path: '/admin/reports' },
+  { label: 'Reports', icon: RiBarChartBoxLine, path: '/admin/reports', permission: 'reports' },
   { label: 'Settings', icon: RiSettings3Line, path: '/admin/settings' },
 ];
 
 const distributorNav = [
   { label: 'Dashboard', icon: RiDashboardLine, path: '/distributor' },
+  { label: 'Marketplace', icon: RiStore2Line, path: '/distributor/marketplace' },
   { label: 'My Stock', icon: RiBox3Line, path: '/distributor/stock' },
   {
     label: 'Orders', icon: RiShoppingCartLine, children: [
-      { label: 'Incoming Requests', path: '/distributor/orders' },
-      { label: 'Dispatch', path: '/distributor/orders/dispatch' },
+      { label: 'My Orders', path: '/distributor/my-orders' },
+      { label: 'Retailer Requests', path: '/distributor/orders' },
       { label: 'History', path: '/distributor/orders/history' },
     ],
   },
-  { label: 'My Retailers', icon: RiStore2Line, path: '/distributor/retailers' },
+  { label: 'My Retailers', icon: RiUserLine, path: '/distributor/retailers' },
   {
     label: 'Accounts', icon: RiMoneyDollarCircleLine, children: [
       { label: 'Ledger', path: '/distributor/accounts' },
@@ -112,12 +114,18 @@ const distributorNav = [
   { label: 'Settings', icon: RiSettings3Line, path: '/distributor/settings' },
 ];
 
-export function getNavItems(role) {
-  switch (role) {
-    case 'admin': return adminNav;
-    case 'distributor': return distributorNav;
-    default: return [];
+export function getNavItems(role, subRole, permissions) {
+  if (role === 'admin') {
+    if (subRole === SUB_ROLES.SUPER_ADMIN) return adminNav;
+    return adminNav.filter(item => {
+      // If no permission is required (e.g., Dashboard, Settings), show it
+      if (!item.permission) return true;
+      // Otherwise check if it's in the user's permissions
+      return (permissions || []).includes(item.permission);
+    });
   }
+  if (role === 'distributor') return distributorNav;
+  return [];
 }
 
 function NavItem({ item, isCollapsed }) {
@@ -184,8 +192,9 @@ function NavItem({ item, isCollapsed }) {
 }
 
 export default function Sidebar({ role = 'admin' }) {
+  const { user } = useAuthContext();
   const { isCollapsed, toggle, isMobileOpen, closeMobile } = useSidebarContext();
-  const navItems = getNavItems(role);
+  const navItems = getNavItems(user?.role, user?.subRole, user?.permissions);
 
   return (
     <>
@@ -221,7 +230,12 @@ export default function Sidebar({ role = 'admin' }) {
 
         {/* Footer */}
         {!isCollapsed && (
-          <div className="p-4 border-t border-border">
+          <div className="p-4 border-t border-border space-y-3">
+            <div className="flex flex-col items-center gap-1.5">
+               <span className="text-[10px] font-black text-brand-teal uppercase tracking-widest bg-brand-teal/5 px-3 py-1 border border-brand-teal/20">
+                 {user?.subRole ? user.subRole.replace('_', ' ') : user?.role || 'Guest'}
+               </span>
+            </div>
             <p className="text-xs text-content-tertiary text-center">© 2026 OGUN CRM</p>
           </div>
         )}

@@ -12,12 +12,27 @@ import Avatar from '../../../core/components/ui/Avatar';
 import Card from '../../../core/components/ui/Card';
 
 import customerData from '../../../data/customer.json';
+import { useAuthContext } from '../../../core/context/AuthContext';
 
 export default function CustomerHomePage() {
    const navigate = useNavigate();
+   const { user } = useAuthContext();
    const { profile, banners, products } = customerData;
    const scrollRef = useRef(null);
    const [currentIndex, setCurrentIndex] = useState(0);
+
+   const [greeting, setGreeting] = useState('');
+
+   useEffect(() => {
+      const getGreeting = () => {
+         const hour = new Date().getHours();
+         if (hour < 12) return "Good Morning";
+         if (hour < 17) return "Good Afternoon";
+         if (hour < 21) return "Good Evening";
+         return "Good Night";
+      };
+      setGreeting(getGreeting());
+   }, []);
 
    useEffect(() => {
       const interval = setInterval(() => {
@@ -34,6 +49,8 @@ export default function CustomerHomePage() {
       return () => clearInterval(interval);
    }, [currentIndex, banners.length]);
 
+   const displayName = user?.name?.split(' ')[0] || profile.name.split(' ')[0];
+
    return (
       <div className="page-container flex flex-col gap-6 max-w-lg mx-auto">
          {/* Top Section - Boutique Header - Ultra Compact Theme */}
@@ -45,8 +62,8 @@ export default function CustomerHomePage() {
                      <img src="/remove bg logo .png" alt="Ogun Logo" className="w-full h-full object-contain" />
                   </div>
                   <div className="flex flex-col">
-                     <p className="text-[7px] text-brand-teal font-black uppercase tracking-[0.4em] leading-none mb-1 opacity-70">Good Morning,</p>
-                     <h3 className="text-[13px] font-black text-gray-800 tracking-tight leading-none">{profile.name.split(' ')[0]}</h3>
+                     <p className="text-[7px] text-brand-pink font-black uppercase tracking-[0.4em] leading-none mb-1">{greeting},</p>
+                     <h3 className="text-[13px] font-black text-gray-800 tracking-tight leading-none">{displayName}</h3>
                   </div>
                </div>
 
@@ -55,16 +72,16 @@ export default function CustomerHomePage() {
                   <div className="flex flex-col items-end pr-2 border-r border-gray-100 h-7 justify-center">
                      <div className="flex items-center gap-1 mb-0.5">
                         <RiShieldStarLine className="text-yellow-500 w-2.5 h-2.5" />
-                        <span className="text-[7px] font-black text-gray-400 uppercase tracking-[0.15em] leading-none">{profile.loyalty}</span>
+                        <span className="text-[7px] font-black text-gray-600 uppercase tracking-[0.15em] leading-none">{profile.loyalty}</span>
                      </div>
                      <div className="flex items-baseline gap-0.5">
                         <span className="text-sm font-black text-gray-800 leading-none">{profile.points}</span>
-                        <span className="text-[6px] text-gray-300 font-bold uppercase tracking-wider">pts</span>
+                        <span className="text-[6px] text-gray-400 font-bold uppercase tracking-wider">pts</span>
                      </div>
                   </div>
 
                   <div className="relative cursor-pointer hover:scale-110 active:scale-95 transition-all p-1.5 group">
-                     <RiNotification3Line className="text-gray-300 w-5 h-5 group-hover:text-brand-pink transition-colors" />
+                     <RiNotification3Line className="text-gray-400 w-5 h-5 group-hover:text-brand-pink transition-colors" />
                      <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-brand-pink rounded-full border border-white"></span>
                   </div>
                </div>

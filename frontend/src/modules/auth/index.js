@@ -1,7 +1,7 @@
-import LoginPage from './pages/LoginPage';
+import LaunchpadPage from './pages/LaunchpadPage';
 
 export const authRoutes = [
-  { path: '/login', element: <LoginPage /> },
+  { path: '/login', element: <LaunchpadPage /> },
 ];
 
-export { default as LoginPage } from './pages/LoginPage';
+export { default as LaunchpadPage } from './pages/LaunchpadPage';

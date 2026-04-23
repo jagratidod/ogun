@@ -33,6 +33,7 @@ export { default as PieChart } from './components/charts/PieChart';
 
 // Hooks
 export { useSearch } from './hooks/useSearch';
+export { usePermissions } from './hooks/usePermissions';
 export { useLocalStorage } from './hooks/useLocalStorage';
 export { usePagination } from './hooks/usePagination';
 export { useSort } from './hooks/useSort';
@@ -43,6 +44,7 @@ export { useMediaQuery, useIsMobile, useIsTablet, useIsDesktop } from './hooks/u
 export { AuthProvider, useAuthContext } from './context/AuthContext';
 export { SidebarProvider, useSidebarContext } from './context/SidebarContext';
 export { NotificationProvider, useNotificationContext } from './context/NotificationContext';
+export { ToastProvider, useNotification } from './context/ToastContext';
 
 // Utils
 export * from './utils/constants';

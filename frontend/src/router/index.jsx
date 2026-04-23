@@ -9,35 +9,46 @@ import RetailerLayout from '../core/components/layout/RetailerLayout';
 import CustomerLayout from '../core/components/layout/CustomerLayout';
 
 // Auth
-import LoginPage from '../modules/auth/pages/LoginPage';
+import LaunchpadPage from '../modules/auth/pages/LaunchpadPage';
+import AdminLoginPage from '../modules/auth/pages/AdminLoginPage';
+import AdminSignUpPage from '../modules/auth/pages/AdminSignUpPage';
+import AdminForgotPasswordPage from '../modules/auth/pages/AdminForgotPasswordPage';
+import DistributorLoginPage from '../modules/auth/pages/DistributorLoginPage';
+import DistributorSignUpPage from '../modules/auth/pages/DistributorSignUpPage';
+import RetailerLoginPage from '../modules/auth/pages/RetailerLoginPage';
+import RetailerSignUpPage from '../modules/auth/pages/RetailerSignUpPage';
+import CustomerLoginPage from '../modules/customer/pages/CustomerLoginPage';
+import CustomerRegisterPage from '../modules/customer/pages/CustomerRegisterPage';
+import CustomerForgotPasswordPage from '../modules/customer/pages/CustomerForgotPasswordPage';
+import UnauthorizedPage from '../modules/auth/pages/UnauthorizedPage';
 
 // Stub for unbuilt modules
 import StubPage from '../modules/shared/StubPage';
 
-import { 
-  AdminDashboardPage, RolesPage, PermissionsPage, UsersPage, 
-  ProductsPage, StockOverview, StockAlerts, OrderListPage, 
-  RestockRequestsPage, OrderFlowPage, LedgerPage, InvoicesPage, 
-  PaymentsPage, FinancialReportPage, EmployeesPage, DepartmentsPage, 
-  PayrollDashboardPage, SalaryProcessPage, LeaveRequestsPage, 
-  LeaveCalendarPage, RewardsDashboardPage, TargetConfigPage, 
-  PointsHistoryPage, ServiceRequestsPage, ServiceDetailPage, 
-  ServiceAnalyticsPage, DistributorListPage, RetailerListPage, 
+import {
+  AdminDashboardPage, RolesPage, PermissionsPage, UsersPage,
+  ProductsPage, StockOverview, StockAlerts, OrderListPage,
+  RestockRequestsPage, OrderFlowPage, LedgerPage, InvoicesPage,
+  PaymentsPage, FinancialReportPage, EmployeesPage, DepartmentsPage,
+  PayrollDashboardPage, SalaryProcessPage, LeaveRequestsPage,
+  LeaveCalendarPage, RewardsDashboardPage, TargetConfigPage,
+  PointsHistoryPage, ServiceRequestsPage, ServiceDetailPage,
+  ServiceAnalyticsPage, DistributorListPage, RetailerListPage,
   CustomerListPage, ReportsPage, AdminSettingsPage, PayslipsPage, DeductionsPage, OfferLettersPage, SocialGridManagerPage
 } from '../modules/admin';
 
-import { 
-  DistributorDashboardPage, DistributorStockPage, IncomingRequestsPage, 
-  DispatchPage, DistOrderHistoryPage, MyRetailersPage, 
-  DistLedgerPage, DistPaymentsPage, DistRewardsPage, 
-  DistAnalyticsPage, DistSettingsPage 
+import {
+  DistributorDashboardPage, DistributorStockPage, IncomingRequestsPage,
+  DispatchPage, DistOrderHistoryPage, MyRetailersPage,
+  DistLedgerPage, DistPaymentsPage, DistRewardsPage,
+  DistAnalyticsPage, DistSettingsPage, BrowseAdminProducts, MyOrdersPage
 } from '../modules/distributor';
 
-import { 
-  RetailerDashboardPage, NewSalePage, SalesHistoryPage, 
-  RetailerStockPage, RestockRequestPage, RetailerLedgerPage, 
-  RetailerCustomersPage, RetailerRewardsPage, RetailerAnalyticsPage, 
-  RetailerSettingsPage 
+import {
+  RetailerDashboardPage, NewSalePage, SalesHistoryPage,
+  RetailerStockPage, RestockRequestPage, RetailerLedgerPage,
+  RetailerCustomersPage, RetailerRewardsPage, RetailerAnalyticsPage,
+  RetailerSettingsPage, BrowseDistributorProducts
 } from '../modules/retailer';
 
 import CustomerHomePage from '../modules/customer/pages/CustomerHomePage';
@@ -48,7 +59,6 @@ import RaiseComplaintPage from '../modules/customer/pages/RaiseComplaintPage';
 import MyServiceRequestsPage from '../modules/customer/pages/MyServiceRequestsPage';
 import ServiceRequestDetailPage from '../modules/customer/pages/ServiceRequestDetailPage';
 import CustomerSettingsPage from '../modules/customer/pages/CustomerSettingsPage';
-import CustomerLoginPage from '../modules/customer/pages/CustomerLoginPage';
 import CustomerSocialPage from '../modules/customer/pages/CustomerSocialPage';
 
 import SplashPage from '../modules/shared/SplashPage';
@@ -64,18 +74,18 @@ const Roles = () => <RolesPage />;
 const Permissions = () => <PermissionsPage />;
 const Users = () => <UsersPage />;
 const Products = () => <ProductsPage />;
-const StockOverviewComp = () => <StockOverview />; 
+const StockOverviewComp = () => <StockOverview />;
 const StockAlertsComp = () => <StockAlerts />;
 const OrderList = () => <OrderListPage />;
 const RestockRequests = () => <RestockRequestsPage />;
 const OrderFlow = () => <OrderFlowPage />;
-const OrderDetailPage = Stub('Order Detail'); // Still a stub for now
+const OrderDetailPage = Stub('Order Detail'); 
 const Ledger = () => <LedgerPage />;
 const Invoices = () => <InvoicesPage />;
 const Payments = () => <PaymentsPage />;
 const FinancialReport = () => <FinancialReportPage />;
 const Employees = () => <EmployeesPage />;
-const EmployeeDetailPage = Stub('Employee Detail'); // Still a stub
+const EmployeeDetailPage = Stub('Employee Detail'); 
 const OfferLetters = () => <OfferLettersPage />;
 const Departments = () => <DepartmentsPage />;
 const PayrollDashboard = () => <PayrollDashboardPage />;
@@ -91,11 +101,11 @@ const ServiceRequests = () => <ServiceRequestsPage />;
 const ServiceDetail = () => <ServiceDetailPage />;
 const ServiceAnalytics = () => <ServiceAnalyticsPage />;
 const DistributorList = () => <DistributorListPage />;
-const DistributorDetailPage = Stub('Distributor Detail'); // Still a stub
+const DistributorDetailPage = Stub('Distributor Detail'); 
 const RetailerList = () => <RetailerListPage />;
-const RetailerDetailPage = Stub('Retailer Detail'); // Still a stub
+const RetailerDetailPage = Stub('Retailer Detail'); 
 const CustomerList = () => <CustomerListPage />;
-const CustomerDetailPage = Stub('Customer Detail'); // Still a stub
+const CustomerDetailPage = Stub('Customer Detail'); 
 const Reports = () => <ReportsPage />;
 const AdminSettings = () => <AdminSettingsPage />;
 const SocialGridManager = () => <SocialGridManagerPage />;
@@ -107,12 +117,14 @@ const IncomingReqs = () => <IncomingRequestsPage />;
 const Dispatch = () => <DispatchPage />;
 const DistOrders = () => <DistOrderHistoryPage />;
 const MyRetailers = () => <MyRetailersPage />;
-const MyRetailerDetailPage = Stub('Retailer Detail'); // Keep as stub
+const MyRetailerDetailPage = Stub('Retailer Detail'); 
 const DistLedger = () => <DistLedgerPage />;
 const DistPayments = () => <DistPaymentsPage />;
 const DistRewards = () => <DistRewardsPage />;
 const DistAnalytics = () => <DistAnalyticsPage />;
 const DistSettings = () => <DistSettingsPage />;
+const BrowseMarketplace = () => <BrowseAdminProducts />;
+const MyOrders = () => <MyOrdersPage />;
 
 // ─── Retailer real pages ───────────────────────────
 const RetailDashboard = () => <RetailerDashboardPage />;
@@ -139,7 +151,10 @@ const CustomerSocial = () => <CustomerSocialPage />;
 
 
 function RootRedirect() {
-  const { isAuthenticated, user } = useAuthContext();
+  const { isAuthenticated, user, loading } = useAuthContext();
+  
+  if (loading) return null; // Wait for auth initialization
+  
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   switch (user?.role) {
     case 'admin': return <Navigate to="/admin" replace />;
@@ -154,17 +169,34 @@ export default function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Root Role Selection Page (4 modules) */}
-        <Route path="/" element={<LoginPage />} />
+        {/* Redirect Root to Business Login */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+
+        {/* Auth Pages */}
+        <Route path="/login" element={<LaunchpadPage />} />
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+        <Route path="/admin/signup" element={<AdminSignUpPage />} />
+        <Route path="/admin/forgot-password" element={<AdminForgotPasswordPage />} />
         
-        {/* Splash Page for Customer Flow */}
+        {/* Distributor Auth */}
+        <Route path="/distributor/login" element={<DistributorLoginPage />} />
+        <Route path="/distributor/signup" element={<DistributorSignUpPage />} />
+
+        {/* Retailer Auth */}
+        <Route path="/retailer/login" element={<RetailerLoginPage />} />
+        <Route path="/retailer/signup" element={<RetailerSignUpPage />} />
+
+        <Route path="/customer/login" element={<CustomerLoginPage />} />
+        <Route path="/customer/register" element={<CustomerRegisterPage />} />
+        <Route path="/customer/forgot-password" element={<CustomerForgotPasswordPage />} />
         <Route path="/splash" element={<SplashPage />} />
         
-        {/* Auth Check Redirect */}
-        <Route path="/home" element={<RootRedirect />} />
+        {/* Error Pages */}
+        <Route path="/unauthorized" element={<UnauthorizedPage />} />
+        <Route path="/admin/unauthorized" element={<UnauthorizedPage isAdmin />} />
 
-        {/* Auth */}
-        <Route path="/login" element={<CustomerLoginPage />} />
+        {/* User Auth Redirect */}
+        <Route path="/home" element={<RootRedirect />} />
 
         {/* ═══ ADMIN ROUTES ═══ */}
         <Route path="/admin" element={
@@ -225,6 +257,8 @@ export default function AppRouter() {
           <Route path="orders" element={<IncomingReqs />} />
           <Route path="orders/dispatch" element={<Dispatch />} />
           <Route path="orders/history" element={<DistOrders />} />
+          <Route path="marketplace" element={<BrowseMarketplace />} />
+          <Route path="my-orders" element={<MyOrders />} />
           <Route path="retailers" element={<MyRetailers />} />
           <Route path="retailers/:id" element={<MyRetailerDetailPage />} />
           <Route path="accounts" element={<DistLedger />} />
@@ -246,10 +280,13 @@ export default function AppRouter() {
           <Route path="sales" element={<NewSale />} />
           <Route path="stock" element={<RetailStock />} />
           <Route path="stock/restock" element={<RestockReq />} />
+          {/* Back-compat alias (dashboard deep-link) */}
+          <Route path="restock" element={<RestockReq />} />
+          <Route path="marketplace" element={<BrowseDistributorProducts />} />
           <Route path="accounts" element={<RetailLedger />} />
-          <Route path="customers" element={<RetailCustomers />} />
+          <Route path="customers" element={<RetailerCustomersPage />} />
           <Route path="rewards" element={<RetailRewards />} />
-          <Route path="analytics" element={<RetailAnalytics />} />
+          <Route path="analytics" element={<RetailerAnalyticsPage />} />
           <Route path="settings" element={<RetailSettings />} />
         </Route>
 
@@ -271,7 +308,7 @@ export default function AppRouter() {
         </Route>
 
         {/* Catch-all */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
     </BrowserRouter>
   );

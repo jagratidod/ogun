@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { RiShoppingBag3Line, RiUserHeartLine, RiStockLine, RiTrophyLine, RiPulseLine, RiArrowRightUpLine, RiEyeLine, RiAddLine, RiHandCoinLine, RiBox3Line, RiTruckLine } from 'react-icons/ri';
 import { PageHeader, MetricCard, AreaChart, Card, CardHeader, CardTitle, CardDescription, DataTable, Badge, Button, Avatar, formatCurrency } from '../../../core';
 import stats from '../../../data/retailer_stats.json';
@@ -39,7 +39,7 @@ export default function RetailerDashboardPage() {
         <div className="cursor-pointer" onClick={() => navigate('/retailer/rewards')}>
           <MetricCard title="Points Balance" value={stats.kpis.loyaltyPoints} icon={RiTrophyLine} />
         </div>
-        <div className="cursor-pointer" onClick={() => navigate('/retailer/restock')}>
+        <div className="cursor-pointer" onClick={() => navigate('/retailer/stock/restock')}>
           <MetricCard title="Pending Restock" value={stats.kpis.pendingRestock} icon={RiTruckLine} />
         </div>
       </div>

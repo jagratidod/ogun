@@ -15,7 +15,7 @@ import { useAuthContext } from '../../../core/context/AuthContext';
 import { toast } from 'react-hot-toast';
 
 export default function RetailerSettingsPage() {
-  const { logout } = useAuthContext();
+  const { user, logout } = useAuthContext();
   const [activeTab, setActiveTab] = useState('Store Profile');
   const [isSaving, setIsSaving] = useState(false);
 
@@ -50,19 +50,19 @@ export default function RetailerSettingsPage() {
                </CardHeader>
                <div className="p-6 space-y-6">
                   <div className="flex items-center gap-6">
-                     <Avatar name="Priya Kitchen World" size="lg" className="rounded-none border border-border" />
+                     <Avatar name={user?.name || 'Retailer'} size="lg" className="rounded-none border border-border" src={user?.avatar} />
                      <div className="flex-1">
-                        <h4 className="text-lg font-bold text-content-primary">Priya Kitchen World</h4>
-                        <p className="text-xs text-brand-teal font-black uppercase tracking-widest leading-none mt-1">Certified Platinum Partner</p>
-                        <p className="text-xs text-content-tertiary mt-1.5 underline cursor-pointer">Official ID: RT-101</p>
+                        <h4 className="text-lg font-bold text-content-primary">{user?.shopName || user?.name || 'Retailer Partner'}</h4>
+                        <p className="text-xs text-brand-teal font-black uppercase tracking-widest leading-none mt-1">{user?.role?.toUpperCase()} PARTNER</p>
+                        <p className="text-xs text-content-tertiary mt-1.5 underline cursor-pointer">Official ID: {user?._id?.toString().slice(-6).toUpperCase()}</p>
                      </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     <Input label="Store Display Name" defaultValue="Priya Kitchen World (North Wing)" />
-                     <Input label="Official Contact" defaultValue="priya.store@ogun.in" />
-                     <Input label="Counter Phone" defaultValue="+91 91234-56789" />
-                     <Input label="Shop Address" defaultValue="Sakinaka, Andheri East, Mumbai, MH, India" />
+                     <Input label="Store Display Name" defaultValue={user?.shopName || user?.name} />
+                     <Input label="Official Contact" defaultValue={user?.email} />
+                     <Input label="Counter Phone" defaultValue={user?.phone || '+91 91234-56789'} />
+                     <Input label="Shop Address" defaultValue={user?.location || 'Sakinaka, Mumbai'} />
                   </div>
                </div>
             </Card>

@@ -5,50 +5,68 @@
       "name": "Super Admin",
       "description": "Full access to all modules and system settings",
       "userCount": 2,
-      "permissionsCount": 156,
-      "isSystem": true
+      "permissionsCount": 14,
+      "isSystem": true,
+      "color": "purple",
+      "permissions": ["hr","payroll","leaves","inventory","orders","distributors","retailers","customers","accounts","reports","rewards","service","content","rbac"]
     },
     {
       "id": "ROL002",
       "name": "Sales Manager",
-      "description": "Manage orders, inventory, and sales reports",
+      "description": "Manage orders, inventory, distributors, retailers, customers and sales reports",
       "userCount": 5,
-      "permissionsCount": 42,
-      "isSystem": false
+      "permissionsCount": 8,
+      "isSystem": false,
+      "color": "teal",
+      "permissions": ["inventory","orders","distributors","retailers","customers","reports","rewards","service"]
     },
     {
       "id": "ROL003",
       "name": "Service Head",
-      "description": "Manage service tickets, technicians, and warranty",
+      "description": "Manage service tickets, technicians, and warranty claims",
       "userCount": 3,
-      "permissionsCount": 28,
-      "isSystem": false
+      "permissionsCount": 2,
+      "isSystem": false,
+      "color": "info",
+      "permissions": ["service","reports"]
     },
     {
       "id": "ROL004",
       "name": "Accountant",
-      "description": "Manage ledgers, invoices, and payments",
+      "description": "Manage ledgers, invoices, payments and financial reports",
       "userCount": 4,
-      "permissionsCount": 35,
-      "isSystem": false
+      "permissionsCount": 2,
+      "isSystem": false,
+      "color": "warning",
+      "permissions": ["accounts","reports"]
     },
     {
       "id": "ROL005",
       "name": "HR Manager",
       "description": "Manage employees, payroll, and leave requests",
       "userCount": 2,
-      "permissionsCount": 40,
-      "isSystem": false
+      "permissionsCount": 3,
+      "isSystem": false,
+      "color": "pink",
+      "permissions": ["hr","payroll","leaves"]
     }
   ],
   "permissions": [
-    { "id": "PRM001", "module": "Dashboard", "action": "View", "description": "Access dashboard metrics" },
-    { "id": "PRM002", "module": "Inventory", "action": "Create", "description": "Add new products" },
-    { "id": "PRM003", "module": "Inventory", "action": "Edit", "description": "Update product details" },
-    { "id": "PRM004", "module": "Inventory", "action": "Delete", "description": "Remove products" },
-    { "id": "PRM005", "module": "Orders", "action": "Approve", "description": "Approve restock requests" },
-    { "id": "PRM006", "module": "Accounts", "action": "View", "description": "View financial reports" },
-    { "id": "PRM007", "module": "HR", "action": "Manage", "description": "Manage employee database" }
+    { "id": "PRM001", "module": "Dashboard",     "section": "dashboard",    "action": "View",   "description": "Access main dashboard metrics and KPIs", "roles": ["ROL001","ROL002","ROL003","ROL004","ROL005"] },
+    { "id": "PRM002", "module": "HR",             "section": "hr",           "action": "Manage", "description": "Full HR employee management access", "roles": ["ROL001","ROL005"] },
+    { "id": "PRM003", "module": "Payroll",        "section": "payroll",      "action": "Manage", "description": "Process and manage payroll runs", "roles": ["ROL001","ROL005"] },
+    { "id": "PRM004", "module": "Leaves",         "section": "leaves",       "action": "Manage", "description": "Approve and manage leave requests", "roles": ["ROL001","ROL005"] },
+    { "id": "PRM005", "module": "Inventory",      "section": "inventory",    "action": "Manage", "description": "Add, edit and remove product inventory", "roles": ["ROL001","ROL002"] },
+    { "id": "PRM006", "module": "Orders",         "section": "orders",       "action": "Manage", "description": "View and process customer/distributor orders", "roles": ["ROL001","ROL002"] },
+    { "id": "PRM007", "module": "Distributors",   "section": "distributors", "action": "Manage", "description": "Manage distributor accounts and assignments", "roles": ["ROL001","ROL002"] },
+    { "id": "PRM008", "module": "Retailers",      "section": "retailers",    "action": "Manage", "description": "Manage retailer accounts and orders", "roles": ["ROL001","ROL002"] },
+    { "id": "PRM009", "module": "Customers",      "section": "customers",    "action": "Manage", "description": "View and manage customer profiles", "roles": ["ROL001","ROL002"] },
+    { "id": "PRM010", "module": "Accounts",       "section": "accounts",     "action": "Manage", "description": "Financial ledgers, invoices and payments", "roles": ["ROL001","ROL004"] },
+    { "id": "PRM011", "module": "Reports",        "section": "reports",      "action": "View",   "description": "Access sales, finance and analytics reports", "roles": ["ROL001","ROL002","ROL003","ROL004"] },
+    { "id": "PRM012", "module": "Rewards",        "section": "rewards",      "action": "Manage", "description": "Manage loyalty points and reward schemes", "roles": ["ROL001","ROL002"] },
+    { "id": "PRM013", "module": "Service",        "section": "service",      "action": "Manage", "description": "View and resolve service tickets", "roles": ["ROL001","ROL002","ROL003"] },
+    { "id": "PRM014", "module": "Content",        "section": "content",      "action": "Manage", "description": "Manage CMS content and media assets", "roles": ["ROL001"] },
+    { "id": "PRM015", "module": "Access Control", "section": "rbac",         "action": "Manage", "description": "Configure roles, users, and permissions", "roles": ["ROL001"] }
   ],
   "users": [
     {
@@ -56,36 +74,65 @@
       "name": "Vikram Sharma",
       "email": "vikram@ogun.in",
       "role": "Super Admin",
+      "roleId": "ROL001",
+      "subRole": "super_admin",
       "status": "active",
       "department": "Management",
-      "lastLogin": "2026-04-06T10:30:00"
+      "permissions": ["hr","payroll","leaves","inventory","orders","distributors","retailers","customers","accounts","reports","rewards","service","content","rbac"],
+      "lastLogin": "2026-04-06T10:30:00",
+      "createdAt": "2025-01-10T09:00:00"
     },
     {
       "id": "USR002",
       "name": "Amit Goel",
       "email": "amit@ogun.in",
       "role": "Sales Manager",
+      "roleId": "ROL002",
+      "subRole": "sales_manager",
       "status": "active",
       "department": "Sales",
-      "lastLogin": "2026-04-06T09:15:00"
+      "permissions": ["inventory","orders","distributors","retailers","customers","reports","rewards","service"],
+      "lastLogin": "2026-04-06T09:15:00",
+      "createdAt": "2025-03-15T10:00:00"
     },
     {
       "id": "USR003",
       "name": "Sneha Kapoor",
       "email": "sneha@ogun.in",
       "role": "Accountant",
+      "roleId": "ROL004",
+      "subRole": "accounts_manager",
       "status": "active",
       "department": "Finance",
-      "lastLogin": "2026-04-05T17:45:00"
+      "permissions": ["accounts","reports"],
+      "lastLogin": "2026-04-05T17:45:00",
+      "createdAt": "2025-02-20T10:00:00"
     },
     {
       "id": "USR004",
       "name": "Rajesh Varma",
       "email": "rajesh@ogun.in",
       "role": "Service Head",
+      "roleId": "ROL003",
+      "subRole": "sales_manager",
       "status": "inactive",
       "department": "Service",
-      "lastLogin": "2026-03-28T14:20:00"
+      "permissions": ["service","reports"],
+      "lastLogin": "2026-03-28T14:20:00",
+      "createdAt": "2025-04-01T10:00:00"
+    },
+    {
+      "id": "USR005",
+      "name": "Priya Nair",
+      "email": "priya@ogun.in",
+      "role": "HR Manager",
+      "roleId": "ROL005",
+      "subRole": "hr_manager",
+      "status": "active",
+      "department": "HR",
+      "permissions": ["hr","payroll","leaves"],
+      "lastLogin": "2026-04-07T08:00:00",
+      "createdAt": "2025-05-10T10:00:00"
     }
   ]
 }

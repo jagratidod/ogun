@@ -1,8 +1,22 @@
 import { RiTruckLine, RiStore2Line, RiMoneyDollarBoxLine, RiStockLine, RiTrophyLine, RiPulseLine, RiArrowRightUpLine, RiEyeLine } from 'react-icons/ri';
 import { PageHeader, MetricCard, AreaChart, Card, CardHeader, CardTitle, CardDescription, DataTable, Badge, Button, Avatar, formatCurrency } from '../../../core';
 import stats from '../../../data/distributor_stats.json';
+import { useDistributorStore } from '../store/useDistributorStore';
 
 export default function DistributorDashboardPage() {
+  const { kpis, restockRequests } = useDistributorStore();
+
+  const recentIncoming = (restockRequests || [])
+    .slice()
+    .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+    .slice(0, 6)
+    .map((r) => ({
+      id: r.id,
+      retailer: r.retailer,
+      amount: r.amount,
+      status: r.status,
+    }));
+
   const columns = [
     { key: 'id', label: 'Order ID', render: (val) => <span className="font-bold text-content-primary">#{val}</span> },
     { key: 'retailer', label: 'Retailer Store' },
@@ -25,11 +39,11 @@ export default function DistributorDashboardPage() {
       </PageHeader>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <MetricCard title="Retailer Network" value={stats.kpis.totalRetailers} icon={RiStore2Line} />
-        <MetricCard title="Active Requests" value={stats.kpis.pendingOrders} icon={RiTruckLine} change={2} />
-        <MetricCard title="Monthly Sales" value={stats.kpis.monthlySales} format="currency" icon={RiMoneyDollarBoxLine} change={12.4} />
+        <MetricCard title="Retailer Network" value={kpis.totalRetailers} icon={RiStore2Line} />
+        <MetricCard title="Active Requests" value={kpis.pendingOrders} icon={RiTruckLine} change={2} />
+        <MetricCard title="Monthly Sales" value={kpis.monthlySales} format="currency" icon={RiMoneyDollarBoxLine} change={12.4} />
         <MetricCard title="Stock Inventory" value={8520} icon={RiStockLine} />
-        <MetricCard title="Loyalty Points" value={stats.kpis.rewardsPoints} icon={RiTrophyLine} />
+        <MetricCard title="Loyalty Points" value={kpis.rewardsPoints} icon={RiTrophyLine} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-2">
@@ -71,7 +85,7 @@ export default function DistributorDashboardPage() {
               <Button size="sm" variant="ghost" icon={RiArrowRightUpLine}>View Dispatch Board</Button>
            </div>
         </CardHeader>
-        <DataTable columns={columns} data={stats.recentOrders} />
+        <DataTable columns={columns} data={recentIncoming.length ? recentIncoming : stats.recentOrders} />
       </Card>
     </div>
   );

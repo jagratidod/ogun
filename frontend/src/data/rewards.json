@@ -1,18 +1,87 @@
 {
+  "systemConfig": {
+    "pointsEnabled": true,
+    "pointToRupeeRatio": 1,
+    "pointsExpiryMonths": 6
+  },
+  "earningRules": {
+    "retailer": {
+      "perProductSale": 10,
+      "bulkBonus100Units": 500,
+      "monthlyTargetBonus": 2000,
+      "fastSellingBonus": 100
+    },
+    "distributor": {
+      "perOrderDispatched": 20,
+      "sameDayDeliveryBonus": 50,
+      "bulkSupplyBonus": 200,
+      "monthlyTargetBonus": 3000
+    }
+  },
+  "tiers": [
+    { "name": "Bronze",   "minPoints": 0,     "color": "#cd7f32", "badge": "🥉", "perks": "Basic access" },
+    { "name": "Silver",   "minPoints": 5000,  "color": "#a8a9ad", "badge": "🥈", "perks": "Priority support" },
+    { "name": "Gold",     "minPoints": 10000, "color": "#ffd700", "badge": "🥇", "perks": "5% margin bonus" },
+    { "name": "Platinum", "minPoints": 20000, "color": "#e5e4e2", "badge": "💎", "perks": "Exclusive perks + Gala invite" }
+  ],
+  "milestones": [
+    { "id": "MS-001", "points": 1000,  "label": "First Thousand",    "badge": "⭐", "reward": "Ogun Gift Box" },
+    { "id": "MS-002", "points": 5000,  "label": "Silver Achiever",   "badge": "🌟", "reward": "Extra 2% Margin" },
+    { "id": "MS-003", "points": 10000, "label": "Gold Champion",     "badge": "🏆", "reward": "POS Hardware Upgrade" },
+    { "id": "MS-004", "points": 20000, "label": "Platinum Legend",   "badge": "💎", "reward": "Annual Gala Invite" }
+  ],
+  "redemptionCatalog": [
+    { "id": "RD-001", "label": "Cash Incentive — ₹500",  "pointsCost": 1000, "type": "cash",    "icon": "money" },
+    { "id": "RD-002", "label": "Gift Voucher — ₹1000",   "pointsCost": 2000, "type": "voucher", "icon": "gift" },
+    { "id": "RD-003", "label": "Discount Coupon — 10%",  "pointsCost": 500,  "type": "coupon",  "icon": "coupon" },
+    { "id": "RD-004", "label": "Free Appliance (Basic)",  "pointsCost": 5000, "type": "product", "icon": "box" },
+    { "id": "RD-005", "label": "POS Hardware Upgrade",   "pointsCost": 12000,"type": "product", "icon": "device" },
+    { "id": "RD-006", "label": "Regional Meet Invite",   "pointsCost": 300,  "type": "event",   "icon": "ticket" }
+  ],
+  "entities": [
+    {
+      "id": "ENT-001", "name": "Priya Kitchen World", "type": "Retailer",    "totalPoints": 12450,
+      "thisMonth": 2500, "tier": "Gold", "expiryDate": "2026-10-01",
+      "pending": 500, "redeemed": 3000
+    },
+    {
+      "id": "ENT-002", "name": "Arjun Patel", "type": "Distributor",         "totalPoints": 18500,
+      "thisMonth": 5000, "tier": "Gold", "expiryDate": "2026-10-01",
+      "pending": 1000, "redeemed": 2000
+    },
+    {
+      "id": "ENT-003", "name": "Smart Kitchen Hub", "type": "Retailer",      "totalPoints": 9800,
+      "thisMonth": 1200, "tier": "Silver", "expiryDate": "2026-09-15",
+      "pending": 0, "redeemed": 1500
+    },
+    {
+      "id": "ENT-004", "name": "HomeChef Appliances", "type": "Retailer",    "totalPoints": 8200,
+      "thisMonth": 800, "tier": "Silver", "expiryDate": "2026-09-01",
+      "pending": 0, "redeemed": 800
+    },
+    {
+      "id": "ENT-005", "name": "Kitchen Express", "type": "Distributor",     "totalPoints": 7450,
+      "thisMonth": 600, "tier": "Silver", "expiryDate": "2026-08-20",
+      "pending": 200, "redeemed": 500
+    }
+  ],
   "targets": [
-    { "id": "TGT-001", "name": "Distributor Q2 Revenue", "type": "Distributor", "value": 5000000, "points": 5000, "status": "Active", "deadline": "2026-06-30" },
-    { "id": "TGT-002", "name": "Retailer Mixer Grinder Push", "type": "Retailer", "value": 150000, "points": 1500, "status": "Active", "deadline": "2026-04-30" },
-    { "id": "TGT-003", "name": "Service Desk Satisfaction", "type": "Staff", "value": 95, "points": 1000, "status": "Active", "deadline": "2026-05-15" }
+    { "id": "TGT-001", "name": "Distributor Q2 Revenue", "type": "Distributor", "value": 5000000, "points": 5000, "current": 4200000, "status": "Active", "deadline": "2026-06-30" },
+    { "id": "TGT-002", "name": "Retailer Mixer Grinder Push", "type": "Retailer", "value": 150000, "points": 1500, "current": 125000, "status": "Active", "deadline": "2026-04-30" },
+    { "id": "TGT-003", "name": "Service Desk Satisfaction", "type": "Staff", "value": 95, "points": 1000, "current": 92, "status": "Active", "deadline": "2026-05-15" }
   ],
   "pointsHistory": [
-    { "id": "PTH-001", "entity": "Priya Kitchen World", "type": "Retailer", "points": 2500, "reason": "Target TGT-002 Achieved", "date": "2026-04-05" },
-    { "id": "PTH-002", "entity": "Arjun Patel", "type": "Distributor", "points": 5000, "reason": "Monthly Sales Bonus", "date": "2026-04-01" },
-    { "id": "PTH-003", "entity": "Smart Kitchen Hub", "type": "Retailer", "points": 1200, "reason": "Product Feedback Bonus", "date": "2026-03-28" }
+    { "id": "PTH-001", "entity": "Priya Kitchen World", "type": "Retailer", "points": 2500, "reason": "Target TGT-002 Achieved", "date": "2026-04-05", "expiry": "2026-10-05" },
+    { "id": "PTH-002", "entity": "Arjun Patel", "type": "Distributor", "points": 5000, "reason": "Monthly Sales Bonus", "date": "2026-04-01", "expiry": "2026-10-01" },
+    { "id": "PTH-003", "entity": "Smart Kitchen Hub", "type": "Retailer", "points": 1200, "reason": "Product Feedback Bonus", "date": "2026-03-28", "expiry": "2026-09-28" },
+    { "id": "PTH-004", "entity": "HomeChef Appliances", "type": "Retailer", "points": 800, "reason": "Inventory Sync Bonus", "date": "2026-03-25", "expiry": "2026-09-25" },
+    { "id": "PTH-005", "entity": "Kitchen Express", "type": "Distributor", "points": 600, "reason": "Fast Delivery Reward", "date": "2026-03-24", "expiry": "2026-09-24" }
   ],
   "leaderboard": [
-    { "name": "Priya Kitchen World", "points": 12450, "rank": 1 },
-    { "name": "Smart Kitchen Hub", "points": 9800, "rank": 2 },
-    { "name": "HomeChef Appliances", "points": 8200, "rank": 3 },
-    { "name": "Kitchen Express", "points": 7450, "rank": 4 }
+    { "name": "Arjun Patel", "points": 18500, "rank": 1, "tier": "Gold" },
+    { "name": "Priya Kitchen World", "points": 12450, "rank": 2, "tier": "Gold" },
+    { "name": "Smart Kitchen Hub", "points": 9800, "rank": 3, "tier": "Silver" },
+    { "name": "HomeChef Appliances", "points": 8200, "rank": 4, "tier": "Silver" },
+    { "name": "Kitchen Express", "points": 7450, "rank": 5, "tier": "Silver" }
   ]
 }
