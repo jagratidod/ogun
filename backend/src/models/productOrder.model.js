@@ -50,10 +50,23 @@ const productOrderSchema = new mongoose.Schema({
   },
   orderType: {
     type: String,
-    enum: ['distributor_to_admin', 'retailer_to_distributor'],
+    enum: ['distributor_to_admin', 'retailer_to_distributor', 'executive_to_retailer'],
     default: 'distributor_to_admin'
   },
+  sellerRole: {
+    type: String,
+    enum: ['admin', 'distributor', 'sales_executive'],
+    default: 'admin'
+  },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
   stockDeducted: {
+    type: Boolean,
+    default: false
+  },
+  stockAddedToBuyer: {
     type: Boolean,
     default: false
   },

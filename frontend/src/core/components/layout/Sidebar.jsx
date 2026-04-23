@@ -18,8 +18,6 @@ const adminNav = [
   { label: 'Dashboard', icon: RiDashboardLine, path: '/admin' },
   {
     label: 'Access Control', icon: RiShieldKeyholeLine, permission: 'rbac', children: [
-      { label: 'Roles', path: '/admin/rbac/roles' },
-      { label: 'Permissions', path: '/admin/rbac/permissions' },
       { label: 'Users', path: '/admin/rbac/users' },
     ],
   },

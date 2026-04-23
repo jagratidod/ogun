@@ -20,13 +20,14 @@ import RetailerSignUpPage from '../modules/auth/pages/RetailerSignUpPage';
 import CustomerLoginPage from '../modules/customer/pages/CustomerLoginPage';
 import CustomerRegisterPage from '../modules/customer/pages/CustomerRegisterPage';
 import CustomerForgotPasswordPage from '../modules/customer/pages/CustomerForgotPasswordPage';
+import SalesLoginPage from '../modules/auth/pages/SalesLoginPage';
 import UnauthorizedPage from '../modules/auth/pages/UnauthorizedPage';
 
 // Stub for unbuilt modules
 import StubPage from '../modules/shared/StubPage';
 
 import {
-  AdminDashboardPage, RolesPage, PermissionsPage, UsersPage,
+  AdminDashboardPage, UsersPage,
   ProductsPage, StockOverview, StockAlerts, OrderListPage,
   RestockRequestsPage, OrderFlowPage, LedgerPage, InvoicesPage,
   PaymentsPage, FinancialReportPage, EmployeesPage, DepartmentsPage,
@@ -54,6 +55,12 @@ import {
   RetailerQueriesPage, RetailerOrdersPage
 } from '../modules/retailer';
 
+import {
+  SalesDashboardPage, RetailerListPage as SalesRetailerListPage, AddRetailerPage,
+  SalesTerminalPage, SalesProfilePage
+} from '../modules/sales';
+
+import SalesLayout from '../core/components/layout/SalesLayout';
 import CustomerHomePage from '../modules/customer/pages/CustomerHomePage';
 import RegisterProductPage from '../modules/customer/pages/RegisterProductPage';
 import MyProductsPage from '../modules/customer/pages/MyProductsPage';
@@ -73,8 +80,6 @@ function Stub(title) {
 
 // ─── Admin stubs ───────────────────────────────────────
 const AdminDashboard = () => <AdminDashboardPage />;
-const Roles = () => <RolesPage />;
-const Permissions = () => <PermissionsPage />;
 const Users = () => <UsersPage />;
 const Products = () => <ProductsPage />;
 const StockOverviewComp = () => <StockOverview />;
@@ -166,6 +171,7 @@ function RootRedirect() {
     case 'admin': return <Navigate to="/admin" replace />;
     case 'distributor': return <Navigate to="/distributor" replace />;
     case 'retailer': return <Navigate to="/retailer" replace />;
+    case 'sales_executive': return <Navigate to="/sales" replace />;
     case 'customer': return <Navigate to="/customer" replace />;
     default: return <Navigate to="/login" replace />;
   }
@@ -192,6 +198,8 @@ export default function AppRouter() {
         <Route path="/retailer/login" element={<RetailerLoginPage />} />
         <Route path="/retailer/signup" element={<RetailerSignUpPage />} />
 
+        <Route path="/sales/login" element={<SalesLoginPage />} />
+
         <Route path="/customer/login" element={<CustomerLoginPage />} />
         <Route path="/customer/register" element={<CustomerRegisterPage />} />
         <Route path="/customer/forgot-password" element={<CustomerForgotPasswordPage />} />
@@ -211,8 +219,6 @@ export default function AppRouter() {
           </ProtectedRoute>
         }>
           <Route index element={<AdminDashboard />} />
-          <Route path="rbac/roles" element={<Roles />} />
-          <Route path="rbac/permissions" element={<Permissions />} />
           <Route path="rbac/users" element={<Users />} />
           <Route path="inventory/products" element={<Products />} />
           <Route path="inventory/stock" element={<StockOverviewComp />} />
@@ -298,6 +304,21 @@ export default function AppRouter() {
           <Route path="rewards" element={<RetailRewards />} />
           <Route path="analytics" element={<RetailerAnalyticsPage />} />
           <Route path="settings" element={<RetailSettings />} />
+        </Route>
+
+        {/* ═══ SALES EXECUTIVE ROUTES ═══ */}
+        <Route path="/sales" element={
+          <ProtectedRoute allowedRoles={['sales_executive']}>
+            <SalesLayout />
+          </ProtectedRoute>
+        }>
+          <Route index element={<SalesDashboardPage />} />
+          <Route path="retailers" element={<SalesRetailerListPage />} />
+          <Route path="retailers/add" element={<AddRetailerPage />} />
+          <Route path="terminal" element={<SalesTerminalPage />} />
+          <Route path="performance" element={<SalesDashboardPage />} /> {/* Reuse dashboard for now */}
+          <Route path="rewards" element={<SalesDashboardPage />} /> {/* Reuse dashboard for now */}
+          <Route path="profile" element={<SalesProfilePage />} />
         </Route>
 
         {/* ═══ CUSTOMER ROUTES ═══ */}

@@ -79,7 +79,7 @@ exports.requestOTP = async (req, res, next) => {
             return ApiResponse.error(res, "Email and Intended Role are required", 400);
         }
 
-        const allowedRoles = ['admin', 'distributor', 'retailer', 'customer'];
+        const allowedRoles = ['admin', 'distributor', 'retailer', 'customer', 'sales_executive'];
         if (!allowedRoles.includes(role)) {
             return ApiResponse.error(res, "Invalid role for OTP request", 400);
         }
@@ -87,7 +87,8 @@ exports.requestOTP = async (req, res, next) => {
         // Check if user exists for Non-Customer roles
         const user = await User.findOne({ email: normalizedEmail });
 
-        if (role !== 'customer' && !user) {
+        const autoCreateRoles = ['customer', 'sales_executive'];
+        if (!autoCreateRoles.includes(role) && !user) {
             return ApiResponse.error(res, "This email is not registered for business access. Please contact Admin.", 403);
         }
 
@@ -167,7 +168,7 @@ exports.verifyOTP = async (req, res, next) => {
             return ApiResponse.error(res, "Missing required fields", 400);
         }
 
-        const allowedRoles = ['admin', 'distributor', 'retailer', 'customer'];
+        const allowedRoles = ['admin', 'distributor', 'retailer', 'customer', 'sales_executive'];
         if (!allowedRoles.includes(role)) {
             return ApiResponse.error(res, "Invalid role for OTP verification", 400);
         }
@@ -203,11 +204,16 @@ exports.verifyOTP = async (req, res, next) => {
         // Valid OTP -> Find or Create User
         let user = await User.findOne({ email: normalizedEmail });
 
-        if (!user && role === 'customer') {
+        if (!user && (role === 'customer' || role === 'sales_executive')) {
             user = await User.create({
                 email: normalizedEmail,
                 name: name || email.split('@')[0],
-                role: 'customer'
+                role: role,
+                isActive: true,
+                salesExecutiveData: {
+                    assignedArea: 'General',
+                    totalPoints: 0
+                }
             });
         }
 

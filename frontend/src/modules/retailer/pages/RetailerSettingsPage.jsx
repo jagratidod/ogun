@@ -1,30 +1,59 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { 
   RiSettings4Line, RiShieldKeyholeLine, RiNotification3Line, 
   RiPaletteLine, RiGlobalLine, RiSmartphoneLine, 
   RiDatabaseLine, RiInformationLine, RiArrowRightSLine, 
   RiLogoutBoxRLine, RiUserLine, RiStore2Line, RiMapPinLine, 
-  RiPhoneLine, RiPrinterLine, RiMoneyDollarBoxLine, RiCouponLine 
+  RiPhoneLine, RiPrinterLine, RiMoneyDollarBoxLine, RiCouponLine,
+  RiHistoryLine, RiRefreshLine
 } from 'react-icons/ri';
 import { 
   PageHeader, Card, CardHeader, CardTitle, CardDescription, 
-  Badge, Avatar, Input, Select, Tabs 
+  Badge, Avatar, Input, Select, Tabs, DataTable, formatCurrency, formatDateTime
 } from '../../../core';
 import Button from '../../../core/components/ui/Button';
 import { useAuthContext } from '../../../core/context/AuthContext';
+import retailerService from '../../../core/services/retailerService';
 import { toast } from 'react-hot-toast';
 
 export default function RetailerSettingsPage() {
   const { user, logout } = useAuthContext();
   const [activeTab, setActiveTab] = useState('Store Profile');
   const [isSaving, setIsSaving] = useState(false);
+  const [salesHistory, setSalesHistory] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
 
   const tabs = [
     { icon: RiStore2Line, label: 'Store Profile' },
+    { icon: RiHistoryLine, label: 'Sales History' },
     { icon: RiPrinterLine, label: 'POS Receipt' },
     { icon: RiMoneyDollarBoxLine, label: 'Pricing logic' },
-    { icon: RiNotification3Line, label: 'Alerts' },
-    { icon: RiPaletteLine, label: 'Appearance' }
+    { icon: RiNotification3Line, label: 'Alerts' }
+  ];
+
+  const fetchHistory = async () => {
+    try {
+      setLoadingHistory(true);
+      const res = await retailerService.getSaleHistory();
+      setSalesHistory(res.data || []);
+    } catch (error) {
+      toast.error('Failed to load history');
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'Sales History') {
+      fetchHistory();
+    }
+  }, [activeTab]);
+
+  const historyColumns = [
+    { key: 'saleId', label: 'ID', render: (val) => <span className="font-bold">#{val}</span> },
+    { key: 'createdAt', label: 'Date', render: (val) => <span className="text-[10px]">{formatDateTime(val)}</span> },
+    { key: 'customer', label: 'Customer', render: (val) => <span className="text-sm font-medium">{val?.name}</span> },
+    { key: 'totalAmount', label: 'Amount', align: 'right', render: (val) => <span className="font-bold text-brand-teal">{formatCurrency(val)}</span> }
   ];
 
   const handleSave = () => {
@@ -77,6 +106,23 @@ export default function RetailerSettingsPage() {
                </div>
             </Card>
           </div>
+        );
+      case 'Sales History':
+        return (
+          <Card>
+            <CardHeader className="flex justify-between items-center">
+              <div>
+                <CardTitle>Customer Sales Log</CardTitle>
+                <CardDescription>All historical transactions processed at this counter</CardDescription>
+              </div>
+              <Button size="sm" variant="secondary" icon={RiRefreshLine} onClick={fetchHistory} loading={loadingHistory} />
+            </CardHeader>
+            <DataTable 
+              columns={historyColumns} 
+              data={salesHistory} 
+              loading={loadingHistory}
+            />
+          </Card>
         );
       case 'POS Receipt':
         return (

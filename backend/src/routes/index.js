@@ -6,11 +6,13 @@ const adminRoutes = require('./admin.routes');
 const distributorRoutes = require('./distributor.routes');
 const retailerRoutes = require('./retailer.routes');
 const customerRoutes = require('./customer.routes');
+const salesExecutiveRoutes = require('./salesExecutive.routes');
 
 router.use('/auth', authRoutes);
 router.use('/admin', adminRoutes);
 router.use('/distributor', distributorRoutes);
 router.use('/retailer', retailerRoutes);
 router.use('/customer', customerRoutes);
+router.use('/sales-executive', salesExecutiveRoutes);
 
 module.exports = router;

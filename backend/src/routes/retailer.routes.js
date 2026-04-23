@@ -10,17 +10,25 @@ const retailerOrderController = require('../controllers/retailer.order.controlle
 const Inventory = require('../models/inventory.model');
 const catchAsync = require('../utils/catchAsync');
 
+const retailerSalesController = require('../controllers/retailer.sales.controller');
+
 router.get('/', (req, res) => {
     return ApiResponse.success(res, null, 'Retailer Module');
 });
 
 // Protect all retailer routes
 router.use(protect);
+
 // Own Inventory
 router.get('/inventory', restrictTo('retailer'), catchAsync(async (req, res) => {
     const inventory = await Inventory.find({ user: req.user._id }).populate('product');
     return ApiResponse.success(res, inventory, 'Inventory fetched');
 }));
+
+// Sales (POS)
+router.post('/sales', restrictTo('retailer'), retailerSalesController.createSale);
+router.get('/sales', restrictTo('retailer'), retailerSalesController.getSaleHistory);
+router.get('/sales/:id', restrictTo('retailer'), retailerSalesController.getSaleDetail);
 
 // Shipments
 router.get('/shipments', restrictTo('retailer'), retailerShipmentController.getIncomingShipments);

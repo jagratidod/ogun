@@ -124,14 +124,14 @@ exports.updateRetailerOrderStatus = catchAsync(async (req, res, next) => {
     if (status) {
         order.status = status;
         
-        // --- STOCK DEDUCTION FOR DISTRIBUTOR ---
+        // --- STOCK DEDUCTION FOR SELLER (Distributor) ---
         const fulfillmentStatuses = ['Confirmed', 'Processing', 'In Transit', 'Completed'];
         if (fulfillmentStatuses.includes(status) && !order.stockDeducted) {
             const Inventory = require('../models/inventory.model');
             
             for (const item of order.products) {
                 const inv = await Inventory.findOne({ 
-                    user: req.user._id, 
+                    user: order.seller, 
                     product: item.product 
                 });
                 
@@ -141,6 +141,30 @@ exports.updateRetailerOrderStatus = catchAsync(async (req, res, next) => {
                 }
             }
             order.stockDeducted = true;
+        }
+
+        // --- STOCK ADDITION FOR BUYER (Retailer) ---
+        if (status === 'Completed' && !order.stockAddedToBuyer) {
+            const Inventory = require('../models/inventory.model');
+            
+            for (const item of order.products) {
+                let buyerInv = await Inventory.findOne({ 
+                    user: order.buyer, 
+                    product: item.product 
+                });
+                
+                if (buyerInv) {
+                    buyerInv.quantity += item.quantity;
+                    await buyerInv.save();
+                } else {
+                    await Inventory.create({
+                        user: order.buyer,
+                        product: item.product,
+                        quantity: item.quantity
+                    });
+                }
+            }
+            order.stockAddedToBuyer = true;
         }
     }
 

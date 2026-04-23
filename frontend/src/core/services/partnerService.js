@@ -29,6 +29,12 @@ const partnerService = {
   getDistributorOrders: async () => {
     const response = await api.get('/distributor/my-orders');
     return response.data;
+  },
+
+  // Get orders placed by Retailers to this Distributor
+  getRetailerOrders: async () => {
+    const response = await api.get('/distributor/retailer-orders');
+    return response.data;
   }
 };
 
