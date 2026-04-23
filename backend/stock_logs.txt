@@ -32,3 +32,8 @@
 [2026-04-22T11:26:15.430Z] - Searching for Product: 69e76822f1580471a865f3a7 under User: 69e615c9e97145424e9ac2d3
 [2026-04-22T11:26:15.521Z] - SUCCESS: 6 units. 99 -> 93
 [2026-04-22T11:26:15.524Z] END: Logic finished for ORD-9AE852A7
+[2026-04-23T05:54:53.995Z] START: Order ORD-EA1599E0, Status: Confirmed, Deducted: false
+[2026-04-23T05:54:53.998Z] Triggering deduction... Items: 1
+[2026-04-23T05:54:53.999Z] - Searching for Product: 69e8a5aad1cff19c107fce08 under User: 69e615c9e97145424e9ac2d3
+[2026-04-23T05:54:54.098Z] - SUCCESS: 6 units. 1105 -> 1099
+[2026-04-23T05:54:54.100Z] END: Logic finished for ORD-EA1599E0

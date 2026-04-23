@@ -1,10 +1,12 @@
 const ApiResponse = require('../utils/apiResponse');
 
 const errorHandler = (err, req, res, next) => {
-    console.error(`[Error] ${err.name}: ${err.message}`);
-    if (process.env.NODE_ENV === 'development') {
-        console.error(err.stack);
-    }
+    console.error('************************************************');
+    console.error(`!!! SERVER ERROR [${req.method} ${req.url}] !!!`);
+    console.error(`Name: ${err.name}`);
+    console.error(`Message: ${err.message}`);
+    console.error(`Stack: ${err.stack}`);
+    console.error('************************************************');
 
     let { statusCode, message } = err;
 

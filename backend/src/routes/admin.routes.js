@@ -51,8 +51,13 @@ router.get('/shipments', checkPermission('inventory'), adminShipmentController.g
 
 // Order Management
 const adminOrderController = require('../controllers/admin.order.controller');
+const adminQueryController = require('../controllers/admin.query.controller');
 router.get('/orders', checkPermission('inventory'), adminOrderController.getAllOrders);
 router.patch('/orders/:id/status', checkPermission('inventory'), adminOrderController.updateOrderStatus);
+
+// Product Queries
+router.get('/product-queries', checkPermission('inventory'), adminQueryController.getAllQueries);
+router.patch('/product-queries/:id/status', checkPermission('inventory'), adminQueryController.updateQueryStatus);
 
 module.exports = router;
 

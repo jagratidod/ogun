@@ -12,3 +12,4 @@ export { default as IncomingRequestsPage } from './pages/IncomingRequestsPage';
 export { default as MyRetailersPage } from './pages/MyRetailersPage';
 export { default as BrowseAdminProducts } from './pages/BrowseAdminProducts';
 export { default as MyOrdersPage } from './pages/MyOrdersPage';
+export { default as DistributorProductQueriesPage } from './pages/DistributorProductQueriesPage';

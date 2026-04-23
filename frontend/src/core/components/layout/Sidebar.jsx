@@ -28,6 +28,7 @@ const adminNav = [
       { label: 'Products', path: '/admin/inventory/products' },
       { label: 'Stock Overview', path: '/admin/inventory/stock' },
       { label: 'Stock Alerts', path: '/admin/inventory/alerts' },
+      { label: 'Product Queries', path: '/admin/inventory/queries' },
     ],
   },
   {
@@ -99,6 +100,7 @@ const distributorNav = [
     label: 'Orders', icon: RiShoppingCartLine, children: [
       { label: 'My Orders', path: '/distributor/my-orders' },
       { label: 'Retailer Requests', path: '/distributor/orders' },
+      { label: 'Product Queries', path: '/distributor/queries' },
       { label: 'History', path: '/distributor/orders/history' },
     ],
   },

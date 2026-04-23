@@ -20,6 +20,7 @@ export { default as PayslipsPage } from './pages/PayslipsPage';
 export { default as PermissionsPage } from './pages/PermissionsPage';
 export { default as PointsHistoryPage } from './pages/PointsHistoryPage';
 export { default as ProductsPage } from './pages/ProductsPage';
+export { default as AdminProductQueriesPage } from './pages/AdminProductQueriesPage';
 export { default as ReportsPage } from './pages/ReportsPage';
 export { default as RestockRequestsPage } from './pages/RestockRequestsPage';
 export { default as RetailerListPage } from './pages/RetailerListPage';

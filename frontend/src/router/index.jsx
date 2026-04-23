@@ -34,21 +34,24 @@ import {
   LeaveCalendarPage, RewardsDashboardPage, TargetConfigPage,
   PointsHistoryPage, ServiceRequestsPage, ServiceDetailPage,
   ServiceAnalyticsPage, DistributorListPage, RetailerListPage,
-  CustomerListPage, ReportsPage, AdminSettingsPage, PayslipsPage, DeductionsPage, OfferLettersPage, SocialGridManagerPage
+  CustomerListPage, ReportsPage, AdminSettingsPage, PayslipsPage, DeductionsPage, OfferLettersPage, SocialGridManagerPage,
+  AdminProductQueriesPage
 } from '../modules/admin';
 
 import {
   DistributorDashboardPage, DistributorStockPage, IncomingRequestsPage,
   DispatchPage, DistOrderHistoryPage, MyRetailersPage,
   DistLedgerPage, DistPaymentsPage, DistRewardsPage,
-  DistAnalyticsPage, DistSettingsPage, BrowseAdminProducts, MyOrdersPage
+  DistAnalyticsPage, DistSettingsPage, BrowseAdminProducts, MyOrdersPage,
+  DistributorProductQueriesPage
 } from '../modules/distributor';
 
 import {
   RetailerDashboardPage, NewSalePage, SalesHistoryPage,
   RetailerStockPage, RestockRequestPage, RetailerLedgerPage,
   RetailerCustomersPage, RetailerRewardsPage, RetailerAnalyticsPage,
-  RetailerSettingsPage, BrowseDistributorProducts
+  RetailerSettingsPage, BrowseDistributorProducts,
+  RetailerQueriesPage
 } from '../modules/retailer';
 
 import CustomerHomePage from '../modules/customer/pages/CustomerHomePage';
@@ -109,6 +112,7 @@ const CustomerDetailPage = Stub('Customer Detail');
 const Reports = () => <ReportsPage />;
 const AdminSettings = () => <AdminSettingsPage />;
 const SocialGridManager = () => <SocialGridManagerPage />;
+const AdminProductQueries = () => <AdminProductQueriesPage />;
 
 // ─── Distributor real pages ───────────────────────────
 const DistDashboard = () => <DistributorDashboardPage />;
@@ -125,6 +129,7 @@ const DistAnalytics = () => <DistAnalyticsPage />;
 const DistSettings = () => <DistSettingsPage />;
 const BrowseMarketplace = () => <BrowseAdminProducts />;
 const MyOrders = () => <MyOrdersPage />;
+const DistProductQueries = () => <DistributorProductQueriesPage />;
 
 // ─── Retailer real pages ───────────────────────────
 const RetailDashboard = () => <RetailerDashboardPage />;
@@ -135,6 +140,7 @@ const RestockReq = () => <RestockRequestPage />;
 const RetailLedger = () => <RetailerLedgerPage />;
 const RetailCustomers = () => <RetailerCustomersPage />;
 const RetailRewards = () => <RetailerRewardsPage />;
+const RetailerQueries = () => <RetailerQueriesPage />;
 const RetailAnalytics = () => <RetailerAnalyticsPage />;
 const RetailSettings = () => <RetailerSettingsPage />;
 
@@ -215,6 +221,7 @@ export default function AppRouter() {
           <Route path="orders/:id" element={<OrderDetailPage />} />
           <Route path="orders/restock" element={<RestockRequests />} />
           <Route path="orders/flow" element={<OrderFlow />} />
+          <Route path="inventory/queries" element={<AdminProductQueries />} />
           <Route path="accounts/ledger" element={<Ledger />} />
           <Route path="accounts/invoices" element={<Invoices />} />
           <Route path="accounts/payments" element={<Payments />} />
@@ -259,6 +266,7 @@ export default function AppRouter() {
           <Route path="orders/history" element={<DistOrders />} />
           <Route path="marketplace" element={<BrowseMarketplace />} />
           <Route path="my-orders" element={<MyOrders />} />
+          <Route path="queries" element={<DistProductQueries />} />
           <Route path="retailers" element={<MyRetailers />} />
           <Route path="retailers/:id" element={<MyRetailerDetailPage />} />
           <Route path="accounts" element={<DistLedger />} />
@@ -283,6 +291,7 @@ export default function AppRouter() {
           {/* Back-compat alias (dashboard deep-link) */}
           <Route path="restock" element={<RestockReq />} />
           <Route path="marketplace" element={<BrowseDistributorProducts />} />
+          <Route path="queries" element={<RetailerQueries />} />
           <Route path="accounts" element={<RetailLedger />} />
           <Route path="customers" element={<RetailerCustomersPage />} />
           <Route path="rewards" element={<RetailRewards />} />

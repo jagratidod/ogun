@@ -28,9 +28,14 @@ router.post('/shipments/dispatch', distributorShipmentController.dispatchToRetai
 
 // Ordering from Admin
 const distributorOrderController = require('../controllers/distributor.order.controller');
+const distributorQueryController = require('../controllers/distributor.query.controller');
 router.get('/browse-products', distributorOrderController.getAvailableProducts);
 router.post('/place-order', distributorOrderController.placeOrder);
 router.get('/my-orders', distributorOrderController.getMyOrders);
+
+// Retailer Queries
+router.get('/product-queries', distributorQueryController.getDistributorQueries);
+router.patch('/product-queries/:id/status', distributorQueryController.updateQueryStatus);
 
 
 // Retailer Management

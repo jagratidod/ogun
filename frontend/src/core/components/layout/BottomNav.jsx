@@ -19,8 +19,11 @@ export default function BottomNav({ items }) {
         
         {/* The Moving Active Indicator */}
         <div 
-          className="absolute h-16 w-[20%] transition-all duration-500 ease-[cubic-bezier(0.68,-0.55,0.265,1.55)]"
-          style={{ transform: `translateX(${(activeIndex * 100)}%)` }}
+          className="absolute h-16 transition-all duration-500 ease-[cubic-bezier(0.68,-0.55,0.265,1.55)]"
+          style={{ 
+            width: `${100 / items.length}%`,
+            transform: `translateX(${(activeIndex * 100)}%)` 
+          }}
         >
           {/* The Scoop Circle */}
           <div className="absolute -top-[20px] left-1/2 -translate-x-1/2 w-[52px] h-[52px] rounded-full bg-surface-primary flex items-center justify-center border-[4px] border-surface-primary shadow-lg overflow-visible">
