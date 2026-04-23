@@ -6,6 +6,7 @@ const { protect, restrictTo } = require('../middleware/auth.middleware');
 const retailerShipmentController = require('../controllers/retailer.shipment.controller');
 const retailerController = require('../controllers/retailer.controller');
 const retailerQueryController = require('../controllers/retailer.query.controller');
+const retailerOrderController = require('../controllers/retailer.order.controller');
 const Inventory = require('../models/inventory.model');
 const catchAsync = require('../utils/catchAsync');
 
@@ -31,6 +32,10 @@ router.get('/admin-catalog', restrictTo('retailer', 'distributor', 'admin'), ret
 // Product Queries (Requests for unavailable products)
 router.post('/product-queries', restrictTo('retailer', 'distributor'), retailerQueryController.createQuery);
 router.get('/product-queries', restrictTo('retailer', 'distributor', 'admin'), retailerQueryController.getMyQueries);
+
+// Orders (Directly ordering from distributor)
+router.post('/orders', restrictTo('retailer'), retailerOrderController.placeOrder);
+router.get('/orders', restrictTo('retailer'), retailerOrderController.getMyOrders);
 
 // Legacy route — kept for backward compatibility
 router.get('/distributor-products', retailerController.getDistributorProducts);

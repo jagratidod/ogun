@@ -30,7 +30,7 @@ function StockBadge({ stockStatus }) {
 }
 
 // ─── Product card for grid view ──────────────────────────────────
-function ProductCard({ product, onDetail, onQuery }) {
+function ProductCard({ product, onDetail, onQuery, onOrder }) {
   const unavailable = !product.available;
 
   return (
@@ -105,6 +105,7 @@ function ProductCard({ product, onDetail, onQuery }) {
             <Button
               variant="primary" size="xs" className="flex-1"
               icon={RiShoppingBag3Line}
+              onClick={() => onOrder(product)}
             >
               Order
             </Button>
@@ -139,6 +140,13 @@ export default function BrowseDistributorProducts() {
   const [queryQty, setQueryQty] = useState(1);
   const [queryMessage, setQueryMessage] = useState('');
   const [isSubmittingQuery, setIsSubmittingQuery] = useState(false);
+  
+  // Order Modal State
+  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+  const [orderProduct, setOrderProduct] = useState(null);
+  const [orderQty, setOrderQty] = useState(1);
+  const [orderNote, setOrderNote] = useState('');
+  const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
 
   useEffect(() => { fetchCatalog(); }, []);
 
@@ -179,6 +187,36 @@ export default function BrowseDistributorProducts() {
       toast.error(error.response?.data?.message || 'Failed to submit request');
     } finally {
       setIsSubmittingQuery(false);
+    }
+  };
+
+  const handleOpenOrderModal = (product) => {
+    setOrderProduct(product);
+    setOrderQty(1);
+    setOrderNote('');
+    setIsOrderModalOpen(true);
+  };
+
+  const handleSubmitOrder = async () => {
+    if (!orderQty || orderQty < 1) {
+      return toast.error('Please enter a valid quantity');
+    }
+
+    try {
+      setIsSubmittingOrder(true);
+      const orderData = {
+        items: [{ productId: orderProduct.id, quantity: orderQty }],
+        notes: orderNote
+      };
+      const res = await retailerService.placeOrder(orderData);
+      toast.success(`Order ${res.data.orderId} placed successfully!`);
+      setIsOrderModalOpen(false);
+      // Optional: Refresh catalog to see updated stock if implemented
+      fetchCatalog();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to place order');
+    } finally {
+      setIsSubmittingOrder(false);
     }
   };
 
@@ -264,7 +302,7 @@ export default function BrowseDistributorProducts() {
         <div className="flex justify-end gap-2">
           <Button variant="secondary" size="xs" icon={RiInformationLine} onClick={() => open(row)}>Detail</Button>
           {row.available ? (
-             <Button variant="primary"   size="xs" icon={RiShoppingBag3Line}>Order</Button>
+             <Button variant="primary"   size="xs" icon={RiShoppingBag3Line} onClick={() => handleOpenOrderModal(row)}>Order</Button>
           ) : (
              <Button variant="warning" size="xs" icon={RiAlertLine} onClick={() => handleOpenQueryModal(row)}>Request</Button>
           )}
@@ -385,7 +423,7 @@ export default function BrowseDistributorProducts() {
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
                 {filteredProducts.map(product => (
-                  <ProductCard key={product.id} product={product} onDetail={open} onQuery={handleOpenQueryModal} />
+                  <ProductCard key={product.id} product={product} onDetail={open} onQuery={handleOpenQueryModal} onOrder={handleOpenOrderModal} />
                 ))}
               </div>
             )}
@@ -457,7 +495,7 @@ export default function BrowseDistributorProducts() {
             <div className="flex gap-3 pt-2 border-t border-border">
               <Button className="flex-1" variant="secondary" onClick={close}>Close</Button>
               {selectedProduct.available ? (
-                <Button className="flex-1" icon={RiShoppingBag3Line}>Place Order</Button>
+                <Button className="flex-1" icon={RiShoppingBag3Line} onClick={() => { close(); handleOpenOrderModal(selectedProduct); }}>Place Order</Button>
               ) : (
                 <Button
                   className="flex-1"
@@ -471,6 +509,64 @@ export default function BrowseDistributorProducts() {
             </div>
           </div>
         )}
+      </Modal>
+
+      {/* Order Submission Modal */}
+      <Modal
+        isOpen={isOrderModalOpen}
+        onClose={() => setIsOrderModalOpen(false)}
+        title="Place Order to Distributor"
+        size="sm"
+      >
+        <div className="space-y-4 py-2">
+          <div className="flex items-center gap-3 p-3 bg-surface-secondary border border-border">
+            <div className="w-12 h-12 bg-white border border-border rounded flex items-center justify-center overflow-hidden">
+              {orderProduct?.images?.[0]?.url ? (
+                <img src={orderProduct.images[0].url} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <RiInboxLine className="text-slate-300 w-6 h-6" />
+              )}
+            </div>
+            <div>
+              <p className="text-sm font-bold text-content-primary leading-tight">{orderProduct?.name}</p>
+              <p className="text-[10px] text-content-tertiary uppercase tracking-widest font-black mt-0.5">{orderProduct?.sku}</p>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+             <Input 
+               label="Quantity" 
+               type="number" 
+               min="1"
+               value={orderQty} 
+               onChange={(e) => setOrderQty(parseInt(e.target.value) || 1)} 
+               placeholder="How many units?"
+             />
+             <div className="space-y-1.5">
+               <label className="text-xs font-bold text-content-secondary uppercase tracking-wider">Note (Optional)</label>
+               <textarea 
+                 className="w-full bg-surface-input border border-border p-3 text-sm focus:border-brand-teal outline-none min-h-[80px] resize-none"
+                 placeholder="Any special instructions?"
+                 value={orderNote}
+                 onChange={(e) => setOrderNote(e.target.value)}
+               />
+             </div>
+          </div>
+
+          <div className="p-3 bg-emerald-50 border border-emerald-100 flex items-center justify-between">
+             <span className="text-xs font-bold text-emerald-700 uppercase">Total Amount</span>
+             <span className="text-lg font-black text-emerald-700">
+               {formatCurrency((orderProduct?.retailerPrice || 0) * orderQty)}
+             </span>
+          </div>
+
+          <div className="flex gap-3 pt-2">
+            <Button className="flex-1" variant="secondary" onClick={() => setIsOrderModalOpen(false)}>Cancel</Button>
+            <Button className="flex-1" variant="primary" loading={isSubmittingOrder} onClick={handleSubmitOrder}>
+              Confirm Order
+            </Button>
+          </div>
+        </div>
       </Modal>
 
       {/* Query Submission Modal */}

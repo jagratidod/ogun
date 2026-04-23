@@ -48,6 +48,11 @@ const productOrderSchema = new mongoose.Schema({
     enum: ['Unpaid', 'Partial', 'Paid'],
     default: 'Unpaid'
   },
+  orderType: {
+    type: String,
+    enum: ['distributor_to_admin', 'retailer_to_distributor'],
+    default: 'distributor_to_admin'
+  },
   stockDeducted: {
     type: Boolean,
     default: false

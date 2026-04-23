@@ -33,6 +33,17 @@ const retailerService = {
   getMyQueries: async () => {
     const response = await api.get('/retailer/product-queries');
     return response.data;
+  },
+
+  // Orders
+  placeOrder: async (data) => {
+    const response = await api.post('/retailer/orders', data);
+    return response.data;
+  },
+
+  getMyOrders: async () => {
+    const response = await api.get('/retailer/orders');
+    return response.data;
   }
 };
 

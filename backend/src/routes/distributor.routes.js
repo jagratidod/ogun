@@ -32,6 +32,8 @@ const distributorQueryController = require('../controllers/distributor.query.con
 router.get('/browse-products', distributorOrderController.getAvailableProducts);
 router.post('/place-order', distributorOrderController.placeOrder);
 router.get('/my-orders', distributorOrderController.getMyOrders);
+router.get('/retailer-orders', distributorOrderController.getRetailerOrders);
+router.patch('/retailer-orders/:id/status', distributorOrderController.updateRetailerOrderStatus);
 
 // Retailer Queries
 router.get('/product-queries', distributorQueryController.getDistributorQueries);

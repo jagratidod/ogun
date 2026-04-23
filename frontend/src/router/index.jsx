@@ -51,7 +51,7 @@ import {
   RetailerStockPage, RestockRequestPage, RetailerLedgerPage,
   RetailerCustomersPage, RetailerRewardsPage, RetailerAnalyticsPage,
   RetailerSettingsPage, BrowseDistributorProducts,
-  RetailerQueriesPage
+  RetailerQueriesPage, RetailerOrdersPage
 } from '../modules/retailer';
 
 import CustomerHomePage from '../modules/customer/pages/CustomerHomePage';
@@ -292,6 +292,7 @@ export default function AppRouter() {
           <Route path="restock" element={<RestockReq />} />
           <Route path="marketplace" element={<BrowseDistributorProducts />} />
           <Route path="queries" element={<RetailerQueries />} />
+          <Route path="orders" element={<RetailerOrdersPage />} />
           <Route path="accounts" element={<RetailLedger />} />
           <Route path="customers" element={<RetailerCustomersPage />} />
           <Route path="rewards" element={<RetailRewards />} />
