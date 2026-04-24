@@ -1,16 +1,45 @@
-import { useState, useMemo } from 'react';
-import { RiStockLine, RiAddLine, RiSearchLine, RiFilterLine, RiEditLine, RiDeleteBin7Line, RiArrowRightDownLine, RiRepeatLine, RiTruckLine, RiInformationLine } from 'react-icons/ri';
+import { useState, useMemo, useEffect } from 'react';
+import { RiStockLine, RiAddLine, RiSearchLine, RiFilterLine, RiEditLine, RiDeleteBin7Line, RiArrowRightDownLine, RiRepeatLine, RiTruckLine, RiInformationLine, RiRefreshLine } from 'react-icons/ri';
 import { PageHeader, Card, CardHeader, CardTitle, CardDescription, DataTable, Badge, Button, Input, Select, useModal, Modal, formatCurrency } from '../../../core';
-import productsData from '../../../data/products.json';
+import retailerService from '../../../core/services/retailerService';
 import { toast } from 'react-hot-toast';
 
 export default function RetailerStockPage() {
+  const [stockData, setStockData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const { isOpen, open, close, data: selectedStock } = useModal();
 
+  useEffect(() => {
+    fetchInventory();
+  }, []);
+
+  const fetchInventory = async () => {
+    try {
+      setLoading(true);
+      const res = await retailerService.getMyInventory();
+      // Map API data to flat structure for easier filtering/display
+      const mapped = (res.data || []).map(item => ({
+        id: item._id,
+        name: item.product?.name || 'Unknown Product',
+        sku: item.product?.sku || 'N/A',
+        stock: item.quantity,
+        purchasePrice: item.product?.distributorPrice || 0, // This is what retailer paid
+        mrp: item.product?.mrp || 0,
+        category: item.product?.category,
+        original: item
+      }));
+      setStockData(mapped);
+    } catch (error) {
+      toast.error('Failed to load inventory');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const filteredProducts = useMemo(() => {
-    return productsData.filter(p => {
+    return stockData.filter(p => {
       const matchSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           p.sku.toLowerCase().includes(searchTerm.toLowerCase());
       
@@ -19,7 +48,7 @@ export default function RetailerStockPage() {
       
       return matchSearch && matchStatus;
     });
-  }, [searchTerm, statusFilter]);
+  }, [stockData, searchTerm, statusFilter]);
 
   const handleRestock = () => {
     toast.success(`Restock request for ${selectedStock.name} sent to distributor.`);
@@ -40,7 +69,7 @@ export default function RetailerStockPage() {
           </span>
        </div>
     )},
-    { key: 'price', label: 'Selling Price', align: 'right', render: (val) => (
+    { key: 'purchasePrice', label: 'Purchase Price (Unit)', align: 'right', render: (val) => (
        <span className="text-xs font-bold text-brand-teal">{formatCurrency(val)}</span>
     )},
     { key: 'status', label: 'Stock Status', render: (_, row) => {
@@ -64,25 +93,26 @@ export default function RetailerStockPage() {
         title="Store Inventory" 
         subtitle="Manage and audit on-shelf appliance stock levels and localized pricing"
       >
+        <Button variant="secondary" icon={RiRefreshLine} onClick={fetchInventory} disabled={loading}>Refresh</Button>
         <Button icon={RiAddLine}>Physical Count Audit</Button>
       </PageHeader>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 mt-2">
          <div className="glass-card p-6 border-l-4 border-brand-teal relative overflow-hidden group hover:-translate-y-1 transition-all">
             <p className="text-[10px] text-content-tertiary font-bold uppercase tracking-widest mb-2">Inventory Depth</p>
-            <h4 className="text-3xl font-black text-content-primary">{productsData.length} SKUs</h4>
+            <h4 className="text-3xl font-black text-content-primary">{stockData.length} SKUs</h4>
             <Badge className="mt-2" variant="teal">HEALTHY SUPPLY</Badge>
          </div>
          <div className="glass-card p-6 border-l-4 border-state-warning flex flex-col justify-between group hover:-translate-y-1 transition-all">
             <p className="text-[10px] text-content-tertiary font-bold uppercase tracking-widest mb-2">Reorder Alerts</p>
             <h4 className="text-3xl font-black text-state-warning">
-              {productsData.filter(p => p.stock <= 5).length} Items
+              {stockData.filter(p => p.stock <= 5).length} Items
             </h4>
             <p className="text-[10px] text-content-tertiary mt-2">Critical below safety buffer</p>
          </div>
          <div className="glass-card p-6 border-l-4 border-brand-pink group hover:-translate-y-1 transition-all">
             <p className="text-[10px] text-content-tertiary font-bold uppercase tracking-widest mb-2">Inventory Value</p>
-            <h4 className="text-3xl font-black text-brand-pink">{formatCurrency(productsData.reduce((acc, p) => acc + (p.price * p.stock), 0))}</h4>
+            <h4 className="text-3xl font-black text-brand-pink">{formatCurrency(stockData.reduce((acc, p) => acc + (p.price * p.stock), 0))}</h4>
             <p className="text-xs text-state-success font-bold mt-2">Estimated Market Val</p>
          </div>
       </div>
@@ -104,11 +134,10 @@ export default function RetailerStockPage() {
                    value={searchTerm}
                    onChange={(e) => setSearchTerm(e.target.value)}
                  />
-                 <Button variant="secondary" icon={RiFilterLine}>Filters</Button>
               </div>
            </div>
         </CardHeader>
-        <DataTable columns={columns} data={filteredProducts} />
+        <DataTable columns={columns} data={filteredProducts} loading={loading} />
       </Card>
 
       <Modal 
@@ -137,7 +166,7 @@ export default function RetailerStockPage() {
            <Input label="Restock Quantity Needed" type="number" placeholder="Enter quantity..." />
            <div className="p-4 rounded-none bg-state-info/5 border border-state-info/20 text-state-info text-xs font-semibold flex gap-3">
               <RiInformationLine className="w-5 h-5 flex-shrink-0" />
-              <p className="leading-relaxed">This request will be sent to <strong>Arjun Patel (AP Logistics)</strong> for regional inventory fulfillment. Standard delivery is 24-48 hours.</p>
+              <p className="leading-relaxed">This request will be sent to your assigned distributor for regional inventory fulfillment. Standard delivery is 24-48 hours.</p>
            </div>
         </div>
       </Modal>

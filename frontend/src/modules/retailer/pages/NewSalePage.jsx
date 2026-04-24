@@ -1,34 +1,73 @@
-import { useState, useMemo } from 'react';
-import { RiAddLine, RiSearchLine, RiDeleteBin7Line, RiShoppingBasketLine, RiUserLine, RiHandCoinLine, RiCouponLine, RiQuestionLine, RiCloseLine, RiCheckDoubleLine, RiFileList3Line } from 'react-icons/ri';
+import { useState, useMemo, useEffect } from 'react';
+import { RiAddLine, RiSearchLine, RiDeleteBin7Line, RiShoppingBasketLine, RiUserLine, RiHandCoinLine, RiCouponLine, RiQuestionLine, RiCloseLine, RiCheckDoubleLine, RiFileList3Line, RiPrinterLine, RiCheckboxCircleFill } from 'react-icons/ri';
 import { PageHeader, Card, CardHeader, CardTitle, CardDescription, Badge, Button, Input, Select, Avatar, formatCurrency, useModal, Modal } from '../../../core';
-import products from '../../../data/products.json';
+import retailerService from '../../../core/services/retailerService';
 import { toast } from 'react-hot-toast';
 
 export default function NewSalePage() {
+  const [stock, setStock] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [cart, setCart] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
+  const [customer, setCustomer] = useState({ name: '', phone: '', address: '' });
+  const [paymentMethod, setPaymentMethod] = useState('Cash');
+  const [completedSale, setCompletedSale] = useState(null);
+  
   const { isOpen, open, close } = useModal();
+  const { isOpen: isInvoiceOpen, open: openInvoice, close: closeInvoice } = useModal();
 
-  const categories = ['All', 'Mixer Grinder', 'Induction Cooktop', 'Chimney', 'Water Purifier'];
+  useEffect(() => {
+    fetchStock();
+  }, []);
+
+  const fetchStock = async () => {
+    try {
+      setLoading(true);
+      const res = await retailerService.getMyInventory();
+      // Only show products with stock > 0
+      const items = (res.data || [])
+        .filter(i => i.quantity > 0)
+        .map(i => ({
+          id: i.product?._id,
+          name: i.product?.name,
+          sku: i.product?.sku,
+          price: i.product?.retailerPrice,
+          stock: i.quantity,
+          category: i.product?.category || 'General',
+          image: i.product?.images?.[0]?.url || 'https://via.placeholder.com/150'
+        }));
+      setStock(items);
+    } catch (error) {
+      toast.error('Failed to load stock');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const categories = useMemo(() => {
+    const cats = ['All', ...new Set(stock.map(p => p.category))];
+    return cats;
+  }, [stock]);
 
   const filteredProducts = useMemo(() => {
-    return products.filter(p => {
+    return stock.filter(p => {
       const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                            p.sku.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = activeCategory === 'All' || p.category === activeCategory;
       return matchesSearch && matchesCategory;
     });
-  }, [searchQuery, activeCategory]);
+  }, [stock, searchQuery, activeCategory]);
 
   const addToCart = (prod) => {
     const existing = cart.find(c => c.id === prod.id);
     if (existing) {
+       if (existing.qty >= prod.stock) return toast.error('Out of stock');
        setCart(cart.map(c => c.id === prod.id ? { ...c, qty: c.qty + 1 } : c));
     } else {
        setCart([...cart, { ...prod, qty: 1 }]);
     }
-    toast.success(`Added ${prod.name} to basket`, { id: 'cart-add' });
+    toast.success(`Added ${prod.name}`, { id: 'cart-add' });
   };
 
   const removeFromCart = (id) => {
@@ -40,10 +79,41 @@ export default function NewSalePage() {
   const tax = subtotal * 0.18;
   const total = subtotal + tax;
 
-  const handleCheckout = () => {
-    toast.success('Transaction Completed. Printing GST Invoice...');
-    setCart([]);
-    close();
+  const handleCheckout = async () => {
+    if (!customer.name || !customer.phone) {
+        return toast.error('Customer details required');
+    }
+
+    try {
+        setLoading(true);
+        const saleData = {
+            customer,
+            items: cart.map(c => ({
+                product: c.id,
+                quantity: c.qty,
+                priceAtSale: c.price
+            })),
+            paymentMethod,
+            totalAmount: total
+        };
+
+        const res = await retailerService.createSale(saleData);
+        setCompletedSale(res.data);
+        setCart([]);
+        setCustomer({ name: '', phone: '', address: '' });
+        close();
+        openInvoice();
+        fetchStock(); // Refresh stock
+        toast.success('Sale completed successfully!');
+    } catch (error) {
+        toast.error(error.response?.data?.message || 'Checkout failed');
+    } finally {
+        setLoading(false);
+    }
+  };
+
+  const printBill = () => {
+     window.print();
   };
 
   return (
@@ -52,7 +122,7 @@ export default function NewSalePage() {
         title="POS Terminal" 
         subtitle="Process sales and issue invoices for walk-in customers"
       >
-        <Button icon={RiUserLine} variant="secondary">Register New Consumer</Button>
+        <Button icon={RiUserLine} variant="secondary">Loyalty Program</Button>
       </PageHeader>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 overflow-hidden mt-2">
@@ -62,7 +132,7 @@ export default function NewSalePage() {
                   <div className="flex-1 max-w-sm">
                     <Input 
                       icon={RiSearchLine} 
-                      placeholder="Scan SKU or search product name..." 
+                      placeholder="Search available products..." 
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -80,7 +150,9 @@ export default function NewSalePage() {
                   </div>
                </CardHeader>
                <div className="flex-1 overflow-y-auto p-4 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 scrollbar-hide">
-                  {filteredProducts.map(prod => (
+                  {loading && stock.length === 0 ? (
+                      <div className="col-span-full py-20 text-center animate-pulse">Loading Inventory...</div>
+                  ) : filteredProducts.map(prod => (
                     <div key={prod.id} className="glass-card p-3 flex flex-col group cursor-pointer hover:border-brand-teal transition-all active:scale-95" onClick={() => addToCart(prod)}>
                        <div className="w-full aspect-[4/3] rounded-none bg-surface-elevated flex items-center justify-center mb-3 text-brand-teal/20 relative overflow-hidden">
                           <img src={prod.image} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt={prod.name} />
@@ -106,7 +178,7 @@ export default function NewSalePage() {
                <CardHeader className="bg-brand-teal/5">
                   <div className="flex items-center justify-between w-full">
                      <CardTitle>Basket Cart</CardTitle>
-                     <Badge variant="teal">{cart.length} Products</Badge>
+                     <Badge variant="teal">{cart.length} Items</Badge>
                   </div>
                </CardHeader>
                <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-hide">
@@ -154,6 +226,7 @@ export default function NewSalePage() {
          </div>
       </div>
 
+      {/* Checkout Modal */}
       <Modal 
         isOpen={isOpen} 
         onClose={close} 
@@ -161,7 +234,7 @@ export default function NewSalePage() {
         footer={
            <div className="flex gap-3">
               <Button variant="secondary" onClick={close}>Cancel</Button>
-              <Button icon={RiCheckDoubleLine} onClick={handleCheckout}>Generate GST Invoice</Button>
+              <Button icon={RiCheckDoubleLine} onClick={handleCheckout} loading={loading}>Complete Sale</Button>
            </div>
         }
       >
@@ -174,17 +247,29 @@ export default function NewSalePage() {
               <RiHandCoinLine className="w-10 h-10 text-brand-teal opacity-20" />
            </div>
 
-           <div className="grid grid-cols-2 gap-4">
-              <Select label="Payment Method" options={[{ label: 'UPI / QR Scan', value: 'upi' }, { label: 'Cash Settlement', value: 'cash' }, { label: 'Credit Card', value: 'card' }]} />
-              <Input label="Customer Contact" placeholder="+91 99XXXXX..." />
-           </div>
-
-           <div className="space-y-2">
-              <label className="text-[11px] text-content-tertiary font-bold uppercase tracking-widest pl-1">Loyalty Discount</label>
-              <div className="flex gap-2">
-                 <Input className="flex-1 h-10" icon={RiCouponLine} placeholder="Enter Code or search by phone..." />
-                 <Button variant="secondary" className="h-10 text-xs px-4">Verify Profile</Button>
+           <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                 <Input 
+                    label="Customer Name" 
+                    placeholder="Full Name" 
+                    value={customer.name}
+                    onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
+                    required
+                 />
+                 <Input 
+                    label="Customer Phone" 
+                    placeholder="+91..." 
+                    value={customer.phone}
+                    onChange={(e) => setCustomer({ ...customer, phone: e.target.value })}
+                    required
+                 />
               </div>
+              <Select 
+                label="Payment Method" 
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+                options={[{ label: 'Cash Settlement', value: 'Cash' }, { label: 'UPI / QR Scan', value: 'UPI' }, { label: 'Credit/Debit Card', value: 'Card' }]} 
+              />
            </div>
 
            <div className="bg-surface-elevated border border-border p-3 rounded-none flex items-center justify-between">
@@ -195,6 +280,97 @@ export default function NewSalePage() {
            </div>
         </div>
       </Modal>
+
+      {/* Printable Invoice Modal */}
+      <Modal
+        isOpen={isInvoiceOpen}
+        onClose={closeInvoice}
+        title="Sale Completed"
+        maxWidth="max-w-2xl"
+        footer={
+           <div className="flex gap-3">
+              <Button variant="secondary" onClick={closeInvoice}>Close</Button>
+              <Button icon={RiPrinterLine} onClick={printBill}>Print Bill</Button>
+           </div>
+        }
+      >
+         <div id="printable-invoice" className="p-8 bg-white text-black font-sans">
+            <div className="flex justify-between items-start border-b-2 border-black pb-6 mb-6">
+               <div>
+                  <h2 className="text-2xl font-black uppercase tracking-tighter">GST INVOICE</h2>
+                  <p className="text-xs mt-1">Invoice #: <strong>{completedSale?.saleId}</strong></p>
+                  <p className="text-xs">Date: {new Date().toLocaleDateString()}</p>
+               </div>
+               <div className="text-right">
+                  <h3 className="text-sm font-black uppercase tracking-widest">{completedSale?.retailer?.shopName || 'Retailer Shop'}</h3>
+                  <p className="text-[10px] uppercase font-bold text-gray-500">Authorized Appliance Dealer</p>
+               </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-10 mb-8">
+               <div>
+                  <h4 className="text-[10px] font-black uppercase text-gray-400 mb-2 tracking-widest">Billed To:</h4>
+                  <p className="text-sm font-black">{completedSale?.customer?.name}</p>
+                  <p className="text-xs">{completedSale?.customer?.phone}</p>
+               </div>
+               <div className="text-right">
+                  <h4 className="text-[10px] font-black uppercase text-gray-400 mb-2 tracking-widest">Payment Status:</h4>
+                  <Badge variant="success" size="xs">PAID VIA {completedSale?.paymentMethod}</Badge>
+               </div>
+            </div>
+
+            <table className="w-full mb-8">
+               <thead>
+                  <tr className="border-b border-gray-200 text-[10px] font-black uppercase text-gray-400">
+                     <th className="text-left py-2">Product Description</th>
+                     <th className="text-center py-2">Qty</th>
+                     <th className="text-right py-2">Unit Price</th>
+                     <th className="text-right py-2">Amount</th>
+                  </tr>
+               </thead>
+               <tbody className="divide-y divide-gray-100">
+                  {completedSale?.products.map((item, idx) => (
+                     <tr key={idx} className="text-xs">
+                        <td className="py-3 font-bold">{item.product?.name}</td>
+                        <td className="py-3 text-center">{item.quantity}</td>
+                        <td className="py-3 text-right">{formatCurrency(item.priceAtSale)}</td>
+                        <td className="py-3 text-right font-black">{formatCurrency(item.priceAtSale * item.quantity)}</td>
+                     </tr>
+                  ))}
+               </tbody>
+            </table>
+
+            <div className="flex justify-end">
+               <div className="w-64 space-y-2">
+                  <div className="flex justify-between text-xs">
+                     <span className="text-gray-400">Subtotal</span>
+                     <span className="font-bold">{formatCurrency(completedSale?.totalAmount / 1.18)}</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                     <span className="text-gray-400">GST (18%)</span>
+                     <span className="font-bold">{formatCurrency(completedSale?.totalAmount - (completedSale?.totalAmount / 1.18))}</span>
+                  </div>
+                  <div className="flex justify-between text-base font-black border-t-2 border-black pt-2 mt-2">
+                     <span>Grand Total</span>
+                     <span className="text-brand-teal">{formatCurrency(completedSale?.totalAmount)}</span>
+                  </div>
+               </div>
+            </div>
+
+            <div className="mt-12 pt-8 border-t border-gray-100 text-center">
+               <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 italic">Thank you for your business!</p>
+               <p className="text-[8px] text-gray-300 mt-2 italic">* This is a computer generated invoice *</p>
+            </div>
+         </div>
+      </Modal>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media print {
+          body * { visibility: hidden; }
+          #printable-invoice, #printable-invoice * { visibility: visible; }
+          #printable-invoice { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+      `}} />
     </div>
   );
 }

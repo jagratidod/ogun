@@ -6,8 +6,11 @@ const { protect, restrictTo } = require('../middleware/auth.middleware');
 const retailerShipmentController = require('../controllers/retailer.shipment.controller');
 const retailerController = require('../controllers/retailer.controller');
 const retailerQueryController = require('../controllers/retailer.query.controller');
+const retailerOrderController = require('../controllers/retailer.order.controller');
 const Inventory = require('../models/inventory.model');
 const catchAsync = require('../utils/catchAsync');
+
+const retailerSalesController = require('../controllers/retailer.sales.controller');
 
 router.get('/', (req, res) => {
     return ApiResponse.success(res, null, 'Retailer Module');
@@ -15,11 +18,17 @@ router.get('/', (req, res) => {
 
 // Protect all retailer routes
 router.use(protect);
+
 // Own Inventory
 router.get('/inventory', restrictTo('retailer'), catchAsync(async (req, res) => {
     const inventory = await Inventory.find({ user: req.user._id }).populate('product');
     return ApiResponse.success(res, inventory, 'Inventory fetched');
 }));
+
+// Sales (POS)
+router.post('/sales', restrictTo('retailer'), retailerSalesController.createSale);
+router.get('/sales', restrictTo('retailer'), retailerSalesController.getSaleHistory);
+router.get('/sales/:id', restrictTo('retailer'), retailerSalesController.getSaleDetail);
 
 // Shipments
 router.get('/shipments', restrictTo('retailer'), retailerShipmentController.getIncomingShipments);
@@ -31,6 +40,10 @@ router.get('/admin-catalog', restrictTo('retailer', 'distributor', 'admin'), ret
 // Product Queries (Requests for unavailable products)
 router.post('/product-queries', restrictTo('retailer', 'distributor'), retailerQueryController.createQuery);
 router.get('/product-queries', restrictTo('retailer', 'distributor', 'admin'), retailerQueryController.getMyQueries);
+
+// Orders (Directly ordering from distributor)
+router.post('/orders', restrictTo('retailer'), retailerOrderController.placeOrder);
+router.get('/orders', restrictTo('retailer'), retailerOrderController.getMyOrders);
 
 // Legacy route — kept for backward compatibility
 router.get('/distributor-products', retailerController.getDistributorProducts);

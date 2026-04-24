@@ -4,15 +4,47 @@ import api from '../api';
 const AuthContext = createContext(null);
 
 // Role-specific localStorage key helpers
-export const getTokenKeys = (role) => ({
-  accessToken: `${role}_token`,
-  refreshToken: `${role}_refresh_token`,
-  user: `${role}_user`,
-});
+const ROLE_KEY_MAP = {
+  sales_executive: 'sales',
+};
+
+const getRoleKey = (role) => ROLE_KEY_MAP[role] || role;
+
+export const getTokenKeys = (role) => {
+  const key = getRoleKey(role);
+  return {
+    accessToken: `${key}_token`,
+    refreshToken: `${key}_refresh_token`,
+    user: `${key}_user`,
+  };
+};
 
 // Find which role is currently logged in by checking all possible keys
 const detectStoredSession = () => {
-  const roles = ['admin', 'distributor', 'retailer', 'customer'];
+  // URL-based priority — same logic as api.js
+  const PATH_ROLE_MAP = {
+    '/admin': 'admin',
+    '/distributor': 'distributor',
+    '/retailer': 'retailer',
+    '/sales': 'sales_executive',
+    '/customer': 'customer',
+  };
+
+  const path = window.location.pathname;
+  const sortedMap = Object.entries(PATH_ROLE_MAP).sort((a, b) => b[0].length - a[0].length);
+  for (const [prefix, role] of sortedMap) {
+    if (path === prefix || path.startsWith(prefix + '/')) {
+      const keys = getTokenKeys(role);
+      const storedUser = localStorage.getItem(keys.user);
+      const token = localStorage.getItem(keys.accessToken);
+      if (storedUser && token) {
+        return { userData: JSON.parse(storedUser), role };
+      }
+    }
+  }
+
+  // Fallback: first available session
+  const roles = ['admin', 'distributor', 'retailer', 'customer', 'sales_executive'];
   for (const role of roles) {
     const keys = getTokenKeys(role);
     const storedUser = localStorage.getItem(keys.user);
@@ -130,7 +162,7 @@ export function AuthProvider({ children }) {
       console.error('Logout error', error);
     } finally {
       // Clear all possible role keys on logout
-      ['admin', 'distributor', 'retailer', 'customer'].forEach((role) => {
+      ['admin', 'distributor', 'retailer', 'customer', 'sales_executive'].forEach((role) => {
         const keys = getTokenKeys(role);
         localStorage.removeItem(keys.user);
         localStorage.removeItem(keys.accessToken);

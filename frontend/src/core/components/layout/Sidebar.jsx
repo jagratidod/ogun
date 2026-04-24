@@ -18,8 +18,6 @@ const adminNav = [
   { label: 'Dashboard', icon: RiDashboardLine, path: '/admin' },
   {
     label: 'Access Control', icon: RiShieldKeyholeLine, permission: 'rbac', children: [
-      { label: 'Roles', path: '/admin/rbac/roles' },
-      { label: 'Permissions', path: '/admin/rbac/permissions' },
       { label: 'Users', path: '/admin/rbac/users' },
     ],
   },
@@ -76,6 +74,7 @@ const adminNav = [
   },
   { label: 'Distributors', icon: RiTruckLine, path: '/admin/distributors', permission: 'distributors' },
   { label: 'Retailers', icon: RiStore2Line, path: '/admin/retailers', permission: 'retailers' },
+  { label: 'Sales Representatives', icon: RiUserLine, path: '/admin/sales-reps', permission: 'sales_reps' },
   { label: 'Customers', icon: RiUserLine, path: '/admin/customers', permission: 'customers' },
   {
     label: 'Service', icon: RiCustomerServiceLine, permission: 'service', children: [

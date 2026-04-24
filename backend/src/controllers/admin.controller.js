@@ -231,8 +231,24 @@ exports.updateRetailerStatus = async (req, res, next) => {
             return ApiResponse.error(res, "Retailer not found", 404);
         }
 
+        const wasInactive = !user.isActive;
         user.isActive = status === 'active';
         await user.save();
+
+        // Award retailerActivationBonus to the sales rep who onboarded this retailer
+        if (status === 'active' && wasInactive && user.onboardedBy) {
+            try {
+                const RewardConfig = require('../models/rewardConfig.model');
+                const config = await RewardConfig.findOne({ key: 'global' });
+                const bonus = config?.earningRules?.salesExecutive?.retailerActivationBonus || 100;
+
+                await User.findByIdAndUpdate(user.onboardedBy, {
+                    $inc: { 'salesExecutiveData.totalPoints': bonus }
+                });
+            } catch (e) {
+                console.error('Failed to award activation bonus:', e.message);
+            }
+        }
 
         return ApiResponse.success(res, {
             id: user._id,

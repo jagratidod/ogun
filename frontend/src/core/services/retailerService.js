@@ -33,6 +33,33 @@ const retailerService = {
   getMyQueries: async () => {
     const response = await api.get('/retailer/product-queries');
     return response.data;
+  },
+
+  // Orders
+  placeOrder: async (data) => {
+    const response = await api.post('/retailer/orders', data);
+    return response.data;
+  },
+
+  getMyOrders: async () => {
+    const response = await api.get('/retailer/orders');
+    return response.data;
+  },
+
+  // Sales (POS)
+  createSale: async (data) => {
+    const response = await api.post('/retailer/sales', data);
+    return response.data;
+  },
+
+  getSaleHistory: async () => {
+    const response = await api.get('/retailer/sales');
+    return response.data;
+  },
+
+  getSaleDetail: async (id) => {
+    const response = await api.get(`/retailer/sales/${id}`);
+    return response.data;
   }
 };
 

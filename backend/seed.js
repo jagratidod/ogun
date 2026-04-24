@@ -29,6 +29,26 @@ const seedAdmin = async () => {
             console.log('Password: admin123');
         }
 
+        // Seed a test sales executive
+        const salesExists = await User.findOne({ email: 'sales@ogun.in' });
+        if (salesExists) {
+            console.log('Sales Executive already exists. Skipping seed.');
+        } else {
+            await User.create({
+                name: 'Test Sales Executive',
+                email: 'sales@ogun.in',
+                password: 'sales123',
+                role: 'sales_executive',
+                isActive: true,
+                salesExecutiveData: {
+                    assignedArea: 'Test Area'
+                }
+            });
+            console.log('Sales Executive created successfully!');
+            console.log('Email: sales@ogun.in');
+            console.log('Password: sales123');
+        }
+
         // Optional: Seed a test distributor and retailer
         const distExists = await User.findOne({ email: 'dist@test.com' });
         if (!distExists) {

@@ -20,6 +20,7 @@ export default function ProtectedRoute({ children, allowedRoles }) {
     if (path.startsWith('/admin')) return <Navigate to="/admin/login" replace />;
     if (path.startsWith('/distributor')) return <Navigate to="/distributor/login" replace />;
     if (path.startsWith('/retailer')) return <Navigate to="/retailer/login" replace />;
+    if (path.startsWith('/sales')) return <Navigate to="/sales/login" replace />;
     if (path.startsWith('/customer')) return <Navigate to="/customer/login" replace />;
     return <Navigate to="/login" replace />;
   }
@@ -43,6 +44,7 @@ export default function ProtectedRoute({ children, allowedRoles }) {
       '/admin/orders': 'orders',
       '/admin/distributors': 'distributors',
       '/admin/retailers': 'retailers',
+      '/admin/sales-reps': 'sales_reps',
       '/admin/customers': 'customers',
       '/admin/service': 'service',
       '/admin/content': 'content',

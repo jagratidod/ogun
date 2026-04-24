@@ -10,6 +10,7 @@ import {
 const bottomNavItems = [
   { label: 'Home', icon: RiDashboardLine, path: '/retailer', exact: true },
   { label: 'Market', icon: RiShoppingBagLine, path: '/retailer/marketplace' },
+  { label: 'Orders', icon: RiShoppingBagLine, path: '/retailer/orders' },
   { label: 'Requests', icon: RiQuestionAnswerLine, path: '/retailer/queries' },
   { label: 'Sell', icon: RiShoppingBagLine, path: '/retailer/sales' },
   { label: 'Stock', icon: RiBox3Line, path: '/retailer/stock' },

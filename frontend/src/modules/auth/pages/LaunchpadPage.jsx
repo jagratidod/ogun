@@ -44,6 +44,16 @@ const LaunchpadPage = () => {
       accent: 'text-white'
     },
     {
+      id: 'sales_executive',
+      title: 'Intelligence',
+      role: 'Field Executive',
+      description: 'On-ground Sales & Market Intelligence',
+      icon: RiLayoutGridFill,
+      path: '/sales/login',
+      theme: 'from-[#3FAFB0] to-[#2D8F9C]',
+      accent: 'text-white'
+    },
+    {
       id: 'customer',
       title: 'Experience',
       role: 'Customer',

@@ -10,15 +10,51 @@ const api = axios.create({
 });
 
 // Detect the active role's token keys from localStorage
+const ROLE_KEY_MAP = { sales_executive: 'sales' };
+const getRoleKey = (role) => ROLE_KEY_MAP[role] || role;
+
+// Map URL path prefix → role, so the right token is always used
+// even when multiple roles are logged in simultaneously
+const PATH_ROLE_MAP = {
+  '/admin': 'admin',
+  '/distributor': 'distributor',
+  '/retailer': 'retailer',
+  '/sales': 'sales_executive',
+  '/customer': 'customer',
+};
+
 const getActiveTokenKeys = () => {
-  const roles = ['admin', 'distributor', 'retailer', 'customer'];
+  // 1. Try to infer role from current URL path — use exact segment match
+  const path = window.location.pathname;
+  // Sort by prefix length descending so more specific paths match first
+  const sortedMap = Object.entries(PATH_ROLE_MAP).sort((a, b) => b[0].length - a[0].length);
+
+  for (const [prefix, role] of sortedMap) {
+    // Match /admin, /admin/*, but NOT /administrator etc.
+    if (path === prefix || path.startsWith(prefix + '/')) {
+      const key = getRoleKey(role);
+      const token = localStorage.getItem(`${key}_token`);
+      if (token) {
+        return {
+          accessKey: `${key}_token`,
+          refreshKey: `${key}_refresh_token`,
+          userKey: `${key}_user`,
+          role,
+        };
+      }
+    }
+  }
+
+  // 2. Fallback: first available token
+  const roles = ['admin', 'distributor', 'retailer', 'customer', 'sales_executive'];
   for (const role of roles) {
-    const token = localStorage.getItem(`${role}_token`);
+    const key = getRoleKey(role);
+    const token = localStorage.getItem(`${key}_token`);
     if (token) {
       return {
-        accessKey: `${role}_token`,
-        refreshKey: `${role}_refresh_token`,
-        userKey: `${role}_user`,
+        accessKey: `${key}_token`,
+        refreshKey: `${key}_refresh_token`,
+        userKey: `${key}_user`,
         role,
       };
     }
@@ -49,7 +85,9 @@ api.interceptors.response.use(
 
       const keys = getActiveTokenKeys();
       if (!keys) {
-        window.location.href = '/login';
+        const path = window.location.pathname;
+        if (path.startsWith('/sales')) window.location.href = '/sales/login';
+        else window.location.href = '/login';
         return Promise.reject(error);
       }
 
@@ -71,7 +109,15 @@ api.interceptors.response.use(
           localStorage.removeItem(keys.refreshKey);
           localStorage.removeItem(keys.userKey);
         }
-        window.location.href = '/login';
+        // Redirect to role-specific login
+        const roleLoginMap = {
+          admin: '/admin/login',
+          distributor: '/distributor/login',
+          retailer: '/retailer/login',
+          sales_executive: '/sales/login',
+          customer: '/customer/login',
+        };
+        window.location.href = roleLoginMap[keys?.role] || '/login';
         return Promise.reject(err);
       }
     }

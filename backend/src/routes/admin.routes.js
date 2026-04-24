@@ -24,6 +24,19 @@ router.put('/distributors/:id/status', checkPermission('distributors'), adminCon
 router.get('/retailers', checkPermission('retailers'), adminController.getRetailers);
 router.put('/retailers/:id/status', checkPermission('retailers'), adminController.updateRetailerStatus);
 
+// Reward Config
+const rewardConfigController = require('../controllers/admin.rewardConfig.controller');
+router.get('/reward-config', rewardConfigController.getConfig);
+router.put('/reward-config/rules/:role', rewardConfigController.updateRules);
+
+// Sales Representatives Management
+const salesRepsController = require('../controllers/admin.salesReps.controller');
+router.get('/sales-reps', salesRepsController.getSalesReps);
+router.post('/sales-reps', salesRepsController.createSalesRep);
+router.get('/sales-reps/:id', salesRepsController.getSalesRepDetail);
+router.put('/sales-reps/:id', salesRepsController.updateSalesRep);
+router.post('/sales-reps/:id/targets', salesRepsController.setTarget);
+
 // Product Management
 const productController = require('../controllers/admin.product.controller');
 const upload = require('../middleware/upload.middleware');
