@@ -3,17 +3,36 @@ import api from '../api';
 
 const AuthContext = createContext(null);
 
+// Role-specific localStorage key helpers
+export const getTokenKeys = (role) => ({
+  accessToken: `${role}_token`,
+  refreshToken: `${role}_refresh_token`,
+  user: `${role}_user`,
+});
+
+// Find which role is currently logged in by checking all possible keys
+const detectStoredSession = () => {
+  const roles = ['admin', 'distributor', 'retailer', 'customer'];
+  for (const role of roles) {
+    const keys = getTokenKeys(role);
+    const storedUser = localStorage.getItem(keys.user);
+    const token = localStorage.getItem(keys.accessToken);
+    if (storedUser && token) {
+      return { userData: JSON.parse(storedUser), role };
+    }
+  }
+  return null;
+};
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('crm_user');
-    const token = localStorage.getItem('access_token');
-
-    if (storedUser && token) {
-      setUser(JSON.parse(storedUser));
+    const session = detectStoredSession();
+    if (session) {
+      setUser(session.userData);
       setIsAuthenticated(true);
     }
     setLoading(false);
@@ -34,13 +53,21 @@ export function AuthProvider({ children }) {
   const verifyOTP = useCallback(async (email, otp, role, name = '') => {
     try {
       const response = await api.post('/auth/verify-otp', { email, otp, role, name });
-      const { user: userData, accessToken, refreshToken } = response.data.data;
+      const data = response.data?.data;
+
+      if (!data?.accessToken || !data?.refreshToken || !data?.user) {
+        return { success: false, message: 'Invalid response from server. Please try again.' };
+      }
+
+      const { user: userData, accessToken, refreshToken } = data;
+      const keys = getTokenKeys(userData.role);
+
+      localStorage.setItem(keys.user, JSON.stringify(userData));
+      localStorage.setItem(keys.accessToken, accessToken);
+      localStorage.setItem(keys.refreshToken, refreshToken);
 
       setUser(userData);
       setIsAuthenticated(true);
-      localStorage.setItem('crm_user', JSON.stringify(userData));
-      localStorage.setItem('access_token', accessToken);
-      localStorage.setItem('refresh_token', refreshToken);
 
       return { success: true, role: userData.role };
     } catch (error) {
@@ -66,13 +93,21 @@ export function AuthProvider({ children }) {
   const loginWithPassword = useCallback(async (email, password) => {
     try {
       const response = await api.post('/auth/admin/login', { email, password });
-      const { user: userData, accessToken, refreshToken } = response.data.data;
+      const data = response.data?.data;
+
+      if (!data?.accessToken || !data?.refreshToken || !data?.user) {
+        return { success: false, message: 'Invalid response from server. Please try again.' };
+      }
+
+      const { user: userData, accessToken, refreshToken } = data;
+      const keys = getTokenKeys(userData.role);
+
+      localStorage.setItem(keys.user, JSON.stringify(userData));
+      localStorage.setItem(keys.accessToken, accessToken);
+      localStorage.setItem(keys.refreshToken, refreshToken);
 
       setUser(userData);
       setIsAuthenticated(true);
-      localStorage.setItem('crm_user', JSON.stringify(userData));
-      localStorage.setItem('access_token', accessToken);
-      localStorage.setItem('refresh_token', refreshToken);
 
       return { success: true, role: userData.role };
     } catch (error) {
@@ -85,18 +120,26 @@ export function AuthProvider({ children }) {
 
   const logout = useCallback(async () => {
     try {
-      const refreshToken = localStorage.getItem('refresh_token');
-      await api.post('/auth/logout', { refreshToken });
+      const role = user?.role;
+      if (role) {
+        const keys = getTokenKeys(role);
+        const refreshToken = localStorage.getItem(keys.refreshToken);
+        await api.post('/auth/logout', { refreshToken });
+      }
     } catch (error) {
       console.error('Logout error', error);
     } finally {
+      // Clear all possible role keys on logout
+      ['admin', 'distributor', 'retailer', 'customer'].forEach((role) => {
+        const keys = getTokenKeys(role);
+        localStorage.removeItem(keys.user);
+        localStorage.removeItem(keys.accessToken);
+        localStorage.removeItem(keys.refreshToken);
+      });
       setUser(null);
       setIsAuthenticated(false);
-      localStorage.removeItem('crm_user');
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
     }
-  }, []);
+  }, [user]);
 
   return (
     <AuthContext.Provider value={{
