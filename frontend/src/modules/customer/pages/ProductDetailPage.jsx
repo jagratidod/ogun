@@ -1,13 +1,51 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { RiPriceTag3Fill, RiShieldFill, RiSmartphoneFill, RiHistoryFill, RiInformationFill, RiPulseFill, RiArrowLeftSLine, RiShoppingBasketFill, RiVerifiedBadgeFill, RiCustomerService2Fill } from 'react-icons/ri';
+import { useState, useEffect } from 'react';
+import { RiPriceTag3Fill, RiShieldFill, RiSmartphoneFill, RiHistoryFill, RiInformationFill, RiPulseFill, RiArrowLeftSLine, RiShoppingBasketFill, RiVerifiedBadgeFill, RiCustomerService2Fill, RiLoader4Line } from 'react-icons/ri';
 import { toast } from 'react-hot-toast';
 import { Badge, Button, Avatar, Card, CardHeader, CardTitle, CardDescription, PageHeader } from '../../../core';
-import customerData from '../../../data/customer.json';
+import api from '../../../core/api';
 
 export default function ProductDetailPage() {
    const navigate = useNavigate();
    const { id } = useParams();
-   const prod = customerData.products.find(p => p.id === id) || customerData.products[0];
+   const [prod, setProd] = useState(null);
+   const [loading, setLoading] = useState(true);
+
+   useEffect(() => {
+      fetchProduct();
+   }, [id]);
+
+   const fetchProduct = async () => {
+      try {
+         const res = await api.get(`/customer/products/${id}`);
+         setProd(res.data?.data);
+      } catch (err) {
+         toast.error('Product not found');
+         navigate('/customer/products');
+      } finally {
+         setLoading(false);
+      }
+   };
+
+   const formatDate = (d) => {
+      if (!d) return '—';
+      return new Date(d).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
+   };
+
+   const getWarrantyLabel = () => {
+      if (!prod?.warrantyExpiryDate) return 'Unknown';
+      return new Date(prod.warrantyExpiryDate) > new Date() ? 'In Warranty' : 'Expired';
+   };
+
+   if (loading) {
+      return (
+         <div className="page-container max-w-lg mx-auto flex items-center justify-center min-h-[60vh]">
+            <RiLoader4Line className="w-8 h-8 text-brand-teal animate-spin" />
+         </div>
+      );
+   }
+
+   if (!prod) return null;
 
    return (
       <div className="page-container flex flex-col gap-5 max-w-lg mx-auto">
@@ -22,17 +60,14 @@ export default function ProductDetailPage() {
          <div className="rounded-[32px] p-8 border-0 shadow-lg bg-gradient-to-br from-brand-teal to-brand-purple flex flex-col items-center justify-center text-center text-white gap-5 relative overflow-hidden">
             <div className="absolute inset-0 bg-white/5 backdrop-blur-3xl"></div>
             <div className="w-28 h-28 rounded-2xl bg-white p-1 flex items-center justify-center border-4 border-white/20 overflow-hidden shadow-2xl relative z-10">
-                 {prod.image ? (
-                    <img src={prod.image} alt={prod.name} className="w-full h-full object-cover rounded-xl" />
-                 ) : (
-                    <RiShoppingBasketFill className="w-12 h-12 text-brand-teal" />
-                 )}
+               <RiShoppingBasketFill className="w-12 h-12 text-brand-teal" />
             </div>
             <div className="flex flex-col items-center relative z-10">
-               <h3 className="text-2xl font-black tracking-tight leading-none">{prod.name}</h3>
+               <h3 className="text-2xl font-black tracking-tight leading-none">{prod.productName}</h3>
+               <p className="text-[10px] mt-1 font-bold text-white/60 uppercase tracking-widest">SN: {prod.serialNumber}</p>
                <div className="flex items-center gap-2 mt-3 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full border border-white/30">
                   <RiVerifiedBadgeFill className="text-yellow-400 w-4 h-4" />
-                  <p className="text-[9px] font-black uppercase tracking-widest">{prod.status}</p>
+                  <p className="text-[9px] font-black uppercase tracking-widest">{getWarrantyLabel()}</p>
                </div>
             </div>
          </div>
@@ -44,9 +79,12 @@ export default function ProductDetailPage() {
             </CardHeader>
             <div className="p-6 space-y-5">
                {[
-                  { icon: RiShieldFill, label: 'Coverage Active', val: 'Full Parts + Labor', color: 'text-brand-teal' },
-                  { icon: RiHistoryFill, label: 'Expiry Date', val: prod.warrantyExp, color: 'text-brand-teal' },
-                  { icon: RiSmartphoneFill, label: 'Policy Serial', val: prod.id, color: 'text-brand-teal' }
+                  { icon: RiShieldFill, label: 'Coverage Active', val: `${prod.warrantyPeriod} Months · Full Parts + Labor`, color: 'text-brand-teal' },
+                  { icon: RiHistoryFill, label: 'Warranty Start', val: formatDate(prod.warrantyStartDate), color: 'text-brand-teal' },
+                  { icon: RiHistoryFill, label: 'Expiry Date', val: formatDate(prod.warrantyExpiryDate), color: 'text-brand-teal' },
+                  { icon: RiSmartphoneFill, label: 'Category', val: prod.category?.toUpperCase(), color: 'text-brand-teal' },
+                  { icon: RiPriceTag3Fill, label: 'Purchase Date', val: formatDate(prod.purchaseDate), color: 'text-brand-teal' },
+                  { icon: RiInformationFill, label: 'Store / Dealer', val: prod.storeName || 'Not specified', color: 'text-brand-teal' },
                ].map(item => (
                   <div key={item.label} className="flex items-center gap-4 group">
                      <div className={`w-11 h-11 rounded-xl bg-gray-50 flex items-center justify-center ${item.color} border border-gray-100 group-hover:bg-white group-hover:shadow-md transition-all`}>
@@ -66,19 +104,19 @@ export default function ProductDetailPage() {
                onClick={() => navigate('/customer/service/raise')}
                className="bg-white p-6 flex flex-col items-center gap-3 border border-gray-100 rounded-3xl group hover:border-brand-teal/30 hover:shadow-lg transition-all active:scale-95 outline-none"
             >
-               <div className="w-14 h-14 rounded-2xl bg-brand-teal/5 flex items-center justify-center text-brand-teal border border-brand-teal/10 group-hover:animate-pop">
+               <div className="w-14 h-14 rounded-2xl bg-brand-teal/5 flex items-center justify-center text-brand-teal border border-brand-teal/10">
                   <RiCustomerService2Fill className="w-7 h-7" />
                </div>
                <p className="text-[11px] font-black text-gray-800 uppercase tracking-wider">Request Service</p>
             </button>
             <button
-               onClick={() => toast.success('AMC Upgrade inquiry sent. Our representative will call you.')}
+               onClick={() => navigate('/customer/warranty')}
                className="bg-white p-6 flex flex-col items-center gap-3 border border-gray-100 rounded-3xl group hover:border-brand-pink/30 hover:shadow-lg transition-all active:scale-95 outline-none"
             >
-               <div className="w-14 h-14 rounded-2xl bg-brand-pink/5 flex items-center justify-center text-brand-pink border border-brand-pink/10 group-hover:animate-pop">
+               <div className="w-14 h-14 rounded-2xl bg-brand-pink/5 flex items-center justify-center text-brand-pink border border-brand-pink/10">
                   <RiPulseFill className="w-7 h-7" />
                </div>
-               <p className="text-[11px] font-black text-gray-800 uppercase tracking-wider">AMC Upgrade</p>
+               <p className="text-[11px] font-black text-gray-800 uppercase tracking-wider">Extend Warranty</p>
             </button>
          </div>
 
@@ -100,4 +138,3 @@ export default function ProductDetailPage() {
       </div>
    );
 }
-

@@ -165,6 +165,10 @@ exports.updateRetailerOrderStatus = catchAsync(async (req, res, next) => {
                 }
             }
             order.stockAddedToBuyer = true;
+
+            // --- REWARD POINTS FOR SELLER (Distributor) ---
+            const RewardService = require('../services/rewardService');
+            await RewardService.creditPoints(order.seller, 'distributor', 'perOrderDispatched', `Fulfilled Retailer Order: ${order.orderId}`);
         }
     }
 

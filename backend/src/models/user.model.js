@@ -73,7 +73,18 @@ const userSchema = new mongoose.Schema({
     },
     lastLogin: {
         type: Date
-    }
+    },
+    // Rewards System
+    rewardPoints: {
+        type: Number,
+        default: 0
+    },
+    pointHistory: [{
+        amount: { type: Number, required: true },
+        reason: { type: String, required: true }, // e.g., "Product Sale Bonus", "Target Achievement"
+        type: { type: String, enum: ['credit', 'debit'], default: 'credit' },
+        timestamp: { type: Date, default: Date.now }
+    }]
 }, {
     timestamps: true
 });

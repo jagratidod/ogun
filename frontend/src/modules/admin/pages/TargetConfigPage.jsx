@@ -48,14 +48,16 @@ export default function TargetConfigPage() {
   const campaignModal = useModal();
   const rulesModal = useModal(); // holds role key: 'retailer' | 'distributor' | 'salesExecutive'
 
-  // Fetch earning rules from backend
+  // Fetch earning rules and targets from backend
   useEffect(() => {
     api.get('/admin/reward-config')
       .then(res => {
-        const rules = res.data?.data?.earningRules;
+        const rules = res.data?.data?.config?.earningRules;
+        const tgts = res.data?.data?.targets;
         if (rules) setEarningRules(prev => ({ ...prev, ...rules }));
+        if (tgts) setTargets(tgts);
       })
-      .catch(() => {}) // fallback to defaults silently
+      .catch(() => {}) 
       .finally(() => setLoadingRules(false));
   }, []);
 
@@ -69,7 +71,7 @@ export default function TargetConfigPage() {
 
     try {
       const res = await api.put(`/admin/reward-config/rules/${role}`, payload);
-      setEarningRules(res.data.data);
+      setEarningRules(prev => ({ ...prev, [role]: res.data.data }));
       toast.success(`${meta.label} earning rules updated!`);
       rulesModal.close();
     } catch {
@@ -77,33 +79,44 @@ export default function TargetConfigPage() {
     }
   };
 
-  const handleSaveCampaign = (e) => {
+  const handleSaveCampaign = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
-    const newTgt = {
-      id: campaignModal.data?.id || `TGT-${Date.now()}`,
+    const payload = {
       name: formData.get('name'),
       type: formData.get('type'),
-      value: Number(formData.get('value')),
-      points: Number(formData.get('points')),
+      metric: formData.get('metric'),
+      targetValue: Number(formData.get('targetValue')),
+      awardPoints: Number(formData.get('awardPoints')),
       deadline: formData.get('deadline'),
       status: campaignModal.data?.status || 'Active',
-      current: campaignModal.data?.current || 0,
     };
-    if (campaignModal.data) {
-      setTargets(targets.map(t => t.id === newTgt.id ? newTgt : t));
-      toast.success('Campaign updated!');
-    } else {
-      setTargets([...targets, newTgt]);
-      toast.success('New campaign created!');
+
+    try {
+      if (campaignModal.data?._id) {
+        const res = await api.put(`/admin/reward-config/targets/${campaignModal.data._id}`, payload);
+        setTargets(targets.map(t => t._id === campaignModal.data._id ? res.data.data : t));
+        toast.success('Campaign updated!');
+      } else {
+        const res = await api.post('/admin/reward-config/targets', payload);
+        setTargets([res.data.data, ...targets]);
+        toast.success('New campaign created!');
+      }
+      campaignModal.close();
+    } catch {
+      toast.error('Failed to save campaign');
     }
-    campaignModal.close();
   };
 
-  const handleDeleteCampaign = (id) => {
+  const handleDeleteCampaign = async (id) => {
     if (window.confirm('Delete this campaign?')) {
-      setTargets(targets.filter(t => t.id !== id));
-      toast.success('Campaign removed');
+      try {
+        await api.delete(`/admin/reward-config/targets/${id}`);
+        setTargets(targets.filter(t => t._id !== id));
+        toast.success('Campaign removed');
+      } catch {
+        toast.error('Failed to delete');
+      }
     }
   };
 
@@ -112,32 +125,31 @@ export default function TargetConfigPage() {
     { key: 'type', label: 'Entity Type', render: (val) => (
       <Badge variant={val === 'Distributor' ? 'purple' : val === 'Sales Executive' ? 'pink' : val === 'Retailer' ? 'teal' : 'info'}>{val}</Badge>
     )},
-    { key: 'value', label: 'Target Value', align: 'right', render: (val, row) => (
+    { key: 'targetValue', label: 'Target Value', align: 'right', render: (val, row) => (
       <div className="flex flex-col items-end">
-        <span className="font-black text-brand-teal text-base">{val.toLocaleString()}</span>
-        <span className="text-[10px] text-content-tertiary font-bold uppercase">{row.type === 'Staff' ? 'Satisf. Score' : 'Revenue INR'}</span>
+        <span className="font-black text-brand-teal text-base">{val?.toLocaleString()}</span>
+        <span className="text-[10px] text-content-tertiary font-bold uppercase">{row.metric === 'rev' ? 'Revenue INR' : row.metric}</span>
       </div>
     )},
-    { key: 'points', label: 'Award Points', align: 'center', render: (val) => (
+    { key: 'awardPoints', label: 'Award Points', align: 'center', render: (val) => (
       <div className="flex flex-col items-center">
         <div className="flex items-center gap-1.5 text-state-warning">
           <RiTrophyLine className="w-4 h-4" />
-          <span className="font-black">{val.toLocaleString()}</span>
+          <span className="font-black">{val?.toLocaleString()}</span>
         </div>
-        <span className="text-[10px] text-brand-teal font-black">Value: ₹{(val * systemConfig.pointToRupeeRatio).toLocaleString()}</span>
       </div>
     )},
     { key: 'deadline', label: 'Campaign Deadline', render: (val) => (
       <div className="flex items-center gap-2">
         <RiTimeLine className="w-3.5 h-3.5 text-content-tertiary" />
-        <span className="text-xs text-content-secondary">{val}</span>
+        <span className="text-xs text-content-secondary">{val ? new Date(val).toLocaleDateString() : '—'}</span>
       </div>
     )},
-    { key: 'status', label: 'Status', render: (val) => <Badge status={val.toLowerCase()}>{val}</Badge> },
+    { key: 'status', label: 'Status', render: (val) => <Badge status={val?.toLowerCase()}>{val}</Badge> },
     { key: 'actions', label: 'Actions', align: 'right', render: (_, row) => (
       <div className="flex justify-end gap-1">
         <Button variant="icon" onClick={() => campaignModal.open(row)}><RiEditLine className="w-4 h-4" /></Button>
-        <Button variant="icon" onClick={() => handleDeleteCampaign(row.id)}><RiDeleteBin7Line className="w-4 h-4 text-state-danger opacity-70" /></Button>
+        <Button variant="icon" onClick={() => handleDeleteCampaign(row._id)}><RiDeleteBin7Line className="w-4 h-4 text-state-danger opacity-70" /></Button>
       </div>
     )},
   ];
@@ -204,15 +216,15 @@ export default function TargetConfigPage() {
               { label: 'Sales Executive', value: 'Sales Executive' },
               { label: 'Service Staff', value: 'Staff' },
             ]} />
-            <Select label="Target Metric" options={[
+            <Select label="Target Metric" name="metric" defaultValue={campaignModal.data?.metric || 'rev'} options={[
               { label: 'Gross Revenue (INR)', value: 'rev' },
               { label: 'Unit Sales (Qty)', value: 'qty' },
               { label: 'Retailers Onboarded', value: 'retailers' },
               { label: 'Service Satisfaction (%)', value: 'srv' },
             ]} />
-            <Input label="Goal Target Value" name="value" type="number" defaultValue={campaignModal.data?.value} placeholder="e.g. 500000" required />
-            <Input label="Award Points" name="points" type="number" defaultValue={campaignModal.data?.points} placeholder="Points on achievement" required />
-            <Input label="Expiry Date" name="deadline" type="date" defaultValue={campaignModal.data?.deadline} required />
+            <Input label="Goal Target Value" name="targetValue" type="number" defaultValue={campaignModal.data?.targetValue} placeholder="e.g. 500000" required />
+            <Input label="Award Points" name="awardPoints" type="number" defaultValue={campaignModal.data?.awardPoints} placeholder="Points on achievement" required />
+            <Input label="Expiry Date" name="deadline" type="date" defaultValue={campaignModal.data?.deadline ? new Date(campaignModal.data.deadline).toISOString().split('T')[0] : ''} required />
           </div>
           <div className="flex justify-end gap-3 pt-4 border-t border-border">
             <Button type="button" variant="secondary" onClick={campaignModal.close}>Cancel</Button>

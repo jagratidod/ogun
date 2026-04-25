@@ -1,11 +1,48 @@
 import { useNavigate } from 'react-router-dom';
-import { RiShoppingBasketFill, RiVerifiedBadgeFill, RiPriceTag3Fill, RiInformationFill, RiAddCircleFill, RiSmartphoneFill, RiHeartFill, RiCustomerServiceFill, RiArrowRightSLine, RiShieldStarFill, RiTimeFill } from 'react-icons/ri';
-import { Badge, Button, Avatar, Card, CardHeader, CardTitle, CardDescription, PageHeader } from '../../../core';
-import customerData from '../../../data/customer.json';
+import { useState, useEffect } from 'react';
+import { RiShoppingBasketFill, RiVerifiedBadgeFill, RiPriceTag3Fill, RiAddCircleFill, RiShieldStarFill, RiHeartFill, RiLoader4Line } from 'react-icons/ri';
+import api from '../../../core/api';
 
 export default function MyProductsPage() {
    const navigate = useNavigate();
-   const { products } = customerData;
+   const [products, setProducts] = useState([]);
+   const [loading, setLoading] = useState(true);
+
+   useEffect(() => {
+      fetchProducts();
+   }, []);
+
+   const fetchProducts = async () => {
+      try {
+         const res = await api.get('/customer/products');
+         setProducts(res.data?.data || []);
+      } catch (err) {
+         console.error('Failed to fetch products:', err);
+      } finally {
+         setLoading(false);
+      }
+   };
+
+   const getWarrantyStatus = (expiryDate) => {
+      if (!expiryDate) return { label: 'Unknown', color: 'text-gray-400 bg-gray-50 border-gray-100' };
+      const now = new Date();
+      const expiry = new Date(expiryDate);
+      if (expiry > now) return { label: 'Active', color: 'text-green-600 bg-green-50 border-green-100' };
+      return { label: 'Expired', color: 'text-red-500 bg-red-50 border-red-100' };
+   };
+
+   const formatDate = (d) => {
+      if (!d) return '—';
+      return new Date(d).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
+   };
+
+   if (loading) {
+      return (
+         <div className="page-container max-w-lg mx-auto flex items-center justify-center min-h-[60vh]">
+            <RiLoader4Line className="w-8 h-8 text-brand-teal animate-spin" />
+         </div>
+      );
+   }
 
    return (
       <div className="page-container flex flex-col gap-3 max-w-lg mx-auto">
@@ -21,38 +58,36 @@ export default function MyProductsPage() {
          </div>
 
          <div className="grid grid-cols-2 gap-3 mt-1">
-            {products.map(prod => (
-               <div
-                  key={prod.id}
-                  onClick={() => navigate(`/customer/products/${prod.id}`)}
-                  className="p-3 rounded-3xl bg-white border border-gray-100 flex flex-col gap-3 group hover:shadow-[0_12px_40px_rgba(0,0,0,0.06)] active:scale-[0.97] transition-all cursor-pointer overflow-hidden relative"
-               >
-                  {/* Status Badge */}
-                  <div className="absolute top-2.5 right-2.5 z-10 bg-white/80 backdrop-blur-md px-2 py-0.5 rounded-full border border-gray-100 flex items-center gap-1 shadow-sm">
-                     <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
-                     <span className="text-[6px] font-black text-green-600 uppercase tracking-tighter">Active</span>
-                  </div>
+            {products.map(prod => {
+               const warranty = getWarrantyStatus(prod.warrantyExpiryDate);
+               return (
+                  <div
+                     key={prod._id}
+                     onClick={() => navigate(`/customer/products/${prod._id}`)}
+                     className="p-3 rounded-3xl bg-white border border-gray-100 flex flex-col gap-3 group hover:shadow-[0_12px_40px_rgba(0,0,0,0.06)] active:scale-[0.97] transition-all cursor-pointer overflow-hidden relative"
+                  >
+                     {/* Status Badge */}
+                     <div className={`absolute top-2.5 right-2.5 z-10 bg-white/80 backdrop-blur-md px-2 py-0.5 rounded-full border flex items-center gap-1 shadow-sm ${warranty.color}`}>
+                        <div className={`w-1 h-1 rounded-full ${warranty.label === 'Active' ? 'bg-green-500 animate-pulse' : 'bg-red-400'}`}></div>
+                        <span className="text-[6px] font-black uppercase tracking-tighter">{warranty.label}</span>
+                     </div>
 
-                  <div className="w-full aspect-square rounded-2xl bg-gray-50 flex items-center justify-center overflow-hidden border border-gray-100 group-hover:border-brand-teal/20 transition-all flex-shrink-0">
-                     <img 
-                        src={prod.image || "/products/mixer.png"} 
-                        alt={prod.name} 
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
-                     />
-                  </div>
-                  
-                  <div className="flex flex-col gap-1.5 px-0.5">
-                     <h4 className="text-[12px] font-black text-gray-800 leading-tight truncate">{prod.name}</h4>
+                     <div className="w-full aspect-square rounded-2xl bg-gray-50 flex items-center justify-center overflow-hidden border border-gray-100 group-hover:border-brand-teal/20 transition-all flex-shrink-0">
+                        <RiShoppingBasketFill className="w-12 h-12 text-brand-teal/20" />
+                     </div>
                      
-                     <div className="flex items-center gap-1.5 bg-teal-50/50 p-1.5 rounded-lg border border-brand-teal/5">
-                        <RiShieldStarFill className="w-3 h-3 text-brand-teal" />
-                        <span className="text-[8px] font-black text-brand-teal uppercase tracking-widest leading-none">EXP: {prod.warrantyExp}</span>
+                     <div className="flex flex-col gap-1.5 px-0.5">
+                        <h4 className="text-[12px] font-black text-gray-800 leading-tight truncate">{prod.productName}</h4>
+                        <div className="flex items-center gap-1.5 bg-teal-50/50 p-1.5 rounded-lg border border-brand-teal/5">
+                           <RiShieldStarFill className="w-3 h-3 text-brand-teal" />
+                           <span className="text-[8px] font-black text-brand-teal uppercase tracking-widest leading-none">EXP: {formatDate(prod.warrantyExpiryDate)}</span>
+                        </div>
                      </div>
                   </div>
-               </div>
-            ))}
+               );
+            })}
 
-            {/* Compact Add Button Card */}
+            {/* Add Button Card */}
             <div className="p-3 rounded-3xl border-2 border-dashed border-gray-100 flex flex-col items-center justify-center gap-2 group hover:border-brand-teal/30 hover:bg-gray-50 transition-all cursor-pointer min-h-[160px]"
                onClick={() => navigate('/customer/products/register')}
             >
@@ -63,6 +98,13 @@ export default function MyProductsPage() {
             </div>
          </div>
 
+         {products.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-16 opacity-40">
+               <RiShoppingBasketFill className="w-16 h-16 text-gray-300 mb-4" />
+               <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">No Products Registered Yet</p>
+            </div>
+         )}
+
          <div className="pb-8 mt-4">
             <div className="flex items-center justify-center gap-3 p-4 rounded-2xl bg-brand-pink/5 border border-brand-pink/10">
                <RiHeartFill className="w-4 h-4 text-brand-pink" />
@@ -72,4 +114,3 @@ export default function MyProductsPage() {
       </div>
    );
 }
-

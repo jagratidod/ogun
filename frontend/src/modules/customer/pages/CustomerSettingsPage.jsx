@@ -5,16 +5,18 @@ import {
   RiDatabaseLine, RiInformationLine, RiArrowRightSLine, 
   RiLogoutBoxRLine, RiUserLine, RiStore2Line, RiMapPinLine, 
   RiPhoneLine, RiHeartLine, RiLockPasswordLine, RiUserStarLine, 
-  RiCheckDoubleLine 
+  RiCheckDoubleLine, RiShieldStarFill
 } from 'react-icons/ri';
 import { 
   PageHeader, Card, CardHeader, CardTitle, CardDescription, 
   Badge, Button, Avatar, Input, Select, Modal, useModal 
 } from '../../../core';
 import { useAuthContext } from '../../../core/context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 
 export default function CustomerSettingsPage() {
+  const navigate = useNavigate();
   const { user, logout } = useAuthContext();
   const [loading, setLoading] = useState(false);
   const { isOpen, open, close, data: activeTab } = useModal();
@@ -36,6 +38,7 @@ export default function CustomerSettingsPage() {
   };
 
   const menuItems = [
+    { icon: RiShieldStarFill, label: 'Warranty Extensions', desc: 'View history and extend coverage', path: '/customer/warranty' },
     { icon: RiUserLine, label: 'Identity Information', desc: 'Name, email, and social profiles' },
     { icon: RiMapPinLine, label: 'Saved Localities', desc: 'Direct service addresses' },
     { icon: RiLockPasswordLine, label: 'Security & Access', desc: 'Passwords and biometric' },
@@ -67,7 +70,7 @@ export default function CustomerSettingsPage() {
 
       <div className="space-y-4">
          {menuItems.map(item => (
-            <Card key={item.label} className="group active:scale-95 transition-all outline-none border-border overflow-hidden hover:border-brand-teal cursor-pointer" onClick={() => open(item)}>
+            <Card key={item.label} className="group active:scale-95 transition-all outline-none border-border overflow-hidden hover:border-brand-teal cursor-pointer" onClick={() => item.path ? navigate(item.path) : open(item)}>
                <div className="p-4 flex items-center gap-4">
                   <div className="w-10 h-10 rounded-none bg-surface-primary flex items-center justify-center text-brand-teal group-hover:shadow-glow transition-all">
                      <item.icon className="w-5 h-5" />

@@ -8,6 +8,7 @@ const distributorRoutes = require('./distributor.routes');
 const retailerRoutes = require('./retailer.routes');
 const customerRoutes = require('./customer.routes');
 const salesExecutiveRoutes = require('./salesExecutive.routes');
+const rewardRoutes = require('./reward.routes');
 
 router.use('/auth', authRoutes);
 router.use('/admin', adminRoutes);
@@ -16,5 +17,6 @@ router.use('/distributor', distributorRoutes);
 router.use('/retailer', retailerRoutes);
 router.use('/customer', customerRoutes);
 router.use('/sales-executive', salesExecutiveRoutes);
+router.use('/rewards', rewardRoutes);
 
 module.exports = router;

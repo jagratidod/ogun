@@ -55,6 +55,19 @@ exports.createSale = catchAsync(async (req, res, next) => {
         notes
     });
 
+    // 4. Credit Reward Points
+    const RewardService = require('../services/rewardService');
+    for (const item of processedItems) {
+        // We credit points per product sold using a multiplier for quantity
+        await RewardService.creditPoints(
+            req.user._id, 
+            'retailer', 
+            'perProductSale', 
+            `Sale of ${item.quantity} units of product ${item.product} (ID: ${sale.saleId})`,
+            item.quantity
+        );
+    }
+
     return ApiResponse.success(res, sale, 'Sale completed successfully', 201);
 });
 

@@ -81,6 +81,15 @@ export default function DistributorListPage() {
       )
     },
     {
+      key: 'rewardPoints', label: 'Reward Points', align: 'center', render: (val) => (
+        <div className="flex flex-col items-center">
+           <div className="flex items-center gap-1 text-brand-purple font-black">
+              <span className="text-sm">{(val || 0).toLocaleString()}</span>
+           </div>
+        </div>
+      )
+    },
+    {
       key: 'actions', label: 'Actions', align: 'right', render: (_val, row) => (
         <div className="flex justify-end gap-1">
           <Button variant="secondary" onClick={() => toggleStatus(row)}>

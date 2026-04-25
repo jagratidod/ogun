@@ -2,7 +2,9 @@ const User = require('../models/user.model');
 const ProductOrder = require('../models/productOrder.model');
 const Product = require('../models/product.model');
 const RewardConfig = require('../models/rewardConfig.model');
-const Leave = require('../models/leave.model'); // Added Leave model
+const Leave = require('../models/leave.model');
+const ServiceRequest = require('../models/serviceRequest.model');
+const RewardService = require('../services/rewardService');
 const ApiResponse = require('../utils/apiResponse');
 const catchAsync = require('../utils/catchAsync');
 const { v4: uuidv4 } = require('uuid');
@@ -44,11 +46,15 @@ exports.getStats = catchAsync(async (req, res) => {
         await freshUser.save();
     }
 
+    const serviceTickets = await ServiceRequest.find({ assignedTechnician: req.user._id });
+    const pendingTickets = serviceTickets.filter(t => ['Assigned', 'In Progress'].includes(t.status)).length;
+
     const stats = {
         totalRetailers: retailers,
         totalSalesValue,
         pendingOrders,
-        rewardPoints: freshUser.salesExecutiveData?.totalPoints || 0,
+        pendingTickets,
+        rewardPoints: freshUser.rewardPoints || 0, // Using top-level rewardPoints
         targets: freshUser.salesExecutiveData?.targets || [],
     };
 
@@ -83,12 +89,14 @@ exports.onboardRetailer = catchAsync(async (req, res) => {
         onboardedBy: req.user._id
     });
 
-    // Award points for onboarding using configured rules
-    if (req.user.salesExecutiveData) {
-        const rules = await getSalesRules();
-        req.user.salesExecutiveData.totalPoints += rules.perRetailerOnboarded;
-        await req.user.save();
-    }
+    // Award points for onboarding using RewardService
+    const rules = await getSalesRules();
+    await RewardService.creditPoints(
+        req.user._id, 
+        'sales_executive', 
+        'perRetailerOnboarded', 
+        `Onboarded Retailer: ${shopName}`
+    );
 
     return ApiResponse.success(res, retailer, 'Retailer onboarded successfully. Awaiting Admin approval.', 201);
 });
@@ -148,12 +156,13 @@ exports.placeOrder = catchAsync(async (req, res) => {
         createdBy: req.user._id
     });
 
-    // Award points for order using configured rules
-    if (req.user.salesExecutiveData) {
-        const rules = await getSalesRules();
-        req.user.salesExecutiveData.totalPoints += rules.perOrderPlaced;
-        await req.user.save();
-    }
+    // Award points for order using RewardService
+    await RewardService.creditPoints(
+        req.user._id, 
+        'sales_executive', 
+        'perOrderPlaced', 
+        `Placed Order: ${order.orderId}`
+    );
 
     return ApiResponse.success(res, order, 'Order placed successfully', 201);
 });
@@ -190,4 +199,64 @@ exports.applyLeave = catchAsync(async (req, res) => {
 exports.getMyLeaves = catchAsync(async (req, res) => {
     const leaves = await Leave.find({ employee: req.user._id }).sort({ createdAt: -1 });
     return ApiResponse.success(res, leaves, 'Leave history fetched');
+});
+
+/**
+ * @desc    Get assigned service tickets
+ * @route   GET /api/v1/sales-executive/service-tickets
+ */
+exports.getAssignedTickets = catchAsync(async (req, res) => {
+    const tickets = await ServiceRequest.find({ assignedTechnician: req.user._id })
+        .populate('registeredProduct', 'productName modelNumber')
+        .populate('customer', 'name phone')
+        .sort({ updatedAt: -1 });
+
+    return ApiResponse.success(res, tickets, 'Service tickets fetched');
+});
+
+/**
+ * @desc    Update service ticket status
+ * @route   PATCH /api/v1/sales-executive/service-tickets/:id/status
+ */
+exports.updateTicketStatus = catchAsync(async (req, res) => {
+    const { status, note } = req.body;
+    const ticket = await ServiceRequest.findOne({ 
+        _id: req.params.id, 
+        assignedTechnician: req.user._id 
+    });
+
+    if (!ticket) {
+        return ApiResponse.error(res, 'Ticket not found or not assigned to you', 404);
+    }
+
+    ticket.status = status;
+    if (status === 'Resolved') {
+        ticket.resolvedAt = new Date();
+        
+        // Handle resolution images if uploaded
+        if (req.files && req.files.length > 0) {
+            ticket.resolutionImages = req.files.map(f => ({
+                url: f.path,
+                public_id: f.filename
+            }));
+        }
+
+        // Credit rewards for resolution
+        await RewardService.creditPoints(
+            req.user._id, 
+            'sales_executive', 
+            'perServiceResolved', 
+            `Resolved Service Ticket: ${ticket.ticketId}`
+        );
+    }
+
+    ticket.history.push({
+        status,
+        note: note || `Status updated to ${status}`,
+        updatedBy: req.user._id
+    });
+
+    await ticket.save();
+
+    return ApiResponse.success(res, ticket, 'Ticket status updated successfully');
 });

@@ -53,7 +53,6 @@ const adminNav = [
     label: 'Orders', icon: RiShoppingCartLine, permission: 'orders', children: [
       { label: 'All Orders', path: '/admin/orders' },
       { label: 'Restock Requests', path: '/admin/orders/restock' },
-      { label: 'Order Flow', path: '/admin/orders/flow' },
     ],
   },
   {

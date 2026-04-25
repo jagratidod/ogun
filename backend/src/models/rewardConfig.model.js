@@ -20,6 +20,7 @@ const rewardConfigSchema = new mongoose.Schema({
             monthlySalesTargetBonus: { type: Number, default: 1000 },
             perOrderPlaced: { type: Number, default: 10 },
             retailerActivationBonus: { type: Number, default: 100 },
+            perServiceResolved: { type: Number, default: 50 },
         },
     },
     systemConfig: {

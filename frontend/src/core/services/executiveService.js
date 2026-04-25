@@ -29,6 +29,17 @@ const executiveService = {
   getProducts: async () => {
     const response = await api.get('/sales-executive/products');
     return response.data;
+  },
+  
+  // Service Management
+  getServiceTickets: async () => {
+    const response = await api.get('/sales-executive/service-tickets');
+    return response.data;
+  },
+  
+  updateTicketStatus: async (id, status, note) => {
+    const response = await api.patch(`/sales-executive/service-tickets/${id}/status`, { status, note });
+    return response.data;
   }
 };
 

@@ -22,6 +22,7 @@ exports.getUsers = async (req, res, next) => {
             subRole: u.subRole,
             permissions: u.permissions || [],
             status: u.isActive ? 'active' : 'inactive',
+            rewardPoints: u.rewardPoints || 0,
             lastLogin: u.lastLogin,
             createdAt: u.createdAt
         }));
@@ -152,6 +153,7 @@ exports.getDistributors = async (req, res, next) => {
             businessName: u.businessName,
             location: u.location,
             status: u.isActive ? 'active' : 'pending',
+            rewardPoints: u.rewardPoints || 0,
             lastLogin: u.lastLogin,
             createdAt: u.createdAt
         }));
@@ -207,6 +209,7 @@ exports.getRetailers = async (req, res, next) => {
             location: u.location,
             distributor: u.distributor ? { id: u.distributor._id, name: u.distributor.name, businessName: u.distributor.businessName } : null,
             status: u.isActive ? 'active' : 'pending',
+            rewardPoints: u.rewardPoints || 0,
             lastLogin: u.lastLogin,
             createdAt: u.createdAt
         }));
@@ -243,7 +246,13 @@ exports.updateRetailerStatus = async (req, res, next) => {
                 const bonus = config?.earningRules?.salesExecutive?.retailerActivationBonus || 100;
 
                 await User.findByIdAndUpdate(user.onboardedBy, {
-                    $inc: { 'salesExecutiveData.totalPoints': bonus }
+                    $inc: { rewardPoints: bonus },
+                    $push: {
+                        pointHistory: {
+                            $each: [{ amount: bonus, reason: `Bonus for Retailer Activation: ${user.shopName}`, type: 'credit', timestamp: new Date() }],
+                            $position: 0
+                        }
+                    }
                 });
             } catch (e) {
                 console.error('Failed to award activation bonus:', e.message);

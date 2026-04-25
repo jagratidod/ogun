@@ -1,7 +1,7 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { 
   RiDashboardLine, RiUserAddLine, RiShoppingCartLine, 
-  RiBarChartLine, RiCompass3Fill, RiUserLine, RiArrowLeftSLine, RiNotification3Fill
+  RiBarChartLine, RiCompass3Fill, RiUserLine, RiArrowLeftSLine, RiNotification3Fill, RiCustomerServiceLine
 } from 'react-icons/ri';
 import BottomNav from './BottomNav';
 import { SidebarProvider } from '../../context/SidebarContext';
@@ -11,7 +11,7 @@ import { APP_NAME } from '../../utils/constants';
 
 const bottomNavItems = [
   { label: 'Home', icon: RiDashboardLine, path: '/sales', exact: true },
-  { label: 'Social', icon: RiCompass3Fill, path: '/sales/social' },
+  { label: 'Service', icon: RiCustomerServiceLine, path: '/sales/service' },
   { label: 'Retailers', icon: RiUserAddLine, path: '/sales/retailers' },
   { label: 'Terminal', icon: RiShoppingCartLine, path: '/sales/terminal' },
   { label: 'Profile', icon: RiUserLine, path: '/sales/profile' },

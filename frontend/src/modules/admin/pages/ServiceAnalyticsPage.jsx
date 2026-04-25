@@ -1,74 +1,120 @@
-import { RiCustomerServiceLine, RiTimeLine, RiInformationLine, RiCheckDoubleLine, RiBarChartLine, RiPulseLine, RiPieChartLine } from 'react-icons/ri';
+import { useState, useEffect } from 'react';
+import { RiCustomerServiceLine, RiTimeLine, RiInformationLine, RiCheckDoubleLine, RiBarChartLine, RiPulseLine, RiPieChartLine, RiLoader4Line } from 'react-icons/ri';
 import { PageHeader, Card, CardHeader, CardTitle, CardDescription, MetricCard, AreaChart, BarChart, PieChart, formatCurrency } from '../../../core';
 import Button from '../../../core/components/ui/Button';
-
-const closureTrend = [
-  { "month": "Jan", "tickets": 142 },
-  { "month": "Feb", "tickets": 156 },
-  { "month": "Mar", "tickets": 182 },
-  { "month": "Apr", "tickets": 168 }
-];
+import api from '../../../core/api';
 
 export default function ServiceAnalyticsPage() {
-  return (
-    <div className="page-container">
-      <PageHeader 
-        title="Service Analytics" 
-        subtitle="Tracking service performance, customer satisfaction, and technical efficiency"
-      >
-        <Button icon={RiInformationLine} variant="secondary">Download Q Report</Button>
-      </PageHeader>
+   const [data, setData] = useState(null);
+   const [loading, setLoading] = useState(true);
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <MetricCard title="Average TAT" value="1.8 Days" icon={RiTimeLine} change={-12.5} changeLabel="improved" />
-        <MetricCard title="Resolution Rate" value="94.2%" icon={RiCheckDoubleLine} change={2.1} />
-        <MetricCard title="NPS Score" value="8.4" icon={RiPulseLine} change={4.5} />
-        <MetricCard title="Service Revenue" value={4560000} format="currency" icon={RiBarChartLine} change={15.4} />
-      </div>
+   useEffect(() => {
+      fetchAnalytics();
+   }, []);
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-         <div className="glass-card p-6">
-            <h3 className="section-title mb-6">Service Ticket Closure Trend</h3>
-            <AreaChart data={closureTrend} dataKey="tickets" xKey="month" name="Resolved" height={320} />
+   const fetchAnalytics = async () => {
+      try {
+         const res = await api.get('/admin/service/analytics');
+         setData(res.data?.data);
+      } catch (err) {
+         console.error('Failed to fetch analytics:', err);
+      } finally {
+         setLoading(false);
+      }
+   };
+
+   if (loading) {
+      return (
+         <div className="flex items-center justify-center min-h-[400px]">
+            <RiLoader4Line className="w-10 h-10 text-brand-teal animate-spin" />
          </div>
-         <div className="glass-card p-6">
-            <h3 className="section-title mb-6">Complaint Distribution by Product</h3>
-            <PieChart 
-              data={[
-                { name: 'Mixer Grinders', value: 450 },
-                { name: 'Induction Cooktops', value: 320 },
-                { name: 'Chimneys', value: 150 },
-                { name: 'Water Purifiers', value: 210 },
-                { name: 'Air Fryers', value: 85 }
-              ]} 
-              height={320} 
-              innerRadius={70} 
-              outerRadius={110} 
+      );
+   }
+
+   const stats = data?.stats || {};
+   const trendData = data?.trendData || [];
+   const categoryDist = data?.categoryDist || [];
+   const techPerformance = (data?.techPerformance || []).map(t => ({
+      name: t.name,
+      score: ((t.resolved / t.total) * 100).toFixed(0)
+   }));
+
+   return (
+      <div className="page-container">
+         <PageHeader 
+            title="Service Analytics" 
+            subtitle="Tracking service performance, customer satisfaction, and technical efficiency"
+         >
+            <Button icon={RiInformationLine} variant="secondary">Download Report</Button>
+         </PageHeader>
+
+         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <MetricCard 
+               title="Average TAT" 
+               value={`${stats.avgResolutionTime || 0} Hrs`} 
+               icon={RiTimeLine} 
+               description="Avg. hours to resolve"
+            />
+            <MetricCard 
+               title="Active Tickets" 
+               value={stats.openRequests || 0} 
+               icon={RiPulseLine} 
+               description="Currently being handled"
+            />
+            <MetricCard 
+               title="Resolution Rate" 
+               value={`${((stats.resolvedRequests / stats.totalRequests) * 100 || 0).toFixed(1)}%`} 
+               icon={RiCheckDoubleLine} 
+               description="Success completion rate"
+            />
+            <MetricCard 
+               title="Warranty Revenue" 
+               value={stats.totalRevenue || 0} 
+               format="currency" 
+               icon={RiBarChartLine} 
+               description="Total from extensions"
             />
          </div>
-      </div>
 
-      <Card>
-         <CardHeader>
-            <CardTitle>Technician Efficiency Rankings</CardTitle>
-            <CardDescription>Top field engineers based on customer feedback and TAT</CardDescription>
-         </CardHeader>
-         <div className="p-6">
-            <BarChart 
-               data={[
-                  { name: 'Ramesh Kumar', val: 98 },
-                  { name: 'Suresh Pal', val: 94 },
-                  { name: 'Karan Varma', val: 91 },
-                  { name: 'Manoj Singh', val: 88 },
-                  { name: 'Arjun Das', val: 85 }
-               ]} 
-               dataKey="val" 
-               xKey="name" 
-               height={300} 
-               name="Efficiency Score" 
-            />
+         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="glass-card p-6">
+               <h3 className="section-title mb-6">Service Ticket Closure Trend</h3>
+               <AreaChart 
+                  data={trendData.length > 0 ? trendData : [{ date: 'No Data', tickets: 0 }]} 
+                  dataKey="tickets" 
+                  xKey="date" 
+                  name="Tickets Raised" 
+                  height={320} 
+                  color="#328D8E"
+               />
+            </div>
+            <div className="glass-card p-6">
+               <h3 className="section-title mb-6">Complaint Distribution by Category</h3>
+               <PieChart 
+                  data={categoryDist.length > 0 ? categoryDist : [{ name: 'None', value: 1 }]} 
+                  height={320} 
+                  innerRadius={70} 
+                  outerRadius={110} 
+               />
+            </div>
          </div>
-      </Card>
-    </div>
-  );
+
+         <Card>
+            <CardHeader>
+               <CardTitle>Technician Efficiency Rankings</CardTitle>
+               <CardDescription>Performance of field engineers based on ticket resolution rate</CardDescription>
+            </CardHeader>
+            <div className="p-6">
+               <BarChart 
+                  data={techPerformance.length > 0 ? techPerformance : [{ name: 'Unassigned', score: 0 }]} 
+                  dataKey="score" 
+                  xKey="name" 
+                  height={300} 
+                  name="Resolution Rate (%)" 
+                  color="#E0128A"
+               />
+            </div>
+         </Card>
+      </div>
+   );
 }

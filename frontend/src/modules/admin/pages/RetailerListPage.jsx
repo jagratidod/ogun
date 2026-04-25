@@ -73,6 +73,15 @@ export default function RetailerListPage() {
       )
     },
     {
+      key: 'rewardPoints', label: 'Reward Points', align: 'center', render: (val) => (
+        <div className="flex flex-col items-center">
+           <div className="flex items-center gap-1 text-brand-teal font-black">
+              <span className="text-sm">{(val || 0).toLocaleString()}</span>
+           </div>
+        </div>
+      )
+    },
+    {
       key: 'distributor', label: 'Assigned Distributor', render: (val) => (
         <div className="flex flex-col">
           <span className="text-xs font-bold text-brand-teal">{val?.businessName || val?.name || 'Independent'}</span>

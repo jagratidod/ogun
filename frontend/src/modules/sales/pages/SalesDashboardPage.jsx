@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { RiUserAddLine, RiShoppingCartLine, RiTimeLine, RiTrophyLine, RiArrowRightUpLine, RiStore2Line } from 'react-icons/ri';
+import { RiUserAddLine, RiShoppingCartLine, RiTimeLine, RiTrophyLine, RiArrowRightUpLine, RiStore2Line, RiCustomerServiceLine } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
 import executiveService from '../../../core/services/executiveService';
 import { PageHeader, Card, Button, Badge, formatCurrency } from '../../../core';
@@ -44,7 +44,8 @@ export default function SalesDashboardPage() {
     { label: 'Retailers Onboarded', val: stats?.totalRetailers ?? 0, icon: RiStore2Line, color: 'text-brand-teal', bg: 'bg-brand-teal/5' },
     { label: 'Points Earned', val: stats?.rewardPoints ?? 0, icon: RiTrophyLine, color: 'text-brand-magenta', bg: 'bg-brand-magenta/5' },
     { label: 'Total Sales', val: formatCurrency(stats?.totalSalesValue ?? 0), icon: RiShoppingCartLine, color: 'text-indigo-500', bg: 'bg-indigo-500/5' },
-    { label: 'Pending Orders', val: stats?.pendingOrders ?? 0, icon: RiTimeLine, color: 'text-state-warning', bg: 'bg-state-warning/5' }
+    { label: 'Pending Orders', val: stats?.pendingOrders ?? 0, icon: RiTimeLine, color: 'text-state-warning', bg: 'bg-state-warning/5' },
+    { label: 'Service Tasks', val: stats?.pendingTickets ?? 0, icon: RiCustomerServiceLine, color: 'text-brand-teal', bg: 'bg-brand-teal/5' }
   ];
 
   const salesPct = targets ? Math.min(100, Math.round((targets.achievedSales / targets.salesTarget) * 100)) : 0;
@@ -86,6 +87,10 @@ export default function SalesDashboardPage() {
           </Button>
           <Button className="h-14 justify-between" icon={RiShoppingCartLine} onClick={() => navigate('/sales/terminal')} variant="secondary">
             <span>Create New Sale</span>
+            <RiArrowRightUpLine />
+          </Button>
+          <Button className="h-14 justify-between" icon={RiCustomerServiceLine} onClick={() => navigate('/sales/service')} variant="ghost" className="h-14 justify-between bg-brand-teal/5 border-brand-teal/20 text-brand-teal">
+            <span>Open Service Desk</span>
             <RiArrowRightUpLine />
           </Button>
         </div>

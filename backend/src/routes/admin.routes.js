@@ -33,6 +33,9 @@ router.patch('/hr-leaves/:id/review', adminController.reviewHRLeave);
 const rewardConfigController = require('../controllers/admin.rewardConfig.controller');
 router.get('/reward-config', rewardConfigController.getConfig);
 router.put('/reward-config/rules/:role', rewardConfigController.updateRules);
+router.post('/reward-config/targets', rewardConfigController.createTarget);
+router.put('/reward-config/targets/:id', rewardConfigController.updateTarget);
+router.delete('/reward-config/targets/:id', rewardConfigController.deleteTarget);
 
 // Sales Representatives Management
 const salesRepsController = require('../controllers/admin.salesReps.controller');
@@ -76,6 +79,14 @@ router.patch('/orders/:id/status', checkPermission('inventory'), adminOrderContr
 // Product Queries
 router.get('/product-queries', checkPermission('inventory'), adminQueryController.getAllQueries);
 router.patch('/product-queries/:id/status', checkPermission('inventory'), adminQueryController.updateQueryStatus);
+
+// Service Requests Management
+const adminServiceController = require('../controllers/admin.service.controller');
+router.get('/service-requests', checkPermission('service'), adminServiceController.getAllServiceRequests);
+router.get('/service-requests/:id', checkPermission('service'), adminServiceController.getServiceRequestDetail);
+router.patch('/service-requests/:id/status', checkPermission('service'), adminServiceController.updateServiceRequestStatus);
+router.get('/registered-products', checkPermission('service'), adminServiceController.getAllRegisteredProducts);
+router.get('/service/analytics', checkPermission('service'), adminServiceController.getServiceAnalytics);
 
 module.exports = router;
 

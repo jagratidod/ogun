@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { RiVerifiedBadgeFill, RiPriceTag3Fill, RiInformationFill, RiAddCircleFill, RiSmartphoneFill, RiShieldFill, RiCalendarFill, RiStore2Fill, RiMapPinFill, RiHandHeartFill, RiCameraFill, RiShieldCheckFill } from 'react-icons/ri';
+import { RiVerifiedBadgeFill, RiPriceTag3Fill, RiInformationFill, RiSmartphoneFill, RiShieldCheckFill, RiCalendarFill, RiStore2Fill, RiMapPinFill, RiHandHeartFill, RiCameraFill, RiShieldStarFill } from 'react-icons/ri';
 import { Badge, Button, Avatar, Card, CardHeader, CardTitle, CardDescription, Input, Select, Combobox, PageHeader } from '../../../core';
 import { toast } from 'react-hot-toast';
+import api from '../../../core/api';
 
 export default function RegisterProductPage() {
    const navigate = useNavigate();
@@ -11,7 +12,6 @@ export default function RegisterProductPage() {
    const [previewUrl, setPreviewUrl] = useState(null);
    const [errors, setErrors] = useState({});
    
-   // Form State
    const [formData, setFormData] = useState({
       category: 'mix',
       productName: '',
@@ -24,14 +24,18 @@ export default function RegisterProductPage() {
       email: '',
       city: '',
       state: '',
-      warrantyPeriod: '12', // Months
+      warrantyPeriod: '12',
       purchaseMode: 'Offline',
       warrantyStartDate: '',
       warrantyExpiryDate: '',
       amcOption: 'No',
       productUsage: 'Residential',
       installationDate: '',
-      installedBy: 'Company'
+      installedBy: 'Company',
+      // Warranty Extension (optional at registration)
+      extendWarranty: false,
+      extensionMonths: '0',
+      extensionType: 'standard'
    });
 
    const categories = [
@@ -42,10 +46,14 @@ export default function RegisterProductPage() {
       { label: 'Dishwasher', value: 'dish' }
    ];
 
+   const extensionPricing = {
+      '6': { standard: 999, premium: 1499 },
+      '12': { standard: 1799, premium: 2499 },
+      '24': { standard: 2999, premium: 4499 }
+   };
+
    const validate = () => {
       const newErrors = {};
-      
-      // Required Strings
       if (!formData.productName.trim()) newErrors.productName = 'Product Name is required';
       if (!formData.serialNumber.trim()) newErrors.serialNumber = 'Serial Number is required';
       if (!formData.customerName.trim()) newErrors.customerName = 'Full Name is required';
@@ -53,14 +61,12 @@ export default function RegisterProductPage() {
       if (!formData.state.trim()) newErrors.state = 'State is required';
       if (!formData.purchaseDate) newErrors.purchaseDate = 'Purchase Date is required';
 
-      // Mobile Validation (Numbers only, 10 digits)
       if (!formData.mobileNumber) {
          newErrors.mobileNumber = 'Mobile Number is required';
       } else if (!/^\d{10}$/.test(formData.mobileNumber)) {
          newErrors.mobileNumber = 'Enter a valid 10-digit mobile number';
       }
 
-      // Email Validation (Optional but must be valid if entered)
       if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
          newErrors.email = 'Enter a valid email address';
       }
@@ -70,7 +76,6 @@ export default function RegisterProductPage() {
    };
 
    const handleInputChange = (field, value) => {
-      // Clear error when user starts typing
       if (errors[field]) {
          setErrors(prev => {
             const next = { ...prev };
@@ -81,7 +86,6 @@ export default function RegisterProductPage() {
 
       const updatedData = { ...formData, [field]: value };
       
-      // Auto-logic: Set Warranty Start Date from Purchase Date
       if (field === 'purchaseDate') {
          updatedData.warrantyStartDate = value;
          if (updatedData.warrantyPeriod) {
@@ -89,7 +93,6 @@ export default function RegisterProductPage() {
          }
       }
 
-      // Auto-logic: Recalculate Expiry if Period changes
       if (field === 'warrantyPeriod' && updatedData.warrantyStartDate) {
          updatedData.warrantyExpiryDate = calculateExpiry(updatedData.warrantyStartDate, value);
       }
@@ -113,16 +116,61 @@ export default function RegisterProductPage() {
       }
    };
 
-   const handleRegister = () => {
+   const handleRegister = async () => {
       if (!validate()) {
          return toast.error('Please correct the errors in the form');
       }
       setLoading(true);
-      setTimeout(() => {
-         setLoading(false);
-         toast.success('Warranty activated successfully!');
+      try {
+         const formDataPayload = new FormData();
+         
+         // Append text fields
+         formDataPayload.append('productName', formData.productName);
+         formDataPayload.append('serialNumber', formData.serialNumber);
+         const catVal = typeof formData.category === 'object' ? formData.category.value : formData.category;
+         formDataPayload.append('category', catVal);
+         formDataPayload.append('purchaseDate', formData.purchaseDate);
+         formDataPayload.append('invoiceNumber', formData.invoiceNumber);
+         formDataPayload.append('storeName', formData.storeName);
+         formDataPayload.append('purchaseMode', formData.purchaseMode);
+         formDataPayload.append('productUsage', formData.productUsage);
+         formDataPayload.append('warrantyPeriod', formData.warrantyPeriod);
+         if (formData.installationDate) formDataPayload.append('installationDate', formData.installationDate);
+         formDataPayload.append('installedBy', formData.installedBy);
+         formDataPayload.append('customerName', formData.customerName);
+         formDataPayload.append('mobileNumber', formData.mobileNumber);
+         formDataPayload.append('email', formData.email);
+         formDataPayload.append('city', formData.city);
+         formDataPayload.append('state', formData.state);
+         formDataPayload.append('amcOption', formData.amcOption);
+
+         // Append file if selected
+         if (selectedFile) {
+            formDataPayload.append('invoiceImage', selectedFile);
+         }
+
+         const res = await api.post('/customer/products/register', formDataPayload, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+         });
+         const product = res.data?.data;
+
+         // If user chose warranty extension at registration
+         if (formData.extendWarranty && formData.extensionMonths !== '0' && product?._id) {
+            const extAmount = extensionPricing[formData.extensionMonths]?.[formData.extensionType] || 0;
+            await api.post(`/customer/products/${product._id}/extend-warranty`, {
+               extensionMonths: formData.extensionMonths,
+               extensionType: formData.extensionType,
+               amount: extAmount
+            });
+         }
+
+         toast.success('Product registered successfully!');
          navigate('/customer/products');
-      }, 1500);
+      } catch (err) {
+         toast.error(err.response?.data?.message || 'Registration failed');
+      } finally {
+         setLoading(false);
+      }
    };
 
    return (
@@ -289,6 +337,61 @@ export default function RegisterProductPage() {
             </Card>
          </section>
 
+         {/* Section: Extend Warranty (Optional at Registration) */}
+         <section className="space-y-4">
+            <div className="flex items-center gap-2 mb-2 px-1">
+               <RiShieldStarFill className="text-brand-pink w-5 h-5" />
+               <h3 className="text-sm font-black uppercase tracking-widest text-gray-800">Extend Warranty</h3>
+            </div>
+            <Card className="rounded-[28px] p-5 space-y-4 border-gray-100 shadow-sm bg-brand-pink/[0.02]">
+               <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-3 cursor-pointer group">
+                     <input 
+                        type="checkbox" 
+                        checked={formData.extendWarranty}
+                        onChange={(e) => handleInputChange('extendWarranty', e.target.checked)}
+                        className="w-5 h-5 accent-brand-pink rounded"
+                     />
+                     <span className="text-[12px] font-black text-gray-800 uppercase tracking-wider group-hover:text-brand-pink transition-colors">
+                        Add Extended Warranty
+                     </span>
+                  </label>
+               </div>
+
+               {formData.extendWarranty && (
+                  <div className="space-y-4 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                     <div className="grid grid-cols-3 gap-3">
+                        {['6', '12', '24'].map(months => (
+                           <button
+                              key={months}
+                              type="button"
+                              onClick={() => handleInputChange('extensionMonths', months)}
+                              className={`p-4 rounded-2xl border-2 text-center transition-all ${
+                                 formData.extensionMonths === months 
+                                 ? 'border-brand-pink bg-brand-pink/5 shadow-lg' 
+                                 : 'border-gray-100 bg-white hover:border-brand-pink/30'
+                              }`}
+                           >
+                              <p className="text-lg font-black text-gray-800">{months === '6' ? '6' : months === '12' ? '1' : '2'}</p>
+                              <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">{months === '6' ? 'Months' : months === '12' ? 'Year' : 'Years'}</p>
+                              <p className="text-[11px] font-black text-brand-pink mt-2">₹{extensionPricing[months]?.standard}</p>
+                           </button>
+                        ))}
+                     </div>
+                     <Select
+                        label="Extension Type"
+                        value={formData.extensionType}
+                        onChange={(e) => handleInputChange('extensionType', e.target.value)}
+                        options={[
+                           { label: 'Standard Coverage', value: 'standard' },
+                           { label: 'Premium (Parts + Labor)', value: 'premium' }
+                        ]}
+                     />
+                  </div>
+               )}
+            </Card>
+         </section>
+
          {/* Section: Customer Details */}
          <section className="space-y-4">
             <div className="flex items-center gap-2 mb-2 px-1">
@@ -387,4 +490,3 @@ export default function RegisterProductPage() {
       </div>
    );
 }
-

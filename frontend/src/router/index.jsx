@@ -34,7 +34,7 @@ import StubPage from '../modules/shared/StubPage';
 import {
   AdminDashboardPage, UsersPage,
   ProductsPage, StockOverview, StockAlerts, OrderListPage,
-  RestockRequestsPage, OrderFlowPage, LedgerPage, InvoicesPage,
+  RestockRequestsPage, LedgerPage, InvoicesPage,
   PaymentsPage, FinancialReportPage, EmployeesPage, DepartmentsPage,
   PayrollDashboardPage, SalaryProcessPage, LeaveRequestsPage,
   LeaveCalendarPage, RewardsDashboardPage, TargetConfigPage,
@@ -57,12 +57,12 @@ import {
   RetailerStockPage, RestockRequestPage, RetailerLedgerPage,
   RetailerCustomersPage, RetailerRewardsPage, RetailerAnalyticsPage,
   RetailerSettingsPage, BrowseDistributorProducts,
-  RetailerQueriesPage, RetailerOrdersPage
+  RetailerOrdersPage
 } from '../modules/retailer';
 
 import {
   SalesDashboardPage, RetailerListPage as SalesRetailerListPage, AddRetailerPage,
-  SalesTerminalPage, SalesProfilePage, SalesSocialPage
+  SalesTerminalPage, SalesProfilePage, SalesSocialPage, TechnicianServicePage
 } from '../modules/sales';
 
 import SalesLayout from '../core/components/layout/SalesLayout';
@@ -75,6 +75,7 @@ import MyServiceRequestsPage from '../modules/customer/pages/MyServiceRequestsPa
 import ServiceRequestDetailPage from '../modules/customer/pages/ServiceRequestDetailPage';
 import CustomerSettingsPage from '../modules/customer/pages/CustomerSettingsPage';
 import CustomerSocialPage from '../modules/customer/pages/CustomerSocialPage';
+import WarrantyExtensionPage from '../modules/customer/pages/WarrantyExtensionPage';
 
 import { HRDashboardPage, HREmployeesPage, HRLeavesPage, HRMyLeavesPage } from '../modules/hr';
 import { ServiceDashboardPage } from '../modules/service-center';
@@ -94,7 +95,6 @@ const StockOverviewComp = () => <StockOverview />;
 const StockAlertsComp = () => <StockAlerts />;
 const OrderList = () => <OrderListPage />;
 const RestockRequests = () => <RestockRequestsPage />;
-const OrderFlow = () => <OrderFlowPage />;
 const OrderDetailPage = Stub('Order Detail'); 
 const Ledger = () => <LedgerPage />;
 const Invoices = () => <InvoicesPage />;
@@ -154,7 +154,6 @@ const RestockReq = () => <RestockRequestPage />;
 const RetailLedger = () => <RetailerLedgerPage />;
 const RetailCustomers = () => <RetailerCustomersPage />;
 const RetailRewards = () => <RetailerRewardsPage />;
-const RetailerQueries = () => <RetailerQueriesPage />;
 const RetailAnalytics = () => <RetailerAnalyticsPage />;
 const RetailSettings = () => <RetailerSettingsPage />;
 
@@ -168,6 +167,7 @@ const MyServiceReqs = () => <MyServiceRequestsPage />;
 const ServiceReqDetail = () => <ServiceRequestDetailPage />;
 const CustomerSettings = () => <CustomerSettingsPage />;
 const CustomerSocial = () => <CustomerSocialPage />;
+const CustomerWarranty = () => <WarrantyExtensionPage />;
 
 
 function RootRedirect() {
@@ -240,7 +240,6 @@ export default function AppRouter() {
           <Route path="orders" element={<OrderList />} />
           <Route path="orders/:id" element={<OrderDetailPage />} />
           <Route path="orders/restock" element={<RestockRequests />} />
-          <Route path="orders/flow" element={<OrderFlow />} />
           <Route path="inventory/queries" element={<AdminProductQueries />} />
           <Route path="accounts/ledger" element={<Ledger />} />
           <Route path="accounts/invoices" element={<Invoices />} />
@@ -312,7 +311,6 @@ export default function AppRouter() {
           {/* Back-compat alias (dashboard deep-link) */}
           <Route path="restock" element={<RestockReq />} />
           <Route path="marketplace" element={<BrowseDistributorProducts />} />
-          <Route path="queries" element={<RetailerQueries />} />
           <Route path="orders" element={<RetailerOrdersPage />} />
           <Route path="accounts" element={<RetailLedger />} />
           <Route path="customers" element={<RetailerCustomersPage />} />
@@ -365,6 +363,7 @@ export default function AppRouter() {
           <Route path="terminal" element={<SalesTerminalPage />} />
           <Route path="performance" element={<SalesDashboardPage />} /> {/* Reuse dashboard for now */}
           <Route path="rewards" element={<SalesDashboardPage />} /> {/* Reuse dashboard for now */}
+          <Route path="service" element={<TechnicianServicePage />} />
           <Route path="profile" element={<SalesProfilePage />} />
         </Route>
 
@@ -382,6 +381,7 @@ export default function AppRouter() {
           <Route path="service" element={<MyServiceReqs />} />
           <Route path="service/:id" element={<ServiceReqDetail />} />
           <Route path="social" element={<CustomerSocial />} />
+          <Route path="warranty" element={<CustomerWarranty />} />
           <Route path="settings" element={<CustomerSettings />} />
         </Route>
 

@@ -2,9 +2,9 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import {
    RiPriceTag3Line, RiTrophyLine, RiAddCircleLine, RiShoppingBasketLine,
-   RiCustomerServiceLine, RiArrowRightSLine, RiShieldStarLine,
+   RiCustomerServiceLine, RiArrowRightSLine, RiShieldStarLine, RiShieldStarFill,
    RiMapPin2Line, RiNotification3Line, RiSearchLine, RiArrowDownSLine,
-   RiShieldCheckFill, RiHandCoinFill, RiMagicFill, RiMicLine, RiInboxFill
+   RiShieldCheckFill, RiHandCoinFill, RiMagicFill, RiMicLine, RiInboxFill, RiLoader4Line
 } from 'react-icons/ri';
 import Badge from '../../../core/components/ui/Badge';
 import Button from '../../../core/components/ui/Button';
@@ -13,15 +13,17 @@ import Card from '../../../core/components/ui/Card';
 
 import customerData from '../../../data/customer.json';
 import { useAuthContext } from '../../../core/context/AuthContext';
+import api from '../../../core/api';
 
 export default function CustomerHomePage() {
    const navigate = useNavigate();
    const { user } = useAuthContext();
-   const { profile, banners, products } = customerData;
+   const { banners } = customerData;
    const scrollRef = useRef(null);
    const [currentIndex, setCurrentIndex] = useState(0);
-
    const [greeting, setGreeting] = useState('');
+   const [products, setProducts] = useState([]);
+   const [loading, setLoading] = useState(true);
 
    useEffect(() => {
       const getGreeting = () => {
@@ -32,7 +34,19 @@ export default function CustomerHomePage() {
          return "Good Night";
       };
       setGreeting(getGreeting());
+      fetchProducts();
    }, []);
+
+   const fetchProducts = async () => {
+      try {
+         const res = await api.get('/customer/products');
+         setProducts(res.data?.data || []);
+      } catch (err) {
+         console.error('Failed to fetch products:', err);
+      } finally {
+         setLoading(false);
+      }
+   };
 
    useEffect(() => {
       const interval = setInterval(() => {
@@ -49,7 +63,12 @@ export default function CustomerHomePage() {
       return () => clearInterval(interval);
    }, [currentIndex, banners.length]);
 
-   const displayName = user?.name?.split(' ')[0] || profile.name.split(' ')[0];
+   const displayName = user?.name?.split(' ')[0] || "Rahul";
+
+   const formatDate = (d) => {
+      if (!d) return '—';
+      return new Date(d).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
+   };
 
    return (
       <div className="page-container flex flex-col gap-6 max-w-lg mx-auto">
@@ -71,11 +90,11 @@ export default function CustomerHomePage() {
                <div className="flex items-center gap-2">
                   <div className="flex flex-col items-end pr-2 border-r border-gray-100 h-7 justify-center">
                      <div className="flex items-center gap-1 mb-0.5">
-                        <RiShieldStarLine className="text-yellow-500 w-2.5 h-2.5" />
-                        <span className="text-[7px] font-black text-gray-600 uppercase tracking-[0.15em] leading-none">{profile.loyalty}</span>
+                        <RiShieldStarFill className="text-yellow-500 w-2.5 h-2.5" />
+                        <span className="text-[7px] font-black text-gray-600 uppercase tracking-[0.15em] leading-none">Gold Partner</span>
                      </div>
                      <div className="flex items-baseline gap-0.5">
-                        <span className="text-sm font-black text-gray-800 leading-none">{profile.points}</span>
+                        <span className="text-sm font-black text-gray-800 leading-none">1240</span>
                         <span className="text-[6px] text-gray-400 font-bold uppercase tracking-wider">pts</span>
                      </div>
                   </div>
@@ -200,35 +219,42 @@ export default function CustomerHomePage() {
                   onClick={() => navigate('/customer/products')}
                   className="text-[10px] font-black text-brand-teal uppercase tracking-widest underline decoration-2 underline-offset-4"
                >
-                  View All ({profile.registeredProducts})
+                  View All ({products.length})
                </button>
             </div>
             <div className="space-y-2.5">
-               {products.map(prod => (
+               {loading ? (
+                  <div className="flex items-center justify-center py-10">
+                     <RiLoader4Line className="w-6 h-6 text-brand-teal animate-spin" />
+                  </div>
+               ) : products.length === 0 ? (
+                  <div className="p-10 rounded-2xl border border-dashed border-gray-100 text-center opacity-40 grayscale">
+                     <RiInboxFill className="w-10 h-10 mx-auto mb-2 text-gray-300" />
+                     <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">No Appliances Registered</p>
+                  </div>
+               ) : products.slice(0, 3).map(prod => (
                   <div
-                     key={prod.id}
-                     onClick={() => navigate(`/customer/products/${prod.id}`)}
+                     key={prod._id}
+                     onClick={() => navigate(`/customer/products/${prod._id}`)}
                      className="py-2 px-3 rounded-xl bg-white border border-gray-50 flex items-center gap-4 group hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] active:scale-[0.98] transition-all cursor-pointer"
                   >
                      <div className="w-12 h-12 rounded-lg bg-gray-50 flex items-center justify-center overflow-hidden border border-gray-100 group-hover:border-brand-teal/30 transition-all flex-shrink-0">
-                        {prod.image ? (
-                           <img src={prod.image} alt={prod.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                        ) : (
-                           <RiInboxFill className="w-6 h-6 text-brand-teal/30" />
-                        )}
+                        <RiInboxFill className="w-6 h-6 text-brand-teal/30" />
                      </div>
                      <div className="flex-1 min-w-0">
-                        <h4 className="text-[13px] font-black text-gray-800 leading-tight mb-1 truncate">{prod.name}</h4>
+                        <h4 className="text-[13px] font-black text-gray-800 leading-tight mb-1 truncate">{prod.productName}</h4>
                         <div className="flex items-center gap-2">
                            <span className="text-[8px] font-black text-brand-teal uppercase tracking-widest bg-teal-50/50 px-1.5 py-0.5 border border-brand-teal/10">
-                              EXP: {prod.warrantyExp}
+                              EXP: {formatDate(prod.warrantyExpiryDate)}
                            </span>
                         </div>
                      </div>
                      
                      <div className="flex items-center gap-1.5 bg-green-50/50 px-2 py-1 rounded-md border border-green-100/50">
-                        <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
-                        <span className="text-[8px] font-black text-green-600 uppercase tracking-widest">Active</span>
+                        <div className={`w-1 h-1 rounded-full ${new Date(prod.warrantyExpiryDate) > new Date() ? 'bg-green-500 animate-pulse' : 'bg-red-400'}`}></div>
+                        <span className="text-[8px] font-black text-green-600 uppercase tracking-widest">
+                           {new Date(prod.warrantyExpiryDate) > new Date() ? 'Active' : 'Expired'}
+                        </span>
                      </div>
                      
                      <RiArrowRightSLine className="text-gray-300 w-5 h-5 group-hover:text-brand-pink group-hover:translate-x-1 transition-all" />
@@ -256,4 +282,3 @@ export default function CustomerHomePage() {
       </div>
    );
 }
-
