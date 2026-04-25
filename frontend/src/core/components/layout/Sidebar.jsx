@@ -18,6 +18,7 @@ const hrNav = [
   { label: 'Dashboard', icon: RiDashboardLine, path: '/hr' },
   { label: 'Employees', icon: RiTeamLine, path: '/hr/employees' },
   { label: 'Leave Requests', icon: RiCalendarCheckLine, path: '/hr/leaves' },
+  { label: 'My Leaves', icon: RiCalendarCheckLine, path: '/hr/my-leaves' },
   { label: 'Payroll', icon: RiWalletLine, path: '/hr/payroll' },
   { label: 'Offer Letters', icon: RiMailSendLine, path: '/hr/offer-letters' },
   { label: 'Departments', icon: RiStackLine, path: '/hr/departments' },
@@ -66,6 +67,7 @@ const adminNav = [
   {
     label: 'HR', icon: RiTeamLine, permission: 'hr', children: [
       { label: 'Employees', path: '/admin/hr/employees' },
+      { label: 'HR Leave Requests', path: '/admin/leaves' },
       { label: 'Offer Letters', path: '/admin/hr/offer-letters' },
       { label: 'Departments', path: '/admin/hr/departments' },
     ],
@@ -216,7 +218,27 @@ function NavItem({ item, isCollapsed }) {
 export default function Sidebar({ role = 'admin' }) {
   const { user } = useAuthContext();
   const { isCollapsed, toggle, isMobileOpen, closeMobile } = useSidebarContext();
-  const navItems = getNavItems(user?.role, user?.subRole, user?.permissions);
+  const location = useLocation();
+
+  // Determine which nav to show based on URL path
+  let navItems = [];
+  if (location.pathname.startsWith('/admin')) {
+    navItems = adminNav;
+  } else if (location.pathname.startsWith('/hr')) {
+    navItems = hrNav;
+  } else if (location.pathname.startsWith('/distributor')) {
+    navItems = distributorNav;
+  } else if (location.pathname.startsWith('/service-center')) {
+    navItems = serviceNav;
+  } else if (location.pathname.startsWith('/retailer')) {
+    navItems = retailerNav || [];
+  } else {
+    // Fallback
+    navItems = getNavItems(user?.role, user?.subRole, user?.permissions);
+  }
+
+  // Always show full adminNav if in /admin path, otherwise use panel-specific nav
+  const filteredNav = navItems;
 
   return (
     <>
@@ -245,7 +267,7 @@ export default function Sidebar({ role = 'admin' }) {
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1 scrollbar-hide">
-          {navItems.map((item, idx) => (
+          {filteredNav.map((item, idx) => (
             <NavItem key={item.label + idx} item={item} isCollapsed={isCollapsed} />
           ))}
         </nav>

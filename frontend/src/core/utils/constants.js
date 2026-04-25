@@ -18,6 +18,7 @@ export const ROLE_PERMISSIONS = {
   [SUB_ROLES.HR_MANAGER]: ['hr', 'payroll', 'leaves'],
   [SUB_ROLES.SALES_MANAGER]: ['inventory', 'orders', 'distributors', 'retailers', 'customers', 'reports', 'rewards', 'service'],
   [SUB_ROLES.ACCOUNTS_MANAGER]: ['accounts', 'reports'],
+  [SUB_ROLES.SERVICE_MANAGER]: ['service', 'orders'],
 };
 
 export const ORDER_STATUS = {

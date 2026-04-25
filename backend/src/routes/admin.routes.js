@@ -25,6 +25,10 @@ router.get('/retailers', checkPermission('retailers'), adminController.getRetail
 router.put('/retailers/:id/status', checkPermission('retailers'), adminController.updateRetailerStatus);
 router.get('/customers', adminController.getCustomers);
 
+// HR Self-Leave Review (Admin Only)
+router.get('/hr-leaves', adminController.getHRLeaves);
+router.patch('/hr-leaves/:id/review', adminController.reviewHRLeave);
+
 // Reward Config
 const rewardConfigController = require('../controllers/admin.rewardConfig.controller');
 router.get('/reward-config', rewardConfigController.getConfig);

@@ -292,3 +292,49 @@ exports.getCustomers = async (req, res, next) => {
         next(error);
     }
 };
+
+// @desc    Get all HR leave requests for Admin review
+// @route   GET /api/v1/admin/hr-leaves
+exports.getHRLeaves = async (req, res, next) => {
+    try {
+        const hrUsers = await User.find({ role: 'admin', subRole: 'hr_manager' }).select('_id');
+        const hrIds = hrUsers.map(u => u._id);
+
+        const Leave = require('../models/leave.model');
+        const leaves = await Leave.find({ employee: { $in: hrIds } })
+            .populate('employee', 'name email subRole')
+            .populate('reviewedBy', 'name')
+            .sort({ createdAt: -1 });
+
+        return ApiResponse.success(res, leaves, 'HR leave requests fetched');
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Review HR leave request (Admin)
+// @route   PATCH /api/v1/admin/hr-leaves/:id/review
+exports.reviewHRLeave = async (req, res, next) => {
+    try {
+        const { status, adminRemarks } = req.body;
+        const Leave = require('../models/leave.model');
+
+        if (!['approved', 'rejected'].includes(status)) {
+            return ApiResponse.error(res, 'Status must be approved or rejected', 400);
+        }
+
+        const leave = await Leave.findById(req.params.id);
+        if (!leave) return ApiResponse.error(res, 'Leave request not found', 404);
+
+        leave.status = status;
+        leave.hrRemarks = adminRemarks || ''; // Reusing hrRemarks field for admin comments
+        leave.reviewedBy = req.user._id;
+        leave.reviewedAt = Date.now();
+
+        await leave.save();
+
+        return ApiResponse.success(res, leave, `HR leave request ${status} successfully`);
+    } catch (error) {
+        next(error);
+    }
+};

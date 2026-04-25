@@ -10,38 +10,37 @@ const api = axios.create({
 });
 
 // Detect the active role's token keys from localStorage
-const ROLE_KEY_MAP = { sales_executive: 'sales' };
+const ROLE_KEY_MAP = { 
+  sales_executive: 'sales',
+  hr_manager: 'hr',
+  service_manager: 'service'
+};
 const getRoleKey = (role) => ROLE_KEY_MAP[role] || role;
 
-// Map URL path prefix → role, so the right token is always used
-// even when multiple roles are logged in simultaneously
+// Map URL path prefix → key prefix, so the right token is always used
 const PATH_ROLE_MAP = {
   '/admin': 'admin',
-  '/hr': 'admin',
-  '/service-center': 'admin',
+  '/hr': 'hr',
+  '/service-center': 'service',
   '/distributor': 'distributor',
   '/retailer': 'retailer',
-  '/sales': 'sales_executive',
+  '/sales': 'sales',
   '/customer': 'customer',
 };
 
 const getActiveTokenKeys = () => {
-  // 1. Try to infer role from current URL path — use exact segment match
   const path = window.location.pathname;
-  // Sort by prefix length descending so more specific paths match first
   const sortedMap = Object.entries(PATH_ROLE_MAP).sort((a, b) => b[0].length - a[0].length);
 
-  for (const [prefix, role] of sortedMap) {
-    // Match /admin, /admin/*, but NOT /administrator etc.
+  for (const [prefix, key] of sortedMap) {
     if (path === prefix || path.startsWith(prefix + '/')) {
-      const key = getRoleKey(role);
       const token = localStorage.getItem(`${key}_token`);
       if (token) {
         return {
           accessKey: `${key}_token`,
           refreshKey: `${key}_refresh_token`,
           userKey: `${key}_user`,
-          role,
+          role: key,
         };
       }
     }

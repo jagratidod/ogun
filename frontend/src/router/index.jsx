@@ -76,7 +76,7 @@ import ServiceRequestDetailPage from '../modules/customer/pages/ServiceRequestDe
 import CustomerSettingsPage from '../modules/customer/pages/CustomerSettingsPage';
 import CustomerSocialPage from '../modules/customer/pages/CustomerSocialPage';
 
-import { HRDashboardPage, HREmployeesPage, HRLeavesPage } from '../modules/hr';
+import { HRDashboardPage, HREmployeesPage, HRLeavesPage, HRMyLeavesPage } from '../modules/hr';
 import { ServiceDashboardPage } from '../modules/service-center';
 
 import SplashPage from '../modules/shared/SplashPage';
@@ -330,6 +330,7 @@ export default function AppRouter() {
           <Route index element={<HRDashboardPage />} />
           <Route path="employees" element={<HREmployeesPage />} />
           <Route path="leaves" element={<HRLeavesPage />} />
+          <Route path="my-leaves" element={<HRMyLeavesPage />} />
           <Route path="payroll" element={<PayrollDashboard />} />
           <Route path="offer-letters" element={<OfferLetters />} />
           <Route path="departments" element={<Departments />} />

@@ -1,34 +1,72 @@
-import { RiCalendarCheckLine, RiCheckDoubleLine, RiCloseCircleLine, RiInformationLine, RiEyeLine } from 'react-icons/ri';
-import { PageHeader, Card, CardHeader, CardTitle, CardDescription, DataTable, Badge, Button, Avatar, useModal, Modal } from '../../../core';
-import hrData from '../../../data/hr.json';
+import { useState, useEffect } from 'react';
+import { RiCalendarCheckLine, RiCheckDoubleLine, RiCloseCircleLine, RiInformationLine, RiEyeLine, RiMessage2Line } from 'react-icons/ri';
+import { PageHeader, Card, CardHeader, CardTitle, CardDescription, DataTable, Badge, Button, Avatar, useModal, Modal, useNotification } from '../../../core';
+import api from '../../../core/api';
 
 export default function LeaveRequestsPage() {
-  const { leaveRequests } = hrData;
+  const [leaves, setLeaves] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { isOpen, open, close, data: selectedReq } = useModal();
+  const [remarks, setRemarks] = useState('');
+  const { showNotification } = useNotification();
+
+  useEffect(() => {
+    fetchHRLeaves();
+  }, []);
+
+  const fetchHRLeaves = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/admin/hr-leaves');
+      setLeaves(response.data.data);
+    } catch (error) {
+      showNotification({ title: 'Error', message: 'Failed to fetch HR leaves', type: 'error' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReview = async (id, status) => {
+    try {
+      await api.patch(`/admin/hr-leaves/${id}/review`, {
+        status,
+        adminRemarks: remarks
+      });
+      showNotification({ title: 'Success', message: `Request ${status}`, type: 'success' });
+      setRemarks('');
+      close();
+      fetchHRLeaves();
+    } catch (error) {
+      showNotification({ title: 'Error', message: 'Failed to review request', type: 'error' });
+    }
+  };
 
   const columns = [
-    { key: 'employee', label: 'Employee', sortable: true, render: (val) => (
+    { key: 'employee', label: 'Employee', sortable: true, render: (val, row) => (
        <div className="flex items-center gap-2">
-          <Avatar name={val} size="xs" />
-          <span className="text-sm font-medium text-content-primary">{val}</span>
+          <Avatar name={val.name} size="xs" />
+          <div className="flex flex-col">
+            <span className="text-sm font-bold text-content-primary">{val.name}</span>
+            <span className="text-[10px] text-content-tertiary uppercase font-black">{val.subRole?.replace('_', ' ')}</span>
+          </div>
        </div>
     )},
-    { key: 'type', label: 'Leave Type' },
-    { key: 'from', label: 'Duration', render: (_, row) => (
-       <span className="text-xs text-content-secondary">{row.from} to {row.to}</span>
-    )},
-    { key: 'days', label: 'Days', align: 'center', render: (val) => (
-       <Badge variant="purple">{val} Days</Badge>
+    { key: 'type', label: 'Leave Type', render: (val) => <span className="uppercase font-bold text-xs">{val}</span> },
+    { key: 'fromDate', label: 'Duration', render: (_, row) => (
+       <span className="text-xs text-content-secondary font-medium">
+         {new Date(row.fromDate).toLocaleDateString()} to {new Date(row.toDate).toLocaleDateString()}
+       </span>
     )},
     { key: 'status', label: 'Status', render: (val) => (
-       <Badge status={val.toLowerCase()}>{val}</Badge>
+       <Badge variant={val === 'approved' ? 'success' : val === 'rejected' ? 'danger' : 'warning'} className="uppercase font-black text-[9px]">
+         {val}
+       </Badge>
     )},
     { key: 'actions', label: 'Actions', align: 'right', render: (_, row) => (
        <div className="flex justify-end gap-1">
-          {row.status === 'Requested' && (
+          {row.status === 'pending' && (
              <>
-                <Button variant="secondary" size="sm" icon={RiCheckDoubleLine}>Approve</Button>
-                <Button variant="ghost" size="sm" icon={RiCloseCircleLine}>Reject</Button>
+                <Button variant="secondary" size="sm" icon={RiCheckDoubleLine} onClick={() => open(row)}>Review</Button>
              </>
           )}
           <Button variant="icon" onClick={() => open(row)}>
@@ -39,70 +77,93 @@ export default function LeaveRequestsPage() {
   ];
 
   return (
-    <div className="page-container">
+    <div className="page-container animate-fade-in">
       <PageHeader 
-        title="Leave Management" 
-        subtitle="Manage and approve staff time-off requests and vacation planning"
+        title="Staff Leave Review" 
+        subtitle="Approve or manage time-off requests from Managers and HR Staff"
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
          {[
-           { label: 'Pending Approvals', val: leaveRequests.filter(r => r.status === 'Requested').length, color: 'text-state-warning' },
-           { label: 'Out Today', val: 3, color: 'text-state-info' },
-           { label: 'Upcoming (Next 7 Days)', val: 5, color: 'text-brand-teal' },
-           { label: 'Avg Leave Usage', val: '2.1 Days', color: 'text-content-secondary' }
+           { label: 'Pending HR Leaves', val: leaves.filter(r => r.status === 'pending').length, color: 'text-state-warning' },
+           { label: 'Approved this month', val: leaves.filter(r => r.status === 'approved').length, color: 'text-brand-teal' },
+           { label: 'Rejected', val: leaves.filter(r => r.status === 'rejected').length, color: 'text-state-danger' },
+           { label: 'Total Requests', val: leaves.length, color: 'text-content-secondary' }
          ].map(item => (
-           <div key={item.label} className="glass-card p-4">
-              <p className="text-[10px] text-content-tertiary font-bold uppercase tracking-wider mb-1">{item.label}</p>
+           <Card key={item.label} className="p-4 border-border/40">
+              <p className="text-[10px] text-content-tertiary font-black uppercase tracking-wider mb-1">{item.label}</p>
               <h4 className={`text-xl font-bold ${item.color}`}>{item.val}</h4>
-           </div>
+           </Card>
          ))}
       </div>
 
       <Card>
         <CardHeader>
            <CardTitle>Inbound Leave Tickets</CardTitle>
-           <CardDescription>Leave applications awaiting managerial review</CardDescription>
+           <CardDescription>HR applications awaiting Super Admin review</CardDescription>
         </CardHeader>
-        <DataTable columns={columns} data={leaveRequests} />
+        <DataTable columns={columns} data={leaves} loading={loading} />
       </Card>
 
       <Modal 
         isOpen={isOpen} 
         onClose={close} 
-        title="Application Review"
+        title="Leave Review"
         footer={
            <div className="flex gap-3">
-              <Button variant="secondary" onClick={close}>Cancel</Button>
-              {selectedReq?.status === 'Requested' && <Button onClick={close}>Approve Request</Button>}
+              <Button variant="secondary" onClick={close}>Close</Button>
+              {selectedReq?.status === 'pending' && (
+                <>
+                  <Button variant="danger" onClick={() => handleReview(selectedReq._id, 'rejected')}>Reject</Button>
+                  <Button onClick={() => handleReview(selectedReq._id, 'approved')}>Approve Request</Button>
+                </>
+              )}
            </div>
         }
       >
         <div className="space-y-4">
-           <div className="grid grid-cols-2 gap-4 text-sm">
+           <div className="grid grid-cols-2 gap-4 text-sm bg-surface-secondary/50 p-4 rounded-sm border border-border/40">
              <div>
-                <p className="text-content-tertiary font-medium">Employee</p>
-                <p className="text-content-primary font-semibold">{selectedReq?.employee}</p>
+                <p className="text-[10px] text-content-tertiary font-black uppercase">Employee</p>
+                <p className="text-content-primary font-bold">{selectedReq?.employee?.name}</p>
              </div>
              <div>
-                <p className="text-content-tertiary font-medium">Leave Category</p>
-                <p className="text-content-primary font-semibold">{selectedReq?.type}</p>
+                <p className="text-[10px] text-content-tertiary font-black uppercase">Category</p>
+                <p className="text-content-primary font-bold uppercase">{selectedReq?.type} Leave</p>
              </div>
-             <div>
-                <p className="text-content-tertiary font-medium">Requested Duration</p>
-                <p className="text-content-primary font-semibold">{selectedReq?.from} to {selectedReq?.to}</p>
-             </div>
-             <div>
-                <p className="text-content-tertiary font-medium">Total Days</p>
-                <p className="text-brand-teal font-bold">{selectedReq?.days} Days</p>
+             <div className="col-span-2">
+                <p className="text-[10px] text-content-tertiary font-black uppercase">Duration</p>
+                <p className="text-content-primary font-bold">
+                  {selectedReq && new Date(selectedReq.fromDate).toLocaleDateString()} to {selectedReq && new Date(selectedReq.toDate).toLocaleDateString()}
+                </p>
              </div>
           </div>
-          <div className="pt-4 border-t border-border">
-             <h5 className="text-sm font-semibold text-content-primary mb-2">Reason for Leave</h5>
-             <p className="text-sm text-content-secondary leading-relaxed bg-surface-input/50 p-3 rounded-none border border-border">
-                "Not feeling well since last night. High fever and body ache. Doctor suggested 2 days rest to recover completely. Will be reachable on Slack for emergencies."
+
+          <div className="space-y-2">
+             <h5 className="text-[10px] font-black text-content-tertiary uppercase">Reason for Leave</h5>
+             <p className="text-sm text-content-secondary leading-relaxed bg-white p-3 rounded-none border border-border italic">
+                "{selectedReq?.reason}"
              </p>
           </div>
+
+          {selectedReq?.status === 'pending' && (
+            <div className="space-y-2 pt-2">
+              <h5 className="text-[10px] font-black text-content-tertiary uppercase">Admin Remarks (Optional)</h5>
+              <textarea 
+                className="input-field w-full min-h-[80px] py-2 resize-none"
+                placeholder="Add comments or instructions..."
+                value={remarks}
+                onChange={(e) => setRemarks(e.target.value)}
+              />
+            </div>
+          )}
+
+          {selectedReq?.status !== 'pending' && selectedReq?.hrRemarks && (
+             <div className="p-3 bg-brand-teal/5 border border-brand-teal/20">
+                <p className="text-[10px] font-black text-brand-teal uppercase">Admin Remark</p>
+                <p className="text-xs text-content-primary italic">"{selectedReq.hrRemarks}"</p>
+             </div>
+          )}
         </div>
       </Modal>
     </div>

@@ -32,11 +32,19 @@ exports.getEmployees = async (req, res, next) => {
 // @route   GET /api/v1/hr/leaves
 exports.getAllLeaves = async (req, res, next) => {
     try {
+        // Only fetch leaves belonging to Sales Executives for HR review
         const leaves = await Leave.find()
-            .populate('employee', 'name email role')
+            .populate({
+                path: 'employee',
+                match: { role: 'sales_executive' },
+                select: 'name email role'
+            })
             .sort({ createdAt: -1 });
 
-        return ApiResponse.success(res, leaves, 'All leave requests fetched');
+        // Filter out leaves where employee populate returned null (non-sales users)
+        const filteredLeaves = leaves.filter(leave => leave.employee !== null);
+
+        return ApiResponse.success(res, filteredLeaves, 'Sales executive leave requests fetched');
     } catch (error) {
         next(error);
     }
@@ -63,6 +71,45 @@ exports.reviewLeave = async (req, res, next) => {
         await leave.save();
 
         return ApiResponse.success(res, leave, `Leave request ${status} successfully`);
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Apply for own leave (HR)
+// @route   POST /api/v1/hr/my-leaves
+exports.applyMyLeave = async (req, res, next) => {
+    try {
+        const { type, fromDate, toDate, reason } = req.body;
+
+        if (!type || !fromDate || !toDate || !reason) {
+            return ApiResponse.error(res, "All fields are required", 400);
+        }
+
+        const leave = await Leave.create({
+            employee: req.user._id,
+            type,
+            fromDate,
+            toDate,
+            reason,
+            status: 'pending'
+        });
+
+        return ApiResponse.success(res, leave, 'Leave application submitted successfully', 201);
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Get HR's own leave history
+// @route   GET /api/v1/hr/my-leaves
+exports.getMyLeaves = async (req, res, next) => {
+    try {
+        const leaves = await Leave.find({ employee: req.user._id })
+            .populate('reviewedBy', 'name')
+            .sort({ createdAt: -1 });
+
+        return ApiResponse.success(res, leaves, 'My leave history fetched');
     } catch (error) {
         next(error);
     }

@@ -47,12 +47,19 @@ export default function AdminLoginPage() {
       }
       
       setLoading(true);
-      const { success, role, message } = await verifyOTP(formData.email, formData.otp, 'admin', formData.name);
+      const { success, role, user: userData, message } = await verifyOTP(formData.email, formData.otp, 'admin', formData.name);
       setLoading(false);
       
       if (success && role === 'admin') {
         toast.success('System Access Granted');
-        navigate('/admin');
+        // Check subRole to redirect to the correct panel
+        if (userData?.subRole === 'hr_manager') {
+           navigate('/hr');
+        } else if (userData?.subRole === 'service_manager') {
+           navigate('/service-center');
+        } else {
+           navigate('/admin');
+        }
       } else {
         toast.error(message || 'Identity Mismatch');
       }

@@ -14,4 +14,8 @@ router.get('/employees', checkPermission('hr'), hrController.getEmployees);
 router.get('/leaves', checkPermission('hr'), hrController.getAllLeaves);
 router.patch('/leaves/:id/review', checkPermission('hr'), hrController.reviewLeave);
 
+// Self Leave
+router.get('/my-leaves', hrController.getMyLeaves);
+router.post('/my-leaves', hrController.applyMyLeave);
+
 module.exports = router;

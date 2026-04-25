@@ -3,19 +3,29 @@ import api from '../api';
 
 const AuthContext = createContext(null);
 
-// Role-specific localStorage key helpers
+// Role-specific localStorage key mapping
 const ROLE_KEY_MAP = {
+  admin: 'admin',
+  hr_manager: 'hr',
+  service_manager: 'service',
+  distributor: 'distributor',
+  retailer: 'retailer',
   sales_executive: 'sales',
+  customer: 'customer'
 };
 
 const getRoleKey = (role) => ROLE_KEY_MAP[role] || role;
 
-export const getTokenKeys = (role) => {
-  const key = getRoleKey(role);
+export const getTokenKeys = (role, subRole) => {
+  // Use subRole for HR and Service to get specific prefixes (hr_token, service_token)
+  const keyPrefix = (subRole === 'hr_manager') ? 'hr' : 
+                   (subRole === 'service_manager') ? 'service' : 
+                   getRoleKey(role);
+                   
   return {
-    accessToken: `${key}_token`,
-    refreshToken: `${key}_refresh_token`,
-    user: `${key}_user`,
+    accessToken: `${keyPrefix}_token`,
+    refreshToken: `${keyPrefix}_refresh_token`,
+    user: `${keyPrefix}_user`,
   };
 };
 
@@ -24,6 +34,8 @@ const detectStoredSession = () => {
   // URL-based priority — same logic as api.js
   const PATH_ROLE_MAP = {
     '/admin': 'admin',
+    '/hr': 'hr_manager',
+    '/service-center': 'service_manager',
     '/distributor': 'distributor',
     '/retailer': 'retailer',
     '/sales': 'sales_executive',
@@ -92,7 +104,8 @@ export function AuthProvider({ children }) {
       }
 
       const { user: userData, accessToken, refreshToken } = data;
-      const keys = getTokenKeys(userData.role);
+      const keys = getTokenKeys(userData.role, userData.subRole);
+
 
       localStorage.setItem(keys.user, JSON.stringify(userData));
       localStorage.setItem(keys.accessToken, accessToken);
@@ -101,7 +114,8 @@ export function AuthProvider({ children }) {
       setUser(userData);
       setIsAuthenticated(true);
 
-      return { success: true, role: userData.role };
+      return { success: true, role: userData.role, user: userData };
+
     } catch (error) {
       return {
         success: false,
