@@ -37,7 +37,7 @@ import {
   RestockRequestsPage, LedgerPage, InvoicesPage,
   PaymentsPage, FinancialReportPage, EmployeesPage, DepartmentsPage,
   PayrollDashboardPage, SalaryProcessPage, LeaveRequestsPage,
-  LeaveCalendarPage, RewardsDashboardPage, TargetConfigPage,
+  RewardsDashboardPage, TargetConfigPage,
   PointsHistoryPage, ServiceRequestsPage, ServiceDetailPage,
   ServiceAnalyticsPage, DistributorListPage, RetailerListPage,
   CustomerListPage, ReportsPage, AdminSettingsPage, PayslipsPage, DeductionsPage, OfferLettersPage, SocialGridManagerPage,
@@ -109,7 +109,6 @@ const SalaryProcess = () => <SalaryProcessPage />;
 const Payslips = () => <PayslipsPage />;
 const Deductions = () => <DeductionsPage />;
 const LeaveRequests = () => <LeaveRequestsPage />;
-const LeaveCalendar = () => <LeaveCalendarPage />;
 const RewardsDashboard = () => <RewardsDashboardPage />;
 const TargetConfig = () => <TargetConfigPage />;
 const PointsHistory = () => <PointsHistoryPage />;
@@ -254,7 +253,6 @@ export default function AppRouter() {
           <Route path="payroll/payslips" element={<Payslips />} />
           <Route path="payroll/deductions" element={<Deductions />} />
           <Route path="leaves" element={<LeaveRequests />} />
-          <Route path="leaves/calendar" element={<LeaveCalendar />} />
           <Route path="rewards" element={<RewardsDashboard />} />
           <Route path="rewards/targets" element={<TargetConfig />} />
           <Route path="rewards/history" element={<PointsHistory />} />

@@ -8,7 +8,6 @@ export { default as DistributorListPage } from './pages/DistributorListPage';
 export { default as EmployeesPage } from './pages/EmployeesPage';
 export { default as FinancialReportPage } from './pages/FinancialReportPage';
 export { default as InvoicesPage } from './pages/InvoicesPage';
-export { default as LeaveCalendarPage } from './pages/LeaveCalendarPage';
 export { default as LeaveRequestsPage } from './pages/LeaveRequestsPage';
 export { default as LedgerPage } from './pages/LedgerPage';
 export { default as OrderFlowPage } from './pages/OrderFlowPage';

@@ -5,12 +5,14 @@ const rewardConfigSchema = new mongoose.Schema({
     earningRules: {
         retailer: {
             perProductSale: { type: Number, default: 10 },
+            perOrderPlaced: { type: Number, default: 10 },
             bulkBonus100Units: { type: Number, default: 500 },
             monthlyTargetBonus: { type: Number, default: 2000 },
             fastSellingBonus: { type: Number, default: 100 },
         },
         distributor: {
             perOrderDispatched: { type: Number, default: 20 },
+            perOrderPlaced: { type: Number, default: 10 },
             sameDayDeliveryBonus: { type: Number, default: 50 },
             bulkSupplyBonus: { type: Number, default: 200 },
             monthlyTargetBonus: { type: Number, default: 3000 },

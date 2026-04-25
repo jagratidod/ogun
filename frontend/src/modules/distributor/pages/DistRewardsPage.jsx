@@ -77,10 +77,14 @@ export default function DistRewardsPage() {
                     <span className="text-content-secondary">Per Order Fulfilled:</span>
                     <span className="font-bold text-brand-purple">+{data?.earningRules?.perOrderDispatched || 0} Pts</span>
                  </div>
-                 <div className="flex justify-between text-xs">
-                    <span className="text-content-secondary">Bulk Supply:</span>
-                    <span className="font-bold text-brand-purple">+{data?.earningRules?.bulkSupplyBonus || 0} Pts</span>
-                 </div>
+                  <div className="flex justify-between text-xs">
+                     <span className="text-content-secondary">Per Order Placed:</span>
+                     <span className="font-bold text-brand-purple">+{data?.earningRules?.perOrderPlaced || 0} Pts</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                     <span className="text-content-secondary">Bulk Supply:</span>
+                     <span className="font-bold text-brand-purple">+{data?.earningRules?.bulkSupplyBonus || 0} Pts</span>
+                  </div>
               </div>
           </Card>
 

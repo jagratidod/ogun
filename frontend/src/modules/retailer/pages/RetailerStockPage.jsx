@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { RiStockLine, RiAddLine, RiSearchLine, RiFilterLine, RiEditLine, RiDeleteBin7Line, RiArrowRightDownLine, RiRepeatLine, RiTruckLine, RiInformationLine, RiRefreshLine } from 'react-icons/ri';
+import { RiStockLine, RiAddLine, RiSearchLine, RiFilterLine, RiEditLine, RiDeleteBin7Line, RiArrowRightDownLine, RiRepeatLine, RiTruckLine, RiInformationLine, RiRefreshLine, RiCheckDoubleLine, RiPriceTag3Line } from 'react-icons/ri';
 import { PageHeader, Card, CardHeader, CardTitle, CardDescription, DataTable, Badge, Button, Input, Select, useModal, Modal, formatCurrency } from '../../../core';
 import retailerService from '../../../core/services/retailerService';
 import { toast } from 'react-hot-toast';
@@ -25,7 +25,8 @@ export default function RetailerStockPage() {
         name: item.product?.name || 'Unknown Product',
         sku: item.product?.sku || 'N/A',
         stock: item.quantity,
-        purchasePrice: item.product?.distributorPrice || 0, // This is what retailer paid
+        purchasePrice: item.product?.retailerPrice || 0, // This is what retailer paid
+        sellingPrice: item.sellingPrice || item.product?.retailerPrice || 0, // Default to retailerPrice if not set
         mrp: item.product?.mrp || 0,
         category: item.product?.category,
         original: item
@@ -35,6 +36,30 @@ export default function RetailerStockPage() {
       toast.error('Failed to load inventory');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const [updateLoading, setUpdateLoading] = useState(false);
+  const [editPrice, setEditPrice] = useState(0);
+
+  const handleOpenEdit = (row) => {
+    setEditPrice(row.sellingPrice);
+    open(row);
+  };
+
+  const handleUpdateInventory = async () => {
+    try {
+      setUpdateLoading(true);
+      await retailerService.updateInventoryItem(selectedStock.id, { 
+        sellingPrice: Number(editPrice) 
+      });
+      toast.success('Selling price updated');
+      close();
+      fetchInventory();
+    } catch (error) {
+      toast.error('Failed to update price');
+    } finally {
+      setUpdateLoading(false);
     }
   };
 
@@ -57,9 +82,16 @@ export default function RetailerStockPage() {
 
   const columns = [
     { key: 'name', label: 'Product Model', sortable: true, render: (val, row) => (
-      <div className="flex flex-col">
-        <h4 className="text-sm font-semibold text-content-primary leading-tight">{val}</h4>
-        <span className="text-[10px] text-content-tertiary font-bold uppercase tracking-widest">{row.sku}</span>
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 bg-surface-elevated border border-border flex items-center justify-center overflow-hidden">
+           {row.original.product?.images?.[0]?.url ? (
+             <img src={row.original.product.images[0].url} className="w-full h-full object-cover" alt="" />
+           ) : <RiStockLine className="text-content-tertiary" />}
+        </div>
+        <div className="flex flex-col">
+          <h4 className="text-sm font-semibold text-content-primary leading-tight">{val}</h4>
+          <span className="text-[10px] text-content-tertiary font-bold uppercase tracking-widest">{row.sku}</span>
+        </div>
       </div>
     )},
     { key: 'stock', label: 'In-Store Qty', align: 'center', sortable: true, render: (val) => (
@@ -69,8 +101,17 @@ export default function RetailerStockPage() {
           </span>
        </div>
     )},
-    { key: 'purchasePrice', label: 'Purchase Price (Unit)', align: 'right', render: (val) => (
-       <span className="text-xs font-bold text-brand-teal">{formatCurrency(val)}</span>
+    { key: 'purchasePrice', label: 'CP (Unit)', align: 'right', render: (val) => (
+       <div className="flex flex-col items-end">
+          <span className="text-xs font-bold text-content-secondary">{formatCurrency(val)}</span>
+          <span className="text-[8px] text-content-tertiary font-black uppercase tracking-widest">Landed Cost</span>
+       </div>
+    )},
+    { key: 'sellingPrice', label: 'Selling Price', align: 'right', render: (val) => (
+       <div className="flex flex-col items-end">
+          <span className="text-sm font-black text-brand-teal">{formatCurrency(val)}</span>
+          <span className="text-[8px] text-state-success font-black uppercase">Customer Price</span>
+       </div>
     )},
     { key: 'status', label: 'Stock Status', render: (_, row) => {
       const status = row.stock === 0 ? 'Stock-out' : row.stock <= 5 ? 'Low Stock' : 'Available';
@@ -82,6 +123,7 @@ export default function RetailerStockPage() {
     }},
     { key: 'actions', label: 'Actions', align: 'right', render: (_, row) => (
       <div className="flex justify-end gap-1">
+        <Button variant="secondary" size="sm" icon={RiEditLine} onClick={() => handleOpenEdit(row)}>Edit Price</Button>
         <Button variant="secondary" size="sm" icon={RiTruckLine} onClick={() => open(row)}>Restock</Button>
       </div>
     )},
@@ -112,7 +154,7 @@ export default function RetailerStockPage() {
          </div>
          <div className="glass-card p-6 border-l-4 border-brand-pink group hover:-translate-y-1 transition-all">
             <p className="text-[10px] text-content-tertiary font-bold uppercase tracking-widest mb-2">Inventory Value</p>
-            <h4 className="text-3xl font-black text-brand-pink">{formatCurrency(stockData.reduce((acc, p) => acc + (p.price * p.stock), 0))}</h4>
+            <h4 className="text-3xl font-black text-brand-pink">{formatCurrency(stockData.reduce((acc, p) => acc + (p.sellingPrice * p.stock), 0))}</h4>
             <p className="text-xs text-state-success font-bold mt-2">Estimated Market Val</p>
          </div>
       </div>
@@ -143,31 +185,55 @@ export default function RetailerStockPage() {
       <Modal 
         isOpen={isOpen} 
         onClose={close} 
-        title={`Restock Demand: ${selectedStock?.name}`}
+        title={selectedStock?.sku ? `Manage SKU: ${selectedStock.sku}` : 'Inventory Action'}
         footer={
            <div className="flex gap-3">
               <Button variant="secondary" onClick={close}>Cancel</Button>
-              <Button icon={RiTruckLine} onClick={handleRestock}>Send Request to Distributor</Button>
+              {selectedStock?.sellingPrice !== undefined ? (
+                 <Button icon={RiCheckDoubleLine} onClick={handleUpdateInventory} loading={updateLoading}>Update Selling Price</Button>
+              ) : (
+                 <Button icon={RiTruckLine} onClick={handleRestock}>Send Restock Request</Button>
+              )}
            </div>
         }
       >
         <div className="space-y-5">
            <div className="p-4 rounded-none bg-surface-elevated border border-border flex items-center justify-between">
               <div>
-                 <p className="text-xs text-content-tertiary uppercase font-black mb-1">On-Counter</p>
+                 <p className="text-[10px] text-content-tertiary uppercase font-black mb-1">Current Stock</p>
                  <h4 className="text-2xl font-black text-brand-teal">{selectedStock?.stock} Units</h4>
               </div>
-              <RiArrowRightDownLine className="text-content-tertiary w-6 h-6 animate-pulse" />
+              <RiArrowRightDownLine className="text-content-tertiary w-6 h-6" />
               <div className="text-right">
-                 <p className="text-xs text-content-tertiary uppercase font-black mb-1">Local Threshold</p>
-                 <h4 className="text-2xl font-bold text-content-primary">5 Units</h4>
+                 <p className="text-[10px] text-content-tertiary uppercase font-black mb-1">Purchase Price</p>
+                 <h4 className="text-2xl font-bold text-content-primary">{formatCurrency(selectedStock?.purchasePrice)}</h4>
               </div>
            </div>
-           <Input label="Restock Quantity Needed" type="number" placeholder="Enter quantity..." />
-           <div className="p-4 rounded-none bg-state-info/5 border border-state-info/20 text-state-info text-xs font-semibold flex gap-3">
-              <RiInformationLine className="w-5 h-5 flex-shrink-0" />
-              <p className="leading-relaxed">This request will be sent to your assigned distributor for regional inventory fulfillment. Standard delivery is 24-48 hours.</p>
-           </div>
+
+           {selectedStock?.sellingPrice !== undefined ? (
+              <div className="space-y-4">
+                 <div className="p-4 bg-brand-teal/5 border border-brand-teal/10 rounded-none">
+                    <p className="text-xs text-brand-teal font-bold mb-3 uppercase tracking-wider">Set Customer Selling Price</p>
+                    <Input 
+                      type="number" 
+                      label="New Selling Price (₹)" 
+                      value={editPrice}
+                      onChange={(e) => setEditPrice(e.target.value)}
+                      placeholder="Enter amount..."
+                      icon={RiPriceTag3Line}
+                    />
+                    <p className="text-[10px] text-content-tertiary mt-2">Recommended Price (MRP): <strong>{formatCurrency(selectedStock.mrp)}</strong></p>
+                 </div>
+              </div>
+           ) : (
+              <>
+                 <Input label="Restock Quantity Needed" type="number" placeholder="Enter quantity..." />
+                 <div className="p-4 rounded-none bg-state-info/5 border border-state-info/20 text-state-info text-xs font-semibold flex gap-3">
+                    <RiInformationLine className="w-5 h-5 flex-shrink-0" />
+                    <p className="leading-relaxed">This request will be sent to your assigned distributor for regional inventory fulfillment. Standard delivery is 24-48 hours.</p>
+                 </div>
+              </>
+           )}
         </div>
       </Modal>
     </div>

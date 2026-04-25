@@ -12,7 +12,7 @@ export default function SalesTerminalPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [selectedRetailer, setSelectedRetailer] = useState('');
-  
+
   const { isOpen, open, close } = useModal();
 
   useEffect(() => {
@@ -39,16 +39,16 @@ export default function SalesTerminalPage() {
     setCart(prev => {
       const existing = prev.find(item => item.productId === product._id);
       if (existing) {
-        return prev.map(item => 
-          item.productId === product._id 
-            ? { ...item, quantity: item.quantity + 1 } 
+        return prev.map(item =>
+          item.productId === product._id
+            ? { ...item, quantity: item.quantity + 1 }
             : item
         );
       }
-      return [...prev, { 
-        productId: product._id, 
-        name: product.name, 
-        price: product.retailerPrice || product.price, 
+      return [...prev, {
+        productId: product._id,
+        name: product.name,
+        price: product.retailerPrice || product.price,
         quantity: 1,
         image: product.images?.[0]?.url
       }];
@@ -88,7 +88,7 @@ export default function SalesTerminalPage() {
     }
   };
 
-  const filteredProducts = products.filter(p => 
+  const filteredProducts = products.filter(p =>
     p.name?.toLowerCase().includes(search.toLowerCase()) ||
     p.sku?.toLowerCase().includes(search.toLowerCase())
   );
@@ -98,8 +98,8 @@ export default function SalesTerminalPage() {
       {/* Top Bar */}
       <div className="p-4 bg-surface-primary border-b border-border space-y-3">
         <div className="flex items-center justify-between">
-           <h2 className="text-xl font-black text-content-primary leading-none">Catalog</h2>
-           <Badge variant="teal">{products.length} Products</Badge>
+          <h2 className="text-xl font-black text-content-primary leading-none">Catalog</h2>
+          <Badge variant="teal">{products.length} Products</Badge>
         </div>
         <Input
           icon={RiSearchLine}
@@ -127,18 +127,18 @@ export default function SalesTerminalPage() {
                     </div>
                   )}
                   {cart.find(i => i.productId === product._id) && (
-                     <div className="absolute top-1 right-1">
-                        <Badge variant="teal" size="xs">Added</Badge>
-                     </div>
+                    <div className="absolute top-1 right-1">
+                      <Badge variant="teal" size="xs">Added</Badge>
+                    </div>
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <h4 className="text-[10px] font-black text-content-primary line-clamp-2 leading-tight uppercase">{product.name}</h4>
                   <p className="text-xs font-black text-brand-teal mt-1">{formatCurrency(product.retailerPrice || product.price)}</p>
                 </div>
-                <Button 
-                  size="xs" 
-                  variant="secondary" 
+                <Button
+                  size="xs"
+                  variant="secondary"
                   className="mt-2 w-full font-bold uppercase tracking-widest text-[9px]"
                   onClick={() => addToCart(product)}
                 >
@@ -158,8 +158,8 @@ export default function SalesTerminalPage() {
               <span className="text-[8px] font-black uppercase tracking-[0.2em] opacity-80">Cart Total</span>
               <span className="text-lg font-black">{formatCurrency(total)}</span>
             </div>
-            <Button 
-              variant="secondary" 
+            <Button
+              variant="secondary"
               className="bg-white text-brand-teal border-none font-black h-10 px-6 uppercase tracking-widest text-xs"
               onClick={open}
             >
@@ -178,9 +178,9 @@ export default function SalesTerminalPage() {
         footer={
           <div className="flex gap-2 w-full">
             <Button variant="secondary" className="flex-1" onClick={close}>Cancel</Button>
-            <Button 
-              variant="primary" 
-              className="flex-2" 
+            <Button
+              variant="primary"
+              className="flex-2"
               onClick={handlePlaceOrder}
               loading={submitting}
               disabled={!selectedRetailer}

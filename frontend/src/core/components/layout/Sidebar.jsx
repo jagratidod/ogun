@@ -82,7 +82,6 @@ const adminNav = [
   {
     label: 'Leaves', icon: RiCalendarCheckLine, permission: 'leaves', children: [
       { label: 'Requests', path: '/admin/leaves' },
-      { label: 'Calendar', path: '/admin/leaves/calendar' },
     ],
   },
   {

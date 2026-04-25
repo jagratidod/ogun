@@ -24,6 +24,10 @@ const inventorySchema = new mongoose.Schema({
     type: String,
     enum: ['In Stock', 'Low Stock', 'Out of Stock'],
     default: 'Out of Stock'
+  },
+  sellingPrice: {
+    type: Number,
+    default: 0
   }
 }, {
   timestamps: true

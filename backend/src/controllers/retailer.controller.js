@@ -50,10 +50,20 @@ exports.getAdminCatalog = catchAsync(async (req, res, next) => {
             }
         });
 
+        // 3.5 Build retailer's own inventory map
+        let myInventoryMap = {};
+        const myInventory = await Inventory.find({ user: req.user._id }).lean();
+        myInventory.forEach(item => {
+            if (item.product) {
+                myInventoryMap[item.product.toString()] = item;
+            }
+        });
+
         // 4. Merge
         const enrichedProducts = allProducts.map(product => {
             const productIdStr = product._id.toString();
             const inventoryRecord = inventoryMap[productIdStr];
+            const myRecord = myInventoryMap[productIdStr];
 
             const distributorUnits = inventoryRecord ? (inventoryRecord.quantity || 0) : 0;
             const available = distributorUnits > 0;
@@ -72,12 +82,16 @@ exports.getAdminCatalog = catchAsync(async (req, res, next) => {
                 category: product.category,
                 images: product.images,
                 retailerPrice: product.retailerPrice,
+                mrp: product.mrp,
                 description: product.description,
                 unit: product.unit || 'units',
                 available,
                 distributorUnits,
                 stockStatus,
-                displayStock: `${distributorUnits} ${product.unit || 'units'}`
+                displayStock: `${distributorUnits} ${product.unit || 'units'}`,
+                inMyStock: !!myRecord,
+                mySellingPrice: myRecord ? myRecord.sellingPrice : 0,
+                myQty: myRecord ? myRecord.quantity : 0
             };
         });
 
@@ -118,4 +132,39 @@ exports.getDistributorProducts = catchAsync(async (req, res, next) => {
     }));
 
     return ApiResponse.success(res, products, 'Distributor products fetched successfully');
+});
+
+/**
+ * @desc    Get retailer's own inventory
+ * @route   GET /api/v1/retailer/inventory
+ * @access  Private (Retailer)
+ */
+exports.getMyInventory = catchAsync(async (req, res, next) => {
+    const inventory = await Inventory.find({ user: req.user._id }).populate('product');
+    return ApiResponse.success(res, inventory, 'Inventory fetched successfully');
+});
+
+/**
+ * @desc    Update an inventory item (selling price or threshold)
+ * @route   PATCH /api/v1/retailer/inventory/:id
+ * @access  Private (Retailer)
+ */
+exports.updateInventoryItem = catchAsync(async (req, res, next) => {
+    const { sellingPrice, minStockThreshold } = req.body;
+    
+    const inventory = await Inventory.findOne({ 
+        _id: req.params.id, 
+        user: req.user._id 
+    });
+
+    if (!inventory) {
+        return ApiResponse.error(res, 'Inventory item not found', 404);
+    }
+
+    if (sellingPrice !== undefined) inventory.sellingPrice = sellingPrice;
+    if (minStockThreshold !== undefined) inventory.minStockThreshold = minStockThreshold;
+
+    await inventory.save();
+
+    return ApiResponse.success(res, inventory, 'Inventory updated successfully');
 });

@@ -73,6 +73,10 @@ exports.placeOrder = catchAsync(async (req, res, next) => {
         console.error('Socket emission failed:', err.message);
     }
 
+    // 4. Credit Reward Points to Retailer for placing order
+    const RewardService = require('../services/rewardService');
+    await RewardService.creditPoints(req.user._id, 'retailer', 'perOrderPlaced', `Order placed to Distributor: ${order.orderId}`);
+    
     return ApiResponse.success(res, order, 'Order placed successfully to distributor', 201);
 });
 

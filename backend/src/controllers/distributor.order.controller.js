@@ -67,7 +67,11 @@ exports.placeOrder = catchAsync(async (req, res, next) => {
     notes,
     status: 'Pending'
   });
-
+  
+  // 4. Credit Reward Points to Distributor for placing order
+  const RewardService = require('../services/rewardService');
+  await RewardService.creditPoints(req.user._id, 'distributor', 'perOrderPlaced', `Order placed to Admin: ${order.orderId}`);
+  
   return ApiResponse.success(res, order, 'Order placed successfully', 201);
 });
 

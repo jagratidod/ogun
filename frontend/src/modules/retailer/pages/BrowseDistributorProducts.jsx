@@ -92,6 +92,14 @@ function ProductCard({ product, onDetail, onQuery, onOrder }) {
           <span>{product.displayStock}</span>
         </div>
 
+        {/* Retailer's own price if in stock */}
+        {product.inMyStock && (
+          <div className="mt-1 p-2 bg-brand-teal/5 border border-brand-teal/10 flex flex-col">
+             <span className="text-[8px] font-black uppercase text-brand-teal tracking-widest">My Selling Price</span>
+             <span className="text-xs font-black text-content-primary">{formatCurrency(product.mySellingPrice || product.retailerPrice)}</span>
+          </div>
+        )}
+
         {/* Actions */}
         <div className="flex gap-2 mt-1">
           <Button
@@ -275,6 +283,14 @@ export default function BrowseDistributorProducts() {
     {
       key: 'retailerPrice', label: 'Your Price (MOP)', sortable: true,
       render: (val) => <span className="font-black text-brand-teal">{formatCurrency(val)}</span>
+    },
+    {
+      key: 'mySellingPrice', label: 'My Selling Price', sortable: true,
+      render: (val, row) => row.inMyStock ? (
+        <span className="font-black text-content-primary">{formatCurrency(val || row.retailerPrice)}</span>
+      ) : (
+        <span className="text-[10px] text-content-tertiary uppercase font-black tracking-widest">Not in Stock</span>
+      )
     },
     {
       key: 'distributorUnits', label: 'Distributor Stock', align: 'center', sortable: true,

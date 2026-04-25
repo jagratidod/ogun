@@ -92,126 +92,107 @@ export default function HRSection() {
   };
 
   return (
-    <div className="space-y-4 animate-fade-in">
-      <div className="flex items-center justify-between px-1">
-        <h4 className="text-[10px] font-black text-content-tertiary uppercase tracking-widest">My HR Portal</h4>
-        <Badge variant="purple" size="xs" className="animate-pulse">HR Sync Active</Badge>
-      </div>
-
-      {/* Tab Switcher - Styled for Premium Feel */}
-      <div className="flex p-1 bg-surface-input rounded-sm border border-border/50">
+    <div className="space-y-3 animate-fade-in">
+      {/* Tab Switcher - Compact & Modern */}
+      <div className="flex p-1 bg-white rounded-2xl border border-border shadow-sm">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 flex flex-col items-center justify-center py-3 gap-1.5 transition-all duration-300 relative ${
+            className={`flex-1 flex flex-col items-center justify-center py-2.5 gap-1 transition-all duration-300 relative ${
               activeTab === tab.id 
                 ? 'text-brand-teal' 
                 : 'text-content-tertiary hover:text-content-secondary'
             }`}
           >
-            <tab.icon size={20} className={activeTab === tab.id ? 'animate-pop' : ''} />
-            <span className="text-[9px] font-black uppercase tracking-widest leading-none">{tab.label}</span>
+            <tab.icon size={18} className={activeTab === tab.id ? 'scale-110' : 'opacity-60'} />
+            <span className="text-[8px] font-black uppercase tracking-tight leading-none">{tab.label}</span>
             {activeTab === tab.id && (
-               <div className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-brand-teal rounded-full shadow-[0_0_8px_var(--color-brand-teal)]" />
+               <div className="absolute -bottom-1 left-1/3 right-1/3 h-1 bg-brand-teal rounded-full shadow-[0_0_8px_rgba(50,141,142,0.3)]" />
             )}
           </button>
         ))}
       </div>
 
-      <Card className="p-4 overflow-hidden border-border/60 shadow-sm">
+      <Card className="p-3.5 rounded-[24px] border-none bg-white shadow-lg shadow-gray-200/40">
         {/* LEAVES TAB */}
         {activeTab === 'leaves' && (
-          <div className="space-y-6">
-            <form onSubmit={handleSubmitLeave} className="space-y-4">
-              <div className="grid grid-cols-1 gap-4">
-                <Combobox 
-                  label="Leave Type" 
-                  options={[
-                    { label: 'Casual Leave', value: 'casual' },
-                    { label: 'Sick Leave', value: 'sick' },
-                    { label: 'Emergency Leave', value: 'emergency' }
-                  ]} 
-                  value={leaveType}
-                  onChange={setLeaveType}
-                  placeholder="Select Leave Type..."
-                />
-                <div className="grid grid-cols-2 gap-3">
-                  <Input 
-                    label="From Date" 
-                    type="date" 
-                    icon={RiCalendarTodoLine}
-                    required 
-                    value={fromDate}
-                    onChange={(e) => setFromDate(e.target.value)}
-                    className="[&::-webkit-calendar-picker-indicator]:opacity-0"
-                  />
-                  <Input 
-                    label="To Date" 
-                    type="date" 
-                    icon={RiCalendarTodoLine}
-                    required 
-                    value={toDate}
-                    onChange={(e) => setToDate(e.target.value)}
-                    className="[&::-webkit-calendar-picker-indicator]:opacity-0"
-                  />
-                </div>
+          <div className="space-y-4">
+            <form onSubmit={handleSubmitLeave} className="space-y-3">
+              <Combobox 
+                label="Type" 
+                options={[
+                  { label: 'Casual', value: 'casual' },
+                  { label: 'Sick', value: 'sick' },
+                  { label: 'Emergency', value: 'emergency' }
+                ]} 
+                value={leaveType}
+                onChange={setLeaveType}
+                className="scale-95 origin-left"
+              />
+              <div className="grid grid-cols-2 gap-2">
                 <Input 
-                  label="Reason for Leave" 
-                  placeholder="Tell HR why you need leave..." 
-                  icon={RiFileList3Line}
+                  label="From" 
+                  type="date" 
                   required 
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
+                  value={fromDate}
+                  onChange={(e) => setFromDate(e.target.value)}
+                  className="h-9 text-xs"
+                />
+                <Input 
+                  label="To" 
+                  type="date" 
+                  required 
+                  value={toDate}
+                  onChange={(e) => setToDate(e.target.value)}
+                  className="h-9 text-xs"
                 />
               </div>
+              <Input 
+                label="Reason" 
+                placeholder="Brief reason..." 
+                required 
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                className="h-9 text-xs"
+              />
               <Button 
                 type="submit" 
-                variant="primary" 
                 loading={loading}
-                className="w-full h-12 uppercase tracking-widest text-[11px] font-black shadow-lg shadow-brand-teal/20" 
+                className="w-full h-10 uppercase tracking-widest text-[10px] font-black rounded-xl" 
                 icon={RiSendPlane2Line}
               >
-                Request Approval
+                Submit Request
               </Button>
             </form>
 
-            <div className="space-y-4 pt-4 border-t border-border/30">
-              <p className="text-[9px] font-black text-content-tertiary uppercase tracking-widest flex items-center gap-2">
-                <RiTimeLine /> Leave History
-              </p>
-              <div className="space-y-2.5">
+            <div className="space-y-2 pt-3 border-t border-border/30">
+              <p className="text-[9px] font-black text-content-tertiary uppercase tracking-widest">Recent History</p>
+              <div className="space-y-1.5">
                 {leaves.length === 0 ? (
-                  <p className="text-[10px] text-center py-4 text-content-tertiary font-bold uppercase">No history found</p>
+                  <p className="text-[9px] text-center py-2 text-content-tertiary font-bold italic">No requests yet.</p>
                 ) : (
-                  leaves.map((leave) => (
-                    <div key={leave._id} className="flex flex-col p-3 bg-surface-primary border border-border/40 hover:border-brand-teal/30 transition-colors group">
-                      <div className="flex items-center justify-between mb-1">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-1 h-8 rounded-full ${
-                            leave.status === 'approved' ? 'bg-state-success' : 
-                            leave.status === 'rejected' ? 'bg-state-danger' : 'bg-state-warning'
-                          }`} />
-                          <div>
-                            <p className="text-[11px] font-bold text-content-primary uppercase">{leave.type} Leave</p>
-                            <p className="text-[9px] text-content-tertiary flex items-center gap-1">
-                              {new Date(leave.fromDate).toLocaleDateString()} <RiArrowLeftLine className="rotate-180 scale-75" /> {new Date(leave.toDate).toLocaleDateString()}
-                            </p>
-                          </div>
+                  leaves.slice(0, 3).map((leave) => (
+                    <div key={leave._id} className="flex items-center justify-between p-2 bg-surface-primary/50 border border-border/30 rounded-xl">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-1 h-6 rounded-full ${
+                          leave.status === 'approved' ? 'bg-state-success' : 
+                          leave.status === 'rejected' ? 'bg-state-danger' : 'bg-state-warning'
+                        }`} />
+                        <div>
+                          <p className="text-[10px] font-bold text-content-primary uppercase leading-none">{leave.type}</p>
+                          <p className="text-[8px] text-content-tertiary mt-1">
+                            {new Date(leave.fromDate).toLocaleDateString()} - {new Date(leave.toDate).toLocaleDateString()}
+                          </p>
                         </div>
-                        <Badge 
-                          variant={leave.status === 'approved' ? 'success' : leave.status === 'rejected' ? 'danger' : 'warning'} 
-                          size="xs" 
-                          className="text-[8px] px-2 uppercase"
-                        >
-                          {leave.status}
-                        </Badge>
                       </div>
-                      {leave.hrRemarks && (
-                        <div className="mt-2 text-[8px] bg-surface-secondary p-1.5 rounded-xs border-l-2 border-brand-teal italic text-content-secondary">
-                          HR: {leave.hrRemarks}
-                        </div>
-                      )}
+                      <Badge 
+                        variant={leave.status === 'approved' ? 'success' : leave.status === 'rejected' ? 'danger' : 'warning'} 
+                        size="xs" 
+                        className="text-[7px] px-1.5 py-0 uppercase"
+                      >
+                        {leave.status}
+                      </Badge>
                     </div>
                   ))
                 )}
@@ -222,42 +203,36 @@ export default function HRSection() {
 
         {/* ISSUES TAB */}
         {activeTab === 'issues' && (
-          <div className="space-y-6">
-            <form onSubmit={handleSubmitIssue} className="space-y-4">
-              <Input label="Issue Title" placeholder="Subject of your concern..." icon={RiAlertLine} required />
+          <div className="space-y-4">
+            <form onSubmit={handleSubmitIssue} className="space-y-3">
+              <Input label="Title" placeholder="Issue title..." required className="h-9 text-xs" />
               <Combobox 
-                label="Priority Level" 
+                label="Priority" 
                 options={[
-                  { label: 'Low - General Inquiry', value: 'low' },
-                  { label: 'Medium - Follow up', value: 'medium' },
-                  { label: 'High - Immediate Attention', value: 'high' },
-                  { label: 'Urgent - Critical Issue', value: 'urgent' }
+                  { label: 'Low', value: 'low' },
+                  { label: 'Medium', value: 'medium' },
+                  { label: 'High', value: 'high' }
                 ]} 
                 value={priority}
                 onChange={setPriority}
-                placeholder="Select Priority..."
+                className="scale-95 origin-left"
               />
-              <Input label="Detailed Description" placeholder="Explain the issue in detail..." icon={RiMessage2Line} required />
-              <Button type="submit" variant="secondary" className="w-full h-12 border-brand-magenta/30 text-brand-magenta uppercase tracking-widest text-[11px] font-black hover:bg-brand-magenta/5" icon={RiSendPlane2Line}>
-                Submit to HR Desk
+              <Input label="Description" placeholder="Explain details..." required className="h-9 text-xs" />
+              <Button type="submit" variant="secondary" className="w-full h-10 border-brand-pink/20 text-brand-pink uppercase tracking-widest text-[10px] font-black rounded-xl" icon={RiSendPlane2Line}>
+                Log Issue
               </Button>
             </form>
 
-            <div className="space-y-4 pt-4 border-t border-border/30">
-              <p className="text-[9px] font-black text-content-tertiary uppercase tracking-widest flex items-center gap-2">
-                <RiCheckDoubleLine /> Logged Concerns
-              </p>
-              <div className="space-y-2.5">
+            <div className="space-y-2 pt-3 border-t border-border/30">
+              <p className="text-[9px] font-black text-content-tertiary uppercase tracking-widest">Logged Cases</p>
+              <div className="space-y-1.5">
                 {issues.map((issue) => (
-                  <div key={issue.id} className="flex items-center justify-between p-3 bg-surface-primary border border-border/40 hover:border-brand-magenta/20 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-1 h-8 rounded-full ${issue.priority === 'high' ? 'bg-state-danger' : 'bg-brand-teal'}`} />
-                      <div>
-                        <p className="text-[11px] font-bold text-content-primary">{issue.title}</p>
-                        <p className="text-[9px] text-content-tertiary uppercase tracking-tighter">{issue.date} • {issue.priority} Priority</p>
-                      </div>
+                  <div key={issue.id} className="flex items-center justify-between p-2 bg-surface-primary/50 border border-border/30 rounded-xl">
+                    <div className="flex items-center gap-2">
+                       <div className={`w-1.5 h-1.5 rounded-full ${issue.priority === 'high' ? 'bg-state-danger' : 'bg-brand-teal'}`} />
+                       <span className="text-[10px] font-bold text-content-primary">{issue.title}</span>
                     </div>
-                    <Badge variant={issue.status === 'resolved' ? 'success' : 'info'} size="xs" className="text-[8px] px-2">
+                    <Badge variant={issue.status === 'resolved' ? 'success' : 'info'} size="xs" className="text-[7px] px-1.5 py-0">
                       {issue.status}
                     </Badge>
                   </div>
@@ -269,35 +244,20 @@ export default function HRSection() {
 
         {/* OFFER LETTER TAB */}
         {activeTab === 'offer' && (
-          <div className="space-y-5 py-2">
-            <div className="relative group overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-tr from-brand-teal/10 via-transparent to-brand-magenta/5 rounded-sm" />
-              <div className="relative aspect-[1/1.4] w-full border border-border/60 bg-white/50 backdrop-blur-sm flex flex-col items-center justify-center p-8 text-center border-dashed">
-                <div className="w-16 h-16 rounded-full bg-brand-teal/10 flex items-center justify-center mb-6 ring-8 ring-brand-teal/5">
-                  <RiFileTextLine size={32} className="text-brand-teal" />
+          <div className="space-y-4 py-1">
+             <div className="aspect-[1.6/1] w-full border border-border bg-surface-primary rounded-2xl flex flex-col items-center justify-center p-4 text-center relative overflow-hidden group">
+                <div className="absolute inset-0 bg-brand-teal/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <RiFileTextLine size={24} className="text-brand-teal mb-2" />
+                <h5 className="text-[11px] font-black text-content-primary uppercase tracking-tight">Offer Letter 2024</h5>
+                <p className="text-[8px] text-content-tertiary font-bold uppercase mt-1 tracking-widest">Signed & Verified</p>
+                <div className="mt-4 flex gap-3 text-[8px] font-black text-content-tertiary uppercase">
+                   <span className="px-2 py-0.5 bg-white rounded-lg border border-border">ID: #882</span>
+                   <span className="px-2 py-0.5 bg-white rounded-lg border border-border">Sales Exec</span>
                 </div>
-                <h5 className="text-[13px] font-black text-content-primary uppercase tracking-widest">OFFER_LETTER_2024.pdf</h5>
-                <p className="text-[10px] text-content-tertiary mt-2 font-bold uppercase tracking-tighter">
-                  Verified Digital Document <br/>
-                  <span className="text-brand-teal opacity-60">Status: Active & Signed</span>
-                </p>
-                
-                <div className="mt-10 grid grid-cols-2 gap-6 w-full text-[9px] font-black text-left uppercase text-content-secondary">
-                    <div className="bg-surface-primary/50 p-2 border-l-2 border-brand-teal">
-                      <span className="text-[8px] text-content-tertiary block mb-1">Position</span>
-                      Field Sales Exec.
-                    </div>
-                    <div className="bg-surface-primary/50 p-2 border-l-2 border-brand-magenta">
-                      <span className="text-[8px] text-content-tertiary block mb-1">Employee ID</span>
-                      #OGN-SE-882
-                    </div>
-                </div>
-              </div>
-            </div>
-            
-            <Button variant="primary" className="w-full h-14 uppercase tracking-widest text-[11px] font-black shadow-xl shadow-brand-teal/10" icon={RiDownloadLine}>
-              Download Official Letter
-            </Button>
+             </div>
+             <Button variant="primary" className="w-full h-11 uppercase tracking-widest text-[10px] font-black rounded-xl shadow-lg shadow-brand-teal/10" icon={RiDownloadLine}>
+               Download PDF
+             </Button>
           </div>
         )}
       </Card>

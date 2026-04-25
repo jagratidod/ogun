@@ -1,6 +1,6 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { 
-  RiDashboardLine, RiUserAddLine, RiShoppingCartLine, 
+import {
+  RiDashboardLine, RiUserAddLine, RiShoppingCartLine,
   RiBarChartLine, RiCompass3Fill, RiUserLine, RiArrowLeftSLine, RiNotification3Fill, RiCustomerServiceLine
 } from 'react-icons/ri';
 import BottomNav from './BottomNav';
@@ -33,8 +33,8 @@ export default function SalesLayout() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               {!isBasePage && (
-                <button 
-                  onClick={() => navigate(-1)} 
+                <button
+                  onClick={() => navigate(-1)}
                   className="w-9 h-9 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 border border-white/30 text-content-primary transition-all active:scale-90"
                   title="Go Back"
                 >
@@ -60,7 +60,7 @@ export default function SalesLayout() {
               <div className="hidden xs:flex flex-col text-right mr-2">
                 <p className="text-[10px] font-black text-content-primary leading-none">{user?.name}</p>
                 <p className="text-[7px] text-brand-teal font-bold uppercase tracking-widest mt-1 opacity-70">
-                   {user?.salesExecutiveData?.assignedArea || 'Field Force'}
+                  {user?.salesExecutiveData?.assignedArea || 'Field Force'}
                 </p>
               </div>
               <button className="relative w-9 h-9 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 border border-white/30 text-content-tertiary transition-all">
@@ -76,7 +76,7 @@ export default function SalesLayout() {
         <main className="flex-1 overflow-y-auto pb-24">
           <Outlet />
         </main>
-        
+
         <BottomNav items={bottomNavItems} />
       </div>
     </SidebarProvider>

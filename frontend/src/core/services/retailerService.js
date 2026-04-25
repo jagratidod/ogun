@@ -13,6 +13,11 @@ const retailerService = {
     return response.data;
   },
 
+  updateInventoryItem: async (id, data) => {
+    const response = await api.patch(`/retailer/inventory/${id}`, data);
+    return response.data;
+  },
+
   // Shipments
   getShipments: async () => {
     const response = await api.get('/retailer/shipments');

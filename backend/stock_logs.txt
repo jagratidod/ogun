@@ -44,3 +44,13 @@
 [2026-04-25T11:18:49.999Z] - Searching for Product: 69e89d291b7bd2954d8fd713 under User: 69e615c9e97145424e9ac2d3
 [2026-04-25T11:18:50.058Z] - SUCCESS: 8 units. 2212 -> 2204
 [2026-04-25T11:18:50.060Z] END: Logic finished for ORD-ADD6EB89
+[2026-04-25T11:41:25.348Z] START: Order RET-UVWWFB1C, Status: Completed, Deducted: false
+[2026-04-25T11:41:25.355Z] Triggering deduction... Items: 1
+[2026-04-25T11:41:25.358Z] - Searching for Product: 69e76c0bf85601f793e04946 under User: 69e716bf365988f5075f5e01
+[2026-04-25T11:41:25.463Z] - SUCCESS: 1 units. 79 -> 78
+[2026-04-25T11:41:25.467Z] END: Logic finished for RET-UVWWFB1C
+[2026-04-25T11:55:33.584Z] START: Order RET-5GFUYDD7, Status: Completed, Deducted: false
+[2026-04-25T11:55:33.589Z] Triggering deduction... Items: 1
+[2026-04-25T11:55:33.590Z] - Searching for Product: 69e76c0bf85601f793e04946 under User: 69e716bf365988f5075f5e01
+[2026-04-25T11:55:33.656Z] - SUCCESS: 1 units. 78 -> 77
+[2026-04-25T11:55:33.658Z] END: Logic finished for RET-5GFUYDD7

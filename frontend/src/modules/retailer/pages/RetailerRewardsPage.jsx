@@ -78,6 +78,10 @@ export default function RetailerRewardsPage() {
                     <span className="font-bold text-brand-teal">+{data?.earningRules?.perProductSale || 0} Pts</span>
                  </div>
                  <div className="flex justify-between text-xs">
+                    <span className="text-content-secondary">Per Order Placed:</span>
+                    <span className="font-bold text-brand-teal">+{data?.earningRules?.perOrderPlaced || 0} Pts</span>
+                 </div>
+                 <div className="flex justify-between text-xs">
                     <span className="text-content-secondary">Monthly Bonus:</span>
                     <span className="font-bold text-brand-teal">+{data?.earningRules?.monthlyTargetBonus || 0} Pts</span>
                  </div>

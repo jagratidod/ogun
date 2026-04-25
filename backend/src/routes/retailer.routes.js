@@ -20,10 +20,8 @@ router.get('/', (req, res) => {
 router.use(protect);
 
 // Own Inventory
-router.get('/inventory', restrictTo('retailer'), catchAsync(async (req, res) => {
-    const inventory = await Inventory.find({ user: req.user._id }).populate('product');
-    return ApiResponse.success(res, inventory, 'Inventory fetched');
-}));
+router.get('/inventory', restrictTo('retailer'), retailerController.getMyInventory);
+router.patch('/inventory/:id', restrictTo('retailer'), retailerController.updateInventoryItem);
 
 // Sales (POS)
 router.post('/sales', restrictTo('retailer'), retailerSalesController.createSale);

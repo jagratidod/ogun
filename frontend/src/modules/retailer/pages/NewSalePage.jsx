@@ -32,7 +32,7 @@ export default function NewSalePage() {
           id: i.product?._id,
           name: i.product?.name,
           sku: i.product?.sku,
-          price: i.product?.retailerPrice,
+          price: i.sellingPrice || i.product?.retailerPrice || 0,
           stock: i.quantity,
           category: i.product?.category || 'General',
           image: i.product?.images?.[0]?.url || 'https://via.placeholder.com/150'
