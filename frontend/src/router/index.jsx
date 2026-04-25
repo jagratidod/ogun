@@ -1,14 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthContext } from '../core/context/AuthContext';
 import ProtectedRoute from './ProtectedRoute';
+import { SUB_ROLES } from '../core/utils/constants';
 
 // Layouts
-import AdminLayout from '../core/components/layout/AdminLayout';
-import DistributorLayout from '../core/components/layout/DistributorLayout';
-import RetailerLayout from '../core/components/layout/RetailerLayout';
-import CustomerLayout from '../core/components/layout/CustomerLayout';
-
-// Auth
 import LaunchpadPage from '../modules/auth/pages/LaunchpadPage';
 import AdminLoginPage from '../modules/auth/pages/AdminLoginPage';
 import AdminSignUpPage from '../modules/auth/pages/AdminSignUpPage';
@@ -21,7 +16,17 @@ import CustomerLoginPage from '../modules/customer/pages/CustomerLoginPage';
 import CustomerRegisterPage from '../modules/customer/pages/CustomerRegisterPage';
 import CustomerForgotPasswordPage from '../modules/customer/pages/CustomerForgotPasswordPage';
 import SalesLoginPage from '../modules/auth/pages/SalesLoginPage';
+import HRLoginPage from '../modules/auth/pages/HRLoginPage';
+import ServiceLoginPage from '../modules/auth/pages/ServiceLoginPage';
 import UnauthorizedPage from '../modules/auth/pages/UnauthorizedPage';
+
+// Layouts
+import AdminLayout from '../core/components/layout/AdminLayout';
+import HRLayout from '../core/components/layout/HRLayout';
+import ServiceLayout from '../core/components/layout/ServiceLayout';
+import DistributorLayout from '../core/components/layout/DistributorLayout';
+import RetailerLayout from '../core/components/layout/RetailerLayout';
+import CustomerLayout from '../core/components/layout/CustomerLayout';
 
 // Stub for unbuilt modules
 import StubPage from '../modules/shared/StubPage';
@@ -57,7 +62,7 @@ import {
 
 import {
   SalesDashboardPage, RetailerListPage as SalesRetailerListPage, AddRetailerPage,
-  SalesTerminalPage, SalesProfilePage
+  SalesTerminalPage, SalesProfilePage, SalesSocialPage
 } from '../modules/sales';
 
 import SalesLayout from '../core/components/layout/SalesLayout';
@@ -70,6 +75,9 @@ import MyServiceRequestsPage from '../modules/customer/pages/MyServiceRequestsPa
 import ServiceRequestDetailPage from '../modules/customer/pages/ServiceRequestDetailPage';
 import CustomerSettingsPage from '../modules/customer/pages/CustomerSettingsPage';
 import CustomerSocialPage from '../modules/customer/pages/CustomerSocialPage';
+
+import { HRDashboardPage, HREmployeesPage, HRLeavesPage } from '../modules/hr';
+import { ServiceDashboardPage } from '../modules/service-center';
 
 import SplashPage from '../modules/shared/SplashPage';
 
@@ -169,7 +177,10 @@ function RootRedirect() {
   
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   switch (user?.role) {
-    case 'admin': return <Navigate to="/admin" replace />;
+    case 'admin': 
+      if (user?.subRole === SUB_ROLES.HR_MANAGER) return <Navigate to="/hr" replace />;
+      if (user?.subRole === SUB_ROLES.SERVICE_MANAGER) return <Navigate to="/service-center" replace />;
+      return <Navigate to="/admin" replace />;
     case 'distributor': return <Navigate to="/distributor" replace />;
     case 'retailer': return <Navigate to="/retailer" replace />;
     case 'sales_executive': return <Navigate to="/sales" replace />;
@@ -200,6 +211,8 @@ export default function AppRouter() {
         <Route path="/retailer/signup" element={<RetailerSignUpPage />} />
 
         <Route path="/sales/login" element={<SalesLoginPage />} />
+        <Route path="/hr/login" element={<HRLoginPage />} />
+        <Route path="/service/login" element={<ServiceLoginPage />} />
 
         <Route path="/customer/login" element={<CustomerLoginPage />} />
         <Route path="/customer/register" element={<CustomerRegisterPage />} />
@@ -308,6 +321,36 @@ export default function AppRouter() {
           <Route path="settings" element={<RetailSettings />} />
         </Route>
 
+        {/* ═══ HR PANEL ROUTES ═══ */}
+        <Route path="/hr" element={
+          <ProtectedRoute allowedRoles={['admin']} allowedSubRoles={[SUB_ROLES.HR_MANAGER]}>
+            <HRLayout />
+          </ProtectedRoute>
+        }>
+          <Route index element={<HRDashboardPage />} />
+          <Route path="employees" element={<HREmployeesPage />} />
+          <Route path="leaves" element={<HRLeavesPage />} />
+          <Route path="payroll" element={<PayrollDashboard />} />
+          <Route path="offer-letters" element={<OfferLetters />} />
+          <Route path="departments" element={<Departments />} />
+          <Route path="grievances" element={<StubPage title="HR Grievances" />} />
+          <Route path="settings" element={<AdminSettingsPage />} />
+        </Route>
+
+        {/* ═══ SERVICE CENTER ROUTES ═══ */}
+        <Route path="/service-center" element={
+          <ProtectedRoute allowedRoles={['admin']} allowedSubRoles={[SUB_ROLES.SERVICE_MANAGER]}>
+            <ServiceLayout />
+          </ProtectedRoute>
+        }>
+          <Route index element={<ServiceDashboardPage />} />
+          <Route path="tickets" element={<ServiceRequestsPage />} />
+          <Route path="tickets/:id" element={<ServiceDetailPage />} />
+          <Route path="technicians" element={<Employees />} /> {/* Filtered by dept in UI or new page later */}
+          <Route path="analytics" element={<ServiceAnalyticsPage />} />
+          <Route path="settings" element={<AdminSettingsPage />} />
+        </Route>
+
         {/* ═══ SALES EXECUTIVE ROUTES ═══ */}
         <Route path="/sales" element={
           <ProtectedRoute allowedRoles={['sales_executive']}>
@@ -315,6 +358,7 @@ export default function AppRouter() {
           </ProtectedRoute>
         }>
           <Route index element={<SalesDashboardPage />} />
+          <Route path="social" element={<SalesSocialPage />} />
           <Route path="retailers" element={<SalesRetailerListPage />} />
           <Route path="retailers/add" element={<AddRetailerPage />} />
           <Route path="terminal" element={<SalesTerminalPage />} />

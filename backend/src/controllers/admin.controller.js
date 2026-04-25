@@ -258,3 +258,37 @@ exports.updateRetailerStatus = async (req, res, next) => {
         next(error);
     }
 };
+// @desc    Get all customers with order stats
+// @route   GET /api/v1/admin/customers
+exports.getCustomers = async (req, res, next) => {
+    try {
+        const customers = await User.find({ role: 'customer' }).select('-password').sort({ createdAt: -1 });
+        
+        const ProductOrder = require('../models/productOrder.model');
+        
+        const mapped = await Promise.all(customers.map(async (u) => {
+            const orderCount = await ProductOrder.countDocuments({ buyer: u._id });
+            const totalSpent = await ProductOrder.aggregate([
+                { $match: { buyer: u._id, status: 'Completed' } },
+                { $group: { _id: null, total: { $sum: '$totalAmount' } } }
+            ]);
+
+            return {
+                id: u._id,
+                name: u.name,
+                email: u.email,
+                location: u.location || 'Not Set',
+                orders: orderCount,
+                totalSpent: totalSpent[0]?.total || 0,
+                loyalty: orderCount > 5 ? 'Platinum' : orderCount > 2 ? 'Gold' : 'Silver',
+                status: u.isActive ? 'active' : 'inactive',
+                createdAt: u.createdAt,
+                lastLogin: u.lastLogin
+            };
+        }));
+
+        return ApiResponse.success(res, mapped, 'Customers fetched successfully');
+    } catch (error) {
+        next(error);
+    }
+};

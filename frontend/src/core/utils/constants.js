@@ -10,6 +10,7 @@ export const SUB_ROLES = {
   HR_MANAGER: 'hr_manager',
   SALES_MANAGER: 'sales_manager',
   ACCOUNTS_MANAGER: 'accounts_manager',
+  SERVICE_MANAGER: 'service_manager',
 };
 
 export const ROLE_PERMISSIONS = {

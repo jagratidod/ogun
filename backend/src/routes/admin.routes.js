@@ -23,6 +23,7 @@ router.get('/distributors', checkPermission('distributors'), adminController.get
 router.put('/distributors/:id/status', checkPermission('distributors'), adminController.updateDistributorStatus);
 router.get('/retailers', checkPermission('retailers'), adminController.getRetailers);
 router.put('/retailers/:id/status', checkPermission('retailers'), adminController.updateRetailerStatus);
+router.get('/customers', adminController.getCustomers);
 
 // Reward Config
 const rewardConfigController = require('../controllers/admin.rewardConfig.controller');

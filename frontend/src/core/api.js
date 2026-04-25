@@ -17,6 +17,8 @@ const getRoleKey = (role) => ROLE_KEY_MAP[role] || role;
 // even when multiple roles are logged in simultaneously
 const PATH_ROLE_MAP = {
   '/admin': 'admin',
+  '/hr': 'admin',
+  '/service-center': 'admin',
   '/distributor': 'distributor',
   '/retailer': 'retailer',
   '/sales': 'sales_executive',

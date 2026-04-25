@@ -2,7 +2,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuthContext } from '../core/context/AuthContext';
 import { SUB_ROLES } from '../core/utils/constants';
 
-export default function ProtectedRoute({ children, allowedRoles }) {
+export default function ProtectedRoute({ children, allowedRoles, allowedSubRoles }) {
   const { isAuthenticated, user, loading } = useAuthContext();
   const location = useLocation();
 
@@ -18,6 +18,8 @@ export default function ProtectedRoute({ children, allowedRoles }) {
     // Determine where to redirect based on the intended destination
     const path = location.pathname;
     if (path.startsWith('/admin')) return <Navigate to="/admin/login" replace />;
+    if (path.startsWith('/hr')) return <Navigate to="/hr/login" replace />;
+    if (path.startsWith('/service-center')) return <Navigate to="/service/login" replace />;
     if (path.startsWith('/distributor')) return <Navigate to="/distributor/login" replace />;
     if (path.startsWith('/retailer')) return <Navigate to="/retailer/login" replace />;
     if (path.startsWith('/sales')) return <Navigate to="/sales/login" replace />;
@@ -30,9 +32,18 @@ export default function ProtectedRoute({ children, allowedRoles }) {
     return <Navigate to="/unauthorized" replace />;
   }
 
-  // Sub-role permission checking (for Admins)
-  if (user?.role === 'admin' && user?.subRole !== SUB_ROLES.SUPER_ADMIN) {
+  // Sub-role checking (Standalone Panels)
+  if (allowedSubRoles && !allowedSubRoles.includes(user?.subRole)) {
+    // Super admin is always allowed
+    if (user?.subRole !== SUB_ROLES.SUPER_ADMIN) {
+      return <Navigate to="/unauthorized" replace />;
+    }
+  }
+
+  // Sub-role permission checking (for main Admin panel sections)
+  if (user?.role === 'admin' && user?.subRole !== SUB_ROLES.SUPER_ADMIN && location.pathname.startsWith('/admin')) {
     const path = location.pathname;
+// ...
     const permissions = user?.permissions || [];
     
     // Define route section mapping

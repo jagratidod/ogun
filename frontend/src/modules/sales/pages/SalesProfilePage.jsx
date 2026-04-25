@@ -2,6 +2,7 @@ import { RiArrowLeftLine, RiLogoutCircleLine, RiUserLine, RiMapPinLine, RiPhoneL
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../../core/context/AuthContext';
 import { Card, Button, Badge } from '../../../core';
+import HRSection from './HRSection';
 
 export default function SalesProfilePage() {
   const { user, logout } = useAuthContext();
@@ -45,6 +46,9 @@ export default function SalesProfilePage() {
               </div>
            </div>
         </Card>
+
+        {/* HR Section */}
+        <HRSection />
 
         <Card className="p-4 space-y-4">
            <div className="flex items-center justify-between">

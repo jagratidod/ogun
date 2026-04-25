@@ -13,4 +13,8 @@ router.get('/retailers', salesExecutiveController.getMyRetailers);
 router.post('/orders', salesExecutiveController.placeOrder);
 router.get('/products', productController.getAllProducts); // Catalog for terminal
 
+// Leave Management
+router.post('/leaves', salesExecutiveController.applyLeave);
+router.get('/leaves', salesExecutiveController.getMyLeaves);
+
 module.exports = router;

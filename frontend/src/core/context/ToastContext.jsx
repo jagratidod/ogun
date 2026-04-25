@@ -6,11 +6,20 @@ const ToastContext = createContext(null);
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
 
-  const showNotification = useCallback((type, message) => {
+  const showNotification = useCallback((typeOrObj, message) => {
     const id = Date.now();
-    setToasts((prev) => [...prev, { id, type, message }]);
+    let type = typeOrObj;
+    let msg = message;
+
+    // Handle object-style: showNotification({ type, message })
+    if (typeof typeOrObj === 'object' && typeOrObj !== null) {
+      type = typeOrObj.type;
+      msg = typeOrObj.message;
+    }
+
+    setToasts((prev) => [...prev, { id, type: type || 'info', message: msg }]);
     
-    // Auto-remove after 3 seconds
+    // Auto-remove after 5 seconds
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
     }, 5000);

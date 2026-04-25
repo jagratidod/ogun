@@ -88,17 +88,19 @@ exports.requestOTP = async (req, res, next) => {
         const user = await User.findOne({ email: normalizedEmail });
 
         const autoCreateRoles = ['customer', 'sales_executive'];
-        if (!autoCreateRoles.includes(role) && !user) {
-            return ApiResponse.error(res, "This email is not registered for business access. Please contact Admin.", 403);
+        const isAutoCreateRole = autoCreateRoles.includes(role);
+
+        if (!isAutoCreateRole && !user) {
+            return ApiResponse.error(res, `The email ${normalizedEmail} is not registered as ${role.toUpperCase()}. Please contact Admin for access.`, 403);
         }
 
         if (user && user.role !== role) {
-            return ApiResponse.error(res, `Unauthorized: This email is registered as ${user.role.toUpperCase()}, not ${role.toUpperCase()}`, 403);
+            return ApiResponse.error(res, `Identity Mismatch: This email is registered as ${user.role.toUpperCase()}, but you are trying to access the ${role.toUpperCase()} portal.`, 403);
         }
 
-        // Block inactive partner/staff accounts early (avoid issuing tokens that will fail later)
-        if (user && role !== 'customer' && !user.isActive) {
-            return ApiResponse.error(res, "Account pending approval or currently disabled. Please contact Admin.", 403);
+        // Block inactive accounts early
+        if (user && !user.isActive) {
+            return ApiResponse.error(res, "Your account is currently disabled. Please contact System Administrator.", 403);
         }
 
         // Dev-mode: skip email delivery and persist a fixed OTP code.

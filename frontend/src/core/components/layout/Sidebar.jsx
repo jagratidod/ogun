@@ -9,10 +9,29 @@ import {
   RiMoneyDollarCircleLine, RiTeamLine, RiWalletLine, RiCalendarCheckLine,
   RiTrophyLine, RiTruckLine, RiStore2Line, RiUserLine,
   RiCustomerServiceLine, RiBarChartBoxLine, RiSettings3Line,
-  RiImage2Line,
+  RiImage2Line, RiStackLine, RiAlertLine, RiMailSendLine,
   RiArrowLeftSLine, RiArrowRightSLine, RiArrowDownSLine,
   RiMenuLine, RiCloseLine
 } from 'react-icons/ri';
+
+const hrNav = [
+  { label: 'Dashboard', icon: RiDashboardLine, path: '/hr' },
+  { label: 'Employees', icon: RiTeamLine, path: '/hr/employees' },
+  { label: 'Leave Requests', icon: RiCalendarCheckLine, path: '/hr/leaves' },
+  { label: 'Payroll', icon: RiWalletLine, path: '/hr/payroll' },
+  { label: 'Offer Letters', icon: RiMailSendLine, path: '/hr/offer-letters' },
+  { label: 'Departments', icon: RiStackLine, path: '/hr/departments' },
+  { label: 'Grievances', icon: RiAlertLine, path: '/hr/grievances' },
+  { label: 'Settings', icon: RiSettings3Line, path: '/hr/settings' },
+];
+
+const serviceNav = [
+  { label: 'Dashboard', icon: RiDashboardLine, path: '/service-center' },
+  { label: 'Service Tickets', icon: RiCustomerServiceLine, path: '/service-center/tickets' },
+  { label: 'Technicians', icon: RiTeamLine, path: '/service-center/technicians' },
+  { label: 'Analytics', icon: RiBarChartBoxLine, path: '/service-center/analytics' },
+  { label: 'Settings', icon: RiSettings3Line, path: '/service-center/settings' },
+];
 
 const adminNav = [
   { label: 'Dashboard', icon: RiDashboardLine, path: '/admin' },
@@ -118,6 +137,8 @@ const distributorNav = [
 export function getNavItems(role, subRole, permissions) {
   if (role === 'admin') {
     if (subRole === SUB_ROLES.SUPER_ADMIN) return adminNav;
+    if (subRole === SUB_ROLES.HR_MANAGER) return hrNav;
+    if (subRole === SUB_ROLES.SERVICE_MANAGER) return serviceNav;
     return adminNav.filter(item => {
       // If no permission is required (e.g., Dashboard, Settings), show it
       if (!item.permission) return true;

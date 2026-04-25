@@ -54,6 +54,26 @@ const LaunchpadPage = () => {
       accent: 'text-white'
     },
     {
+      id: 'hr',
+      title: 'Human Resources',
+      role: 'HR Manager',
+      description: 'Employee Lifecycle & Payroll',
+      icon: RiUserHeartFill,
+      path: '/hr/login',
+      theme: 'from-brand-teal to-[#2D8F9C]',
+      accent: 'text-white'
+    },
+    {
+      id: 'service',
+      title: 'Support',
+      role: 'Service Manager',
+      description: 'Field Service & Ticket Ops',
+      icon: RiSettings4Fill,
+      path: '/service/login',
+      theme: 'from-brand-teal to-brand-teal-dark',
+      accent: 'text-white'
+    },
+    {
       id: 'customer',
       title: 'Experience',
       role: 'Customer',

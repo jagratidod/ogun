@@ -2,6 +2,7 @@ const User = require('../models/user.model');
 const ProductOrder = require('../models/productOrder.model');
 const Product = require('../models/product.model');
 const RewardConfig = require('../models/rewardConfig.model');
+const Leave = require('../models/leave.model'); // Added Leave model
 const ApiResponse = require('../utils/apiResponse');
 const catchAsync = require('../utils/catchAsync');
 const { v4: uuidv4 } = require('uuid');
@@ -155,4 +156,38 @@ exports.placeOrder = catchAsync(async (req, res) => {
     }
 
     return ApiResponse.success(res, order, 'Order placed successfully', 201);
+});
+
+// Leave Management for Sales Executive
+
+/**
+ * @desc    Apply for leave
+ * @route   POST /api/v1/sales-executive/leaves
+ */
+exports.applyLeave = catchAsync(async (req, res) => {
+    const { type, fromDate, toDate, reason } = req.body;
+
+    if (!type || !fromDate || !toDate || !reason) {
+        return ApiResponse.error(res, "All fields are required", 400);
+    }
+
+    const leave = await Leave.create({
+        employee: req.user._id,
+        type,
+        fromDate,
+        toDate,
+        reason,
+        status: 'pending'
+    });
+
+    return ApiResponse.success(res, leave, 'Leave request submitted successfully', 201);
+});
+
+/**
+ * @desc    Get my leave history
+ * @route   GET /api/v1/sales-executive/leaves
+ */
+exports.getMyLeaves = catchAsync(async (req, res) => {
+    const leaves = await Leave.find({ employee: req.user._id }).sort({ createdAt: -1 });
+    return ApiResponse.success(res, leaves, 'Leave history fetched');
 });
