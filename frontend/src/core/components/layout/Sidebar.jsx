@@ -9,7 +9,7 @@ import {
   RiMoneyDollarCircleLine, RiTeamLine, RiWalletLine, RiCalendarCheckLine,
   RiTrophyLine, RiTruckLine, RiStore2Line, RiUserLine,
   RiCustomerServiceLine, RiBarChartBoxLine, RiSettings3Line,
-  RiImage2Line, RiStackLine, RiAlertLine, RiMailSendLine,
+  RiImage2Line, RiStackLine, RiAlertLine, RiMailSendLine, RiToolsLine,
   RiArrowLeftSLine, RiArrowRightSLine, RiArrowDownSLine,
   RiMenuLine, RiCloseLine
 } from 'react-icons/ri';
@@ -27,11 +27,11 @@ const hrNav = [
 ];
 
 const serviceNav = [
-  { label: 'Dashboard', icon: RiDashboardLine, path: '/service-center' },
-  { label: 'Service Tickets', icon: RiCustomerServiceLine, path: '/service-center/tickets' },
-  { label: 'Technicians', icon: RiTeamLine, path: '/service-center/technicians' },
-  { label: 'Analytics', icon: RiBarChartBoxLine, path: '/service-center/analytics' },
-  { label: 'Settings', icon: RiSettings3Line, path: '/service-center/settings' },
+  { label: 'Dashboard', icon: RiDashboardLine, path: '/technician' },
+  { label: 'Service Tickets', icon: RiCustomerServiceLine, path: '/technician/tickets' },
+  { label: 'Technicians', icon: RiTeamLine, path: '/technician/technicians' },
+  { label: 'Analytics', icon: RiBarChartBoxLine, path: '/technician/analytics' },
+  { label: 'Settings', icon: RiSettings3Line, path: '/technician/settings' },
 ];
 
 const adminNav = [
@@ -96,6 +96,7 @@ const adminNav = [
   { label: 'Retailers', icon: RiStore2Line, path: '/admin/retailers', permission: 'retailers' },
   { label: 'Sales Representatives', icon: RiUserLine, path: '/admin/sales-reps', permission: 'sales_reps' },
   { label: 'Customers', icon: RiUserLine, path: '/admin/customers', permission: 'customers' },
+  { label: 'Technicians', icon: RiToolsLine, path: '/admin/technicians', permission: 'service' },
   {
     label: 'Service', icon: RiCustomerServiceLine, permission: 'service', children: [
       { label: 'Requests', path: '/admin/service' },
@@ -228,6 +229,8 @@ export default function Sidebar({ role = 'admin' }) {
   } else if (location.pathname.startsWith('/distributor')) {
     navItems = distributorNav;
   } else if (location.pathname.startsWith('/service-center')) {
+    navItems = serviceNav;
+  } else if (location.pathname.startsWith('/technician')) {
     navItems = serviceNav;
   } else if (location.pathname.startsWith('/retailer')) {
     navItems = retailerNav || [];

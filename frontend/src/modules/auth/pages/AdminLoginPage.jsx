@@ -56,7 +56,7 @@ export default function AdminLoginPage() {
         if (userData?.subRole === 'hr_manager') {
            navigate('/hr');
         } else if (userData?.subRole === 'service_manager') {
-           navigate('/service-center');
+           navigate('/technician');
         } else {
            navigate('/admin');
         }

@@ -34,3 +34,4 @@ export { default as TargetConfigPage } from './pages/TargetConfigPage';
 export { default as UsersPage } from './pages/UsersPage';
 export { default as SalesRepsPage } from './pages/SalesRepsPage';
 export { default as SocialGridManagerPage } from './pages/SocialGridManagerPage';
+export { default as TechniciansPage } from './pages/TechniciansPage';

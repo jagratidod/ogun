@@ -18,6 +18,7 @@ import CustomerForgotPasswordPage from '../modules/customer/pages/CustomerForgot
 import SalesLoginPage from '../modules/auth/pages/SalesLoginPage';
 import HRLoginPage from '../modules/auth/pages/HRLoginPage';
 import ServiceLoginPage from '../modules/auth/pages/ServiceLoginPage';
+import TechnicianSignupPage from '../modules/auth/pages/TechnicianSignupPage';
 import UnauthorizedPage from '../modules/auth/pages/UnauthorizedPage';
 
 // Layouts
@@ -41,7 +42,7 @@ import {
   PointsHistoryPage, ServiceRequestsPage, ServiceDetailPage,
   ServiceAnalyticsPage, DistributorListPage, RetailerListPage,
   CustomerListPage, ReportsPage, AdminSettingsPage, PayslipsPage, DeductionsPage, OfferLettersPage, SocialGridManagerPage,
-  AdminProductQueriesPage, SalesRepsPage
+  AdminProductQueriesPage, SalesRepsPage, TechniciansPage
 } from '../modules/admin';
 
 import {
@@ -127,6 +128,7 @@ const AdminSettings = () => <AdminSettingsPage />;
 const SocialGridManager = () => <SocialGridManagerPage />;
 const AdminProductQueries = () => <AdminProductQueriesPage />;
 const SalesReps = () => <SalesRepsPage />;
+const Technicians = () => <TechniciansPage />;
 
 // ─── Distributor real pages ───────────────────────────
 const DistDashboard = () => <DistributorDashboardPage />;
@@ -179,7 +181,7 @@ function RootRedirect() {
   switch (user?.role) {
     case 'admin': 
       if (user?.subRole === SUB_ROLES.HR_MANAGER) return <Navigate to="/hr" replace />;
-      if (user?.subRole === SUB_ROLES.SERVICE_MANAGER) return <Navigate to="/service-center" replace />;
+      if (user?.subRole === SUB_ROLES.SERVICE_MANAGER) return <Navigate to="/technician" replace />;
       return <Navigate to="/admin" replace />;
     case 'distributor': return <Navigate to="/distributor" replace />;
     case 'retailer': return <Navigate to="/retailer" replace />;
@@ -212,7 +214,8 @@ export default function AppRouter() {
 
         <Route path="/sales/login" element={<SalesLoginPage />} />
         <Route path="/hr/login" element={<HRLoginPage />} />
-        <Route path="/service/login" element={<ServiceLoginPage />} />
+        <Route path="/technician/login" element={<ServiceLoginPage />} />
+        <Route path="/technician/signup" element={<TechnicianSignupPage />} />
 
         <Route path="/customer/login" element={<CustomerLoginPage />} />
         <Route path="/customer/register" element={<CustomerRegisterPage />} />
@@ -268,6 +271,7 @@ export default function AppRouter() {
           <Route path="service" element={<ServiceRequests />} />
           <Route path="service/:id" element={<ServiceDetail />} />
           <Route path="service/analytics" element={<ServiceAnalytics />} />
+          <Route path="technicians" element={<Technicians />} />
           <Route path="content/social-grid" element={<SocialGridManager />} />
           <Route path="reports" element={<Reports />} />
           <Route path="settings" element={<AdminSettings />} />
@@ -336,8 +340,8 @@ export default function AppRouter() {
           <Route path="settings" element={<AdminSettingsPage />} />
         </Route>
 
-        {/* ═══ SERVICE CENTER ROUTES ═══ */}
-        <Route path="/service-center" element={
+        {/* ═══ TECHNICIAN / SERVICE CENTER ROUTES ═══ */}
+        <Route path="/technician" element={
           <ProtectedRoute allowedRoles={['admin']} allowedSubRoles={[SUB_ROLES.SERVICE_MANAGER]}>
             <ServiceLayout />
           </ProtectedRoute>
@@ -345,10 +349,14 @@ export default function AppRouter() {
           <Route index element={<ServiceDashboardPage />} />
           <Route path="tickets" element={<ServiceRequestsPage />} />
           <Route path="tickets/:id" element={<ServiceDetailPage />} />
-          <Route path="technicians" element={<Employees />} /> {/* Filtered by dept in UI or new page later */}
+          <Route path="technicians" element={<Employees />} />
           <Route path="analytics" element={<ServiceAnalyticsPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
         </Route>
+
+        {/* Redirect old /service-center URLs */}
+        <Route path="/service-center" element={<Navigate to="/technician" replace />} />
+        <Route path="/service-center/*" element={<Navigate to="/technician" replace />} />
 
         {/* ═══ SALES EXECUTIVE ROUTES ═══ */}
         <Route path="/sales" element={

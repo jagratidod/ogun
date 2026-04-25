@@ -33,6 +33,20 @@ const userSchema = new mongoose.Schema({
         default: null,
         trim: true
     },
+    phone: {
+        type: String,
+        default: null,
+        trim: true
+    },
+    approvalStatus: {
+        type: String,
+        enum: ['pending', 'approved', 'rejected'],
+        default: 'approved'
+    },
+    approvalNote: {
+        type: String,
+        default: null
+    },
     role: {
         type: String,
         enum: ['admin', 'distributor', 'retailer', 'customer', 'sales_executive'],

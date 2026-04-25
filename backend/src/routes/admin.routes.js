@@ -88,5 +88,14 @@ router.patch('/service-requests/:id/status', checkPermission('service'), adminSe
 router.get('/registered-products', checkPermission('service'), adminServiceController.getAllRegisteredProducts);
 router.get('/service/analytics', checkPermission('service'), adminServiceController.getServiceAnalytics);
 
+// Technician Management
+const technicianController = require('../controllers/admin.technician.controller');
+router.get('/technicians', checkPermission('service'), technicianController.getTechnicians);
+router.post('/technicians', checkPermission('service'), technicianController.createTechnician);
+router.get('/technicians/:id', checkPermission('service'), technicianController.getTechnicianDetail);
+router.put('/technicians/:id', checkPermission('service'), technicianController.updateTechnician);
+router.patch('/technicians/:id/approval', checkPermission('service'), technicianController.updateApprovalStatus);
+router.delete('/technicians/:id', checkPermission('service'), technicianController.deleteTechnician);
+
 module.exports = router;
 
