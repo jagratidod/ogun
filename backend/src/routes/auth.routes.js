@@ -7,6 +7,8 @@ router.post('/register', authController.register);
 router.post('/request-otp', authController.requestOTP);
 router.post('/verify-otp', authController.verifyOTP);
 router.post('/admin/login', authController.adminLogin);
+router.post('/technician/register', authController.registerTechnician);
+router.post('/technician/login', authController.technicianLogin);
 router.post('/refresh', authController.refreshToken);
 router.post('/logout', authController.logout);
 router.get('/distributors', authController.getDistributors);

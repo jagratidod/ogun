@@ -392,3 +392,101 @@ exports.logout = async (req, res, next) => {
         next(error);
     }
 };
+
+// @desc    Technician Self-Registration
+// @route   POST /api/v1/auth/technician/register
+exports.registerTechnician = async (req, res, next) => {
+    try {
+        const { name, email, password, phone, location } = req.body;
+        const normalizedEmail = String(email || '').trim().toLowerCase();
+
+        if (!name || !normalizedEmail || !password) {
+            return ApiResponse.error(res, 'Name, email and password are required', 400);
+        }
+
+        const existing = await User.findOne({ email: normalizedEmail });
+        if (existing) {
+            return ApiResponse.error(res, 'An account with this email already exists', 400);
+        }
+
+        const technician = await User.create({
+            name,
+            email: normalizedEmail,
+            password,
+            phone: phone || null,
+            location: location || null,
+            role: 'admin',
+            subRole: 'technician',
+            isActive: false,
+            approvalStatus: 'pending'
+        });
+
+        return ApiResponse.success(res, {
+            id: technician._id,
+            name: technician.name,
+            email: technician.email,
+            approvalStatus: technician.approvalStatus
+        }, 'Registration submitted. Your account will be activated after admin approval.', 201);
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Technician Login (Password Based)
+// @route   POST /api/v1/auth/technician/login
+exports.technicianLogin = async (req, res, next) => {
+    try {
+        const { email, password } = req.body;
+        const normalizedEmail = String(email || '').trim().toLowerCase();
+
+        if (!normalizedEmail || !password) {
+            return ApiResponse.error(res, 'Email and password are required', 400);
+        }
+
+        const user = await User.findOne({ email: normalizedEmail, subRole: 'technician' }).select('+password');
+
+        if (!user) {
+            return ApiResponse.error(res, 'No technician account found with this email', 401);
+        }
+
+        const isMatch = await user.comparePassword(password, user.password);
+        if (!isMatch) {
+            return ApiResponse.error(res, 'Invalid credentials', 401);
+        }
+
+        if (user.approvalStatus === 'pending') {
+            return ApiResponse.error(res, 'Your account is pending admin approval. Please wait.', 403);
+        }
+
+        if (user.approvalStatus === 'rejected') {
+            return ApiResponse.error(res, 'Your account has been rejected. Please contact admin.', 403);
+        }
+
+        if (!user.isActive) {
+            return ApiResponse.error(res, 'Your account is currently deactivated. Contact admin.', 403);
+        }
+
+        const { accessToken, refreshToken } = signTokens(user._id);
+
+        const refreshExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        await Token.create({ userId: user._id, token: refreshToken, expiresAt: refreshExpires });
+
+        user.lastLogin = Date.now();
+        await user.save();
+
+        return ApiResponse.success(res, {
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                subRole: user.subRole,
+                permissions: user.permissions
+            },
+            accessToken,
+            refreshToken
+        }, 'Login successful');
+    } catch (error) {
+        next(error);
+    }
+};

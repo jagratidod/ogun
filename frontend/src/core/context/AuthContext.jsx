@@ -36,6 +36,7 @@ const detectStoredSession = () => {
     '/admin': 'admin',
     '/hr': 'hr_manager',
     '/service-center': 'service_manager',
+    '/technician': 'service_manager',
     '/distributor': 'distributor',
     '/retailer': 'retailer',
     '/sales': 'sales_executive',
@@ -164,6 +165,35 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  const loginTechnician = useCallback(async (email, password) => {
+    try {
+      const response = await api.post('/auth/technician/login', { email, password });
+      const data = response.data?.data;
+
+      if (!data?.accessToken || !data?.refreshToken || !data?.user) {
+        return { success: false, message: 'Invalid response from server.' };
+      }
+
+      const { user: userData, accessToken, refreshToken } = data;
+      // Technicians use 'service' key prefix (same as service_manager)
+      const keys = getTokenKeys(userData.role, 'service_manager');
+
+      localStorage.setItem(keys.user, JSON.stringify(userData));
+      localStorage.setItem(keys.accessToken, accessToken);
+      localStorage.setItem(keys.refreshToken, refreshToken);
+
+      setUser(userData);
+      setIsAuthenticated(true);
+
+      return { success: true, user: userData };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Login failed'
+      };
+    }
+  }, []);
+
   const logout = useCallback(async () => {
     try {
       const role = user?.role;
@@ -196,6 +226,7 @@ export function AuthProvider({ children }) {
       verifyOTP,
       registerPartner,
       loginWithPassword,
+      loginTechnician,
       logout
     }}>
       {!loading && children}

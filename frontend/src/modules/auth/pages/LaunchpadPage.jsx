@@ -69,7 +69,7 @@ const LaunchpadPage = () => {
       role: 'Service Manager',
       description: 'Field Service & Ticket Ops',
       icon: RiSettings4Fill,
-      path: '/service/login',
+      path: '/technician/login',
       theme: 'from-brand-teal to-brand-teal-dark',
       accent: 'text-white'
     },
