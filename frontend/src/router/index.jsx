@@ -38,10 +38,10 @@ import {
   RestockRequestsPage, LedgerPage, InvoicesPage,
   PaymentsPage, FinancialReportPage, EmployeesPage, DepartmentsPage,
   PayrollDashboardPage, SalaryProcessPage, LeaveRequestsPage,
-  RewardsDashboardPage, TargetConfigPage,
+  RewardsDashboardPage, TargetConfigPage, RedemptionQueuePage,
   PointsHistoryPage, ServiceRequestsPage, ServiceDetailPage,
   ServiceAnalyticsPage, DistributorListPage, RetailerListPage,
-  CustomerListPage, ReportsPage, AdminSettingsPage, PayslipsPage, DeductionsPage, OfferLettersPage, SocialGridManagerPage,
+  CustomerListPage, AdminSettingsPage, PayslipsPage, DeductionsPage, OfferLettersPage, SocialGridManagerPage,
   AdminProductQueriesPage, SalesRepsPage, TechniciansPage
 } from '../modules/admin';
 
@@ -50,7 +50,7 @@ import {
   DispatchPage, DistOrderHistoryPage, MyRetailersPage,
   DistLedgerPage, DistPaymentsPage, DistRewardsPage,
   DistAnalyticsPage, DistSettingsPage, BrowseAdminProducts, MyOrdersPage,
-  DistributorProductQueriesPage
+  DistributorProductQueriesPage, DistributorSocialPage
 } from '../modules/distributor';
 
 import {
@@ -58,13 +58,15 @@ import {
   RetailerStockPage, RestockRequestPage, RetailerLedgerPage,
   RetailerCustomersPage, RetailerRewardsPage, RetailerAnalyticsPage,
   RetailerSettingsPage, BrowseDistributorProducts,
-  RetailerOrdersPage
+  RetailerOrdersPage, RetailerSocialPage, RetailerSalesPage
 } from '../modules/retailer';
+
 
 import {
   SalesDashboardPage, RetailerListPage as SalesRetailerListPage, AddRetailerPage,
-  SalesTerminalPage, SalesProfilePage, SalesSocialPage, TechnicianServicePage
+  SalesTerminalPage, SalesProfilePage, SalesSocialPage, TechnicianServicePage, SalesRewardsPage
 } from '../modules/sales';
+
 
 import SalesLayout from '../core/components/layout/SalesLayout';
 import CustomerHomePage from '../modules/customer/pages/CustomerHomePage';
@@ -78,7 +80,7 @@ import CustomerSettingsPage from '../modules/customer/pages/CustomerSettingsPage
 import CustomerSocialPage from '../modules/customer/pages/CustomerSocialPage';
 import WarrantyExtensionPage from '../modules/customer/pages/WarrantyExtensionPage';
 
-import { HRDashboardPage, HREmployeesPage, HRLeavesPage, HRMyLeavesPage } from '../modules/hr';
+import { HRDashboardPage, HREmployeesPage, HRLeavesPage, HRMyLeavesPage, HRPayrollDashboardPage, HRSalarySetupPage, HRRunPayrollPage, HRPayslipsPage } from '../modules/hr';
 import { ServiceDashboardPage } from '../modules/service-center';
 
 import TechnicianManagerLayout from '../core/components/layout/TechnicianManagerLayout';
@@ -125,7 +127,6 @@ const RetailerList = () => <RetailerListPage />;
 const RetailerDetailPage = Stub('Retailer Detail'); 
 const CustomerList = () => <CustomerListPage />;
 const CustomerDetailPage = Stub('Customer Detail'); 
-const Reports = () => <ReportsPage />;
 const AdminSettings = () => <AdminSettingsPage />;
 const SocialGridManager = () => <SocialGridManagerPage />;
 const AdminProductQueries = () => <AdminProductQueriesPage />;
@@ -148,6 +149,7 @@ const DistSettings = () => <DistSettingsPage />;
 const BrowseMarketplace = () => <BrowseAdminProducts />;
 const MyOrders = () => <MyOrdersPage />;
 const DistProductQueries = () => <DistributorProductQueriesPage />;
+const DistributorSocial = () => <DistributorSocialPage />;
 
 // ─── Retailer real pages ───────────────────────────
 const RetailDashboard = () => <RetailerDashboardPage />;
@@ -160,6 +162,7 @@ const RetailCustomers = () => <RetailerCustomersPage />;
 const RetailRewards = () => <RetailerRewardsPage />;
 const RetailAnalytics = () => <RetailerAnalyticsPage />;
 const RetailSettings = () => <RetailerSettingsPage />;
+const RetailerSocial = () => <RetailerSocialPage />;
 
 // ─── Customer real pages ───────────────────────────
 const CustomerHome = () => <CustomerHomePage />;
@@ -264,6 +267,7 @@ export default function AppRouter() {
           <Route path="rewards" element={<RewardsDashboard />} />
           <Route path="rewards/targets" element={<TargetConfig />} />
           <Route path="rewards/history" element={<PointsHistory />} />
+          <Route path="rewards/redemptions" element={<RedemptionQueuePage />} />
           <Route path="distributors" element={<DistributorList />} />
           <Route path="distributors/:id" element={<DistributorDetailPage />} />
           <Route path="retailers" element={<RetailerList />} />
@@ -276,7 +280,6 @@ export default function AppRouter() {
           <Route path="service/analytics" element={<ServiceAnalytics />} />
           <Route path="technicians" element={<Technicians />} />
           <Route path="content/social-grid" element={<SocialGridManager />} />
-          <Route path="reports" element={<Reports />} />
           <Route path="settings" element={<AdminSettings />} />
         </Route>
 
@@ -300,6 +303,7 @@ export default function AppRouter() {
           <Route path="accounts/payments" element={<DistPayments />} />
           <Route path="rewards" element={<DistRewards />} />
           <Route path="analytics" element={<DistAnalytics />} />
+          <Route path="social" element={<DistributorSocial />} />
           <Route path="settings" element={<DistSettings />} />
         </Route>
 
@@ -313,6 +317,8 @@ export default function AppRouter() {
           <Route path="sales/new" element={<NewSale />} />
           <Route path="sales/history" element={<SalesHistory />} />
           <Route path="sales" element={<NewSale />} />
+
+
           <Route path="stock" element={<RetailStock />} />
           <Route path="stock/restock" element={<RestockReq />} />
           {/* Back-compat alias (dashboard deep-link) */}
@@ -323,22 +329,27 @@ export default function AppRouter() {
           <Route path="customers" element={<RetailerCustomersPage />} />
           <Route path="rewards" element={<RetailRewards />} />
           <Route path="analytics" element={<RetailerAnalyticsPage />} />
+          <Route path="social" element={<RetailerSocial />} />
           <Route path="settings" element={<RetailSettings />} />
         </Route>
 
         {/* ═══ HR PANEL ROUTES ═══ */}
         <Route path="/hr" element={
-          <ProtectedRoute allowedRoles={['admin']} allowedSubRoles={[SUB_ROLES.HR_MANAGER]}>
+          <ProtectedRoute allowedRoles={['admin']} allowedSubRoles={[SUB_ROLES.HR_MANAGER, SUB_ROLES.SUPER_ADMIN]}>
             <HRLayout />
           </ProtectedRoute>
         }>
+
           <Route index element={<HRDashboardPage />} />
           <Route path="employees" element={<HREmployeesPage />} />
           <Route path="leaves" element={<HRLeavesPage />} />
           <Route path="my-leaves" element={<HRMyLeavesPage />} />
-          <Route path="payroll" element={<PayrollDashboard />} />
-          <Route path="offer-letters" element={<OfferLetters />} />
+          <Route path="payroll" element={<HRPayrollDashboardPage />} />
+          <Route path="payroll/setup" element={<HRSalarySetupPage />} />
+          <Route path="payroll/run" element={<HRRunPayrollPage />} />
+          <Route path="payroll/history" element={<HRPayslipsPage />} />
           <Route path="departments" element={<Departments />} />
+
           <Route path="grievances" element={<StubPage title="HR Grievances" />} />
           <Route path="settings" element={<AdminSettingsPage />} />
         </Route>
@@ -393,7 +404,8 @@ export default function AppRouter() {
           <Route path="retailers/add" element={<AddRetailerPage />} />
           <Route path="terminal" element={<SalesTerminalPage />} />
           <Route path="performance" element={<SalesDashboardPage />} /> {/* Reuse dashboard for now */}
-          <Route path="rewards" element={<SalesDashboardPage />} /> {/* Reuse dashboard for now */}
+          <Route path="rewards" element={<SalesRewardsPage />} />
+
           <Route path="service" element={<TechnicianServicePage />} />
           <Route path="profile" element={<SalesProfilePage />} />
         </Route>

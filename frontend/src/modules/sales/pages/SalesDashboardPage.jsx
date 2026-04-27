@@ -44,11 +44,11 @@ export default function SalesDashboardPage() {
   }, [fetchStats]);
 
   const statCards = [
-    { label: 'Retailers', val: stats?.totalRetailers ?? 0, icon: RiStore2Fill, color: 'text-brand-teal', bg: 'bg-brand-teal/10' },
-    { label: 'Points', val: stats?.rewardPoints ?? 0, icon: RiTrophyFill, color: 'text-brand-pink', bg: 'bg-brand-pink/10' },
-    { label: 'Sales', val: formatCurrency(stats?.totalSalesValue ?? 0), icon: RiShoppingCartFill, color: 'text-brand-purple', bg: 'bg-brand-purple/10' },
-    { label: 'Pending', val: stats?.pendingOrders ?? 0, icon: RiTimeFill, color: 'text-state-warning', bg: 'bg-state-warning/10' },
-    { label: 'Tasks', val: stats?.pendingTickets ?? 0, icon: RiCustomerService2Fill, color: 'text-brand-teal', bg: 'bg-brand-teal/10' }
+    { label: 'Retailers', val: stats?.totalRetailers ?? 0, icon: RiStore2Fill, color: 'text-brand-teal', bg: 'bg-brand-teal/10', path: '/sales/retailers' },
+    { label: 'Points', val: stats?.rewardPoints ?? 0, icon: RiTrophyFill, color: 'text-brand-pink', bg: 'bg-brand-pink/10', path: '/sales/rewards' },
+    { label: 'Sales', val: formatCurrency(stats?.totalSalesValue ?? 0), icon: RiShoppingCartFill, color: 'text-brand-purple', bg: 'bg-brand-purple/10', path: '/sales/terminal' },
+    { label: 'Pending', val: stats?.pendingOrders ?? 0, icon: RiTimeFill, color: 'text-state-warning', bg: 'bg-state-warning/10', path: '/sales/terminal' },
+    { label: 'Tasks', val: stats?.pendingTickets ?? 0, icon: RiCustomerService2Fill, color: 'text-brand-teal', bg: 'bg-brand-teal/10', path: '/sales/service' }
   ];
 
   const monthLabel = new Date().toLocaleString('default', { month: 'short', year: 'numeric' });
@@ -66,7 +66,11 @@ export default function SalesDashboardPage() {
       {/* Compact Stats Grid */}
       <div className="grid grid-cols-2 gap-3">
         {statCards.map((stat, i) => (
-          <div key={i} className={`p-3.5 rounded-[20px] border border-border bg-white shadow-sm flex flex-col gap-2 relative overflow-hidden group hover:shadow-md transition-all active:scale-95 ${i === 4 ? 'col-span-2 py-3 flex-row items-center gap-4' : ''}`}>
+          <div 
+            key={i} 
+            onClick={() => navigate(stat.path)}
+            className={`p-3.5 rounded-[20px] border border-border bg-white shadow-sm flex flex-col gap-2 relative overflow-hidden group hover:shadow-md transition-all active:scale-95 cursor-pointer ${i === 4 ? 'col-span-2 py-3 flex-row items-center gap-4' : ''}`}
+          >
             <div className={`w-9 h-9 rounded-xl ${stat.bg} flex items-center justify-center flex-shrink-0`}>
               <stat.icon className={`${stat.color} w-5 h-5`} />
             </div>
@@ -82,14 +86,13 @@ export default function SalesDashboardPage() {
         ))}
       </div>
 
-      {/* Colorful Quick Actions (Services Style) - Compact Grid */}
+      {/* Colorful Quick Actions */}
       <section className="space-y-3">
         <div className="flex justify-between items-center px-1">
            <h3 className="text-[10px] font-black text-content-primary uppercase tracking-widest opacity-80">Quick Services</h3>
         </div>
         
         <div className="grid grid-cols-4 gap-2">
-           {/* Onboard */}
            <div onClick={() => navigate('/sales/retailers/add')} className="flex flex-col items-center gap-2 group cursor-pointer active:scale-90 transition-all">
               <div className="w-12 h-12 bg-brand-teal rounded-2xl shadow-lg shadow-brand-teal/20 flex items-center justify-center">
                  <RiUserAddFill className="text-white w-6 h-6" />
@@ -97,7 +100,6 @@ export default function SalesDashboardPage() {
               <span className="text-[9px] font-black text-content-primary uppercase">Onboard</span>
            </div>
 
-           {/* Terminal */}
            <div onClick={() => navigate('/sales/terminal')} className="flex flex-col items-center gap-2 group cursor-pointer active:scale-90 transition-all">
               <div className="w-12 h-12 bg-brand-pink rounded-2xl shadow-lg shadow-brand-pink/20 flex items-center justify-center">
                  <RiShoppingCartFill className="text-white w-6 h-6" />
@@ -105,7 +107,6 @@ export default function SalesDashboardPage() {
               <span className="text-[9px] font-black text-content-primary uppercase">Terminal</span>
            </div>
 
-           {/* Service */}
            <div onClick={() => navigate('/sales/service')} className="flex flex-col items-center gap-2 group cursor-pointer active:scale-90 transition-all">
               <div className="w-12 h-12 bg-brand-purple rounded-2xl shadow-lg shadow-brand-purple/20 flex items-center justify-center">
                  <RiCustomerService2Fill className="text-white w-6 h-6" />
@@ -113,7 +114,6 @@ export default function SalesDashboardPage() {
               <span className="text-[9px] font-black text-content-primary uppercase">Tickets</span>
            </div>
 
-           {/* Expert (Locked/Inactive style) */}
            <div className="flex flex-col items-center gap-2 opacity-40 grayscale group cursor-not-allowed">
               <div className="w-12 h-12 bg-surface-elevated rounded-2xl flex items-center justify-center">
                  <RiPlayFill className="text-content-tertiary w-6 h-6" />
@@ -123,7 +123,7 @@ export default function SalesDashboardPage() {
         </div>
       </section>
 
-      {/* Target Progress (Compact Card) */}
+      {/* Target Progress */}
       <Card className="p-4 rounded-[24px] border-none bg-white shadow-lg shadow-gray-200/40">
         <div className="flex items-center justify-between mb-4">
           <h4 className="text-[10px] font-black text-content-primary uppercase tracking-widest opacity-80">Performance Goals</h4>
@@ -134,7 +134,6 @@ export default function SalesDashboardPage() {
           <p className="text-[10px] text-content-tertiary text-center py-2 italic font-medium">No active targets found.</p>
         ) : (
           <div className="space-y-5">
-            {/* Sales Target */}
             <div>
               <div className="flex justify-between items-end mb-1.5">
                 <span className="text-[9px] font-black text-content-tertiary uppercase tracking-tighter">Gross Sales</span>
@@ -145,7 +144,6 @@ export default function SalesDashboardPage() {
               </div>
             </div>
 
-            {/* Retailer Target */}
             <div>
               <div className="flex justify-between items-end mb-1.5">
                 <span className="text-[9px] font-black text-content-tertiary uppercase tracking-tighter">New Shops</span>

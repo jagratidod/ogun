@@ -86,19 +86,8 @@ export default function CustomerHomePage() {
                   </div>
                </div>
 
-               {/* Right Side - Identity / Stats Group - Ultra Compact */}
+               {/* Right Side - Notification Group */}
                <div className="flex items-center gap-2">
-                  <div className="flex flex-col items-end pr-2 border-r border-gray-100 h-7 justify-center">
-                     <div className="flex items-center gap-1 mb-0.5">
-                        <RiShieldStarFill className="text-yellow-500 w-2.5 h-2.5" />
-                        <span className="text-[7px] font-black text-gray-600 uppercase tracking-[0.15em] leading-none">Gold Partner</span>
-                     </div>
-                     <div className="flex items-baseline gap-0.5">
-                        <span className="text-sm font-black text-gray-800 leading-none">1240</span>
-                        <span className="text-[6px] text-gray-400 font-bold uppercase tracking-wider">pts</span>
-                     </div>
-                  </div>
-
                   <div className="relative cursor-pointer hover:scale-110 active:scale-95 transition-all p-1.5 group">
                      <RiNotification3Line className="text-gray-400 w-5 h-5 group-hover:text-brand-pink transition-colors" />
                      <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-brand-pink rounded-full border border-white"></span>
@@ -262,22 +251,6 @@ export default function CustomerHomePage() {
                ))}
             </div>
          </div>
-
-         {/* Rewards Teaser */}
-         <Card className="bg-white/50 border-dashed border-2">
-            <div className="p-6 flex items-center gap-6">
-               <div className="w-14 h-14 rounded-none bg-brand-teal/5 flex items-center justify-center shadow-glow border border-brand-teal/20">
-                  <RiTrophyLine className="text-brand-teal w-7 h-7" />
-               </div>
-               <div className="flex-1">
-                  <h4 className="text-xs font-black text-content-primary">Tier Milestones</h4>
-                  <p className="text-[10px] text-content-secondary mt-1">Earn 240 more points to unlock Platinum membership!</p>
-                  <div className="w-full h-1 bg-white overflow-hidden rounded-none mt-3">
-                     <div className="h-full bg-brand-pink" style={{ width: '80%' }} />
-                  </div>
-               </div>
-            </div>
-         </Card>
 
       </div>
    );

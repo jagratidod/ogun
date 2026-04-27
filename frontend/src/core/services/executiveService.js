@@ -40,7 +40,19 @@ const executiveService = {
   updateTicketStatus: async (id, status, note) => {
     const response = await api.patch(`/sales-executive/service-tickets/${id}/status`, { status, note });
     return response.data;
+  },
+
+  // Rewards & Loyalty
+  getRewardData: async () => {
+    const response = await api.get('/rewards/my-rewards');
+    return response.data;
+  },
+
+  requestRedemption: async (data) => {
+    const response = await api.post('/rewards/redemptions/request', data);
+    return response.data;
   }
 };
+
 
 export default executiveService;

@@ -6,14 +6,14 @@ import { SidebarProvider } from '../../context/SidebarContext';
 import { useIsMobile } from '../../hooks/useMediaQuery';
 import {
   RiDashboardLine, RiBox3Line, RiShoppingCartLine,
-  RiTrophyLine, RiMenuLine
+  RiTrophyLine, RiMenuLine, RiCompass3Fill
 } from 'react-icons/ri';
 
 const bottomNavItems = [
   { label: 'Home', icon: RiDashboardLine, path: '/distributor', exact: true },
+  { label: 'Explore', icon: RiCompass3Fill, path: '/distributor/social' },
   { label: 'Stock', icon: RiBox3Line, path: '/distributor/stock' },
   { label: 'Orders', icon: RiShoppingCartLine, path: '/distributor/orders' },
-  { label: 'Rewards', icon: RiTrophyLine, path: '/distributor/rewards' },
   { label: 'More', icon: RiMenuLine, path: '/distributor/settings' },
 ];
 

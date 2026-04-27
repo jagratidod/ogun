@@ -19,6 +19,9 @@ router.get('/', (req, res) => {
 // Protect all retailer routes
 router.use(protect);
 
+// Dashboard Stats
+router.get('/dashboard-stats', restrictTo('retailer'), retailerController.getDashboardStats);
+
 // Own Inventory
 router.get('/inventory', restrictTo('retailer'), retailerController.getMyInventory);
 router.patch('/inventory/:id', restrictTo('retailer'), retailerController.updateInventoryItem);

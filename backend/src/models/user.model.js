@@ -80,6 +80,22 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    // Payroll fields (HR-managed)
+    salary: {
+        type: Number,
+        default: 0
+    },
+    department: {
+        type: String,
+        default: null,
+        trim: true
+    },
+    bankDetails: {
+        bankName: { type: String, default: null },
+        accountNumber: { type: String, default: null },
+        ifscCode: { type: String, default: null },
+        accountHolder: { type: String, default: null }
+    },
     distributor: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',

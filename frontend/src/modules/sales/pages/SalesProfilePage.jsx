@@ -1,4 +1,4 @@
-import { RiArrowLeftLine, RiLogoutCircleLine, RiUserLine, RiMapPinFill, RiPhoneFill, RiMailFill, RiShieldFill } from 'react-icons/ri';
+import { RiArrowLeftLine, RiLogoutCircleLine, RiUserLine, RiMapPinFill, RiPhoneFill, RiMailFill, RiShieldFill, RiCompass3Fill } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../../core/context/AuthContext';
 import { Card, Button, Badge } from '../../../core';
@@ -69,6 +69,15 @@ export default function SalesProfilePage() {
                   </div>
                </div>
             </div>
+
+            <Button
+               variant="secondary"
+               className="w-full text-brand-teal border-brand-teal/10 bg-brand-teal/5 hover:bg-brand-teal/10 font-black uppercase tracking-[0.2em] text-[10px] h-11 rounded-2xl"
+               icon={RiCompass3Fill}
+               onClick={() => navigate('/sales/social')}
+            >
+               Explore Reels
+            </Button>
 
             <Button
                variant="secondary"

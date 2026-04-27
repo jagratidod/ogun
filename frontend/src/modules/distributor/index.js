@@ -13,3 +13,4 @@ export { default as MyRetailersPage } from './pages/MyRetailersPage';
 export { default as BrowseAdminProducts } from './pages/BrowseAdminProducts';
 export { default as MyOrdersPage } from './pages/MyOrdersPage';
 export { default as DistributorProductQueriesPage } from './pages/DistributorProductQueriesPage';
+export { default as DistributorSocialPage } from './pages/DistributorSocialPage';

@@ -16,7 +16,9 @@ export default function HREmployeesPage() {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedDept, setSelectedDept] = useState('All');
   const { showNotification } = useNotification();
+
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -34,10 +36,14 @@ export default function HREmployeesPage() {
     fetchEmployees();
   }, [showNotification]);
 
-  const filteredEmployees = employees.filter(emp => 
-    emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    emp.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const departments = ['All', ...new Set(employees.map(e => e.department || 'Operations'))].sort();
+
+  const filteredEmployees = employees.filter(emp => {
+    const matchesSearch = emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          emp.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesDept = selectedDept === 'All' || emp.department === selectedDept;
+    return matchesSearch && matchesDept;
+  });
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto animate-fade-in">
@@ -65,6 +71,23 @@ export default function HREmployeesPage() {
         </div>
       </div>
 
+      {/* Department Tabs */}
+      <div className="flex flex-wrap gap-2 p-1 bg-surface-secondary/50 border border-border/40 inline-flex rounded-none">
+        {departments.map(dept => (
+          <button
+            key={dept}
+            onClick={() => setSelectedDept(dept)}
+            className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all ${
+              selectedDept === dept 
+                ? 'bg-brand-teal text-white shadow-lg' 
+                : 'text-content-tertiary hover:text-content-primary hover:bg-surface-secondary'
+            }`}
+          >
+            {dept} ({dept === 'All' ? employees.length : employees.filter(e => e.department === dept).length})
+          </button>
+        ))}
+      </div>
+
       {loading ? (
         <div className="space-y-3">
           {[1,2,3,4,5].map(i => <Card key={i} className="h-16 animate-pulse bg-surface-secondary" />)}
@@ -75,7 +98,7 @@ export default function HREmployeesPage() {
             <RiSearchLine size={32} />
           </div>
           <h3 className="text-lg font-bold text-content-primary">No employees found</h3>
-          <p className="text-sm text-content-tertiary">Try adjusting your search terms.</p>
+          <p className="text-sm text-content-tertiary">Try adjusting your filters or search terms.</p>
         </Card>
       ) : (
         <div className="bg-surface-primary border border-border/40 rounded-sm divide-y divide-border/20">
@@ -93,8 +116,8 @@ export default function HREmployeesPage() {
                 <div className="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-3 gap-2 items-center">
                   <div className="flex items-center gap-2">
                     <h4 className="text-sm font-bold text-content-primary truncate">{emp.name}</h4>
-                    <Badge variant={emp.role === 'admin' ? 'purple' : 'teal'} size="xs" className="text-[8px] px-1 py-0 uppercase font-black">
-                      {emp.role === 'sales_executive' ? 'Sales' : emp.role}
+                    <Badge variant={emp.department === 'Technician' ? 'teal' : emp.role === 'admin' ? 'purple' : 'teal'} size="xs" className="text-[8px] px-1 py-0 uppercase font-black">
+                      {emp.department}
                     </Badge>
                   </div>
                   
@@ -104,8 +127,8 @@ export default function HREmployeesPage() {
                   </div>
 
                   <div className="hidden md:flex items-center gap-1.5 text-[11px] text-content-tertiary truncate">
-                    <RiMapPinLine size={13} className="text-brand-teal/60 flex-shrink-0" />
-                    <span className="truncate">{emp.assignedArea || 'General'}</span>
+                    <RiShieldUserLine size={13} className="text-brand-teal/60 flex-shrink-0" />
+                    <span className="truncate uppercase tracking-tight font-bold opacity-70">{emp.subRole || emp.role}</span>
                   </div>
                 </div>
               </div>
@@ -130,3 +153,5 @@ export default function HREmployeesPage() {
     </div>
   );
 }
+
+

@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast';
 import SocialGrid from '../../../core/components/social/SocialGrid';
 import { useSocialGrid } from '../../../core/hooks/useSocialGrid';
 
-export default function SalesSocialPage() {
+export default function RetailerSocialPage() {
   const { items } = useSocialGrid();
   const [selected, setSelected] = useState(null);
   const [likedPosts, setLikedPosts] = useState(new Set());
@@ -26,8 +26,8 @@ export default function SalesSocialPage() {
 
   const handleShare = async (post) => {
     const shareData = {
-      title: 'Sales Update from Ogun',
-      text: post.label || 'New update from Admin',
+      title: 'Partner Update from Ogun',
+      text: post.label || 'New update from Ogun Ecosystem',
       url: window.location.href,
     };
 
@@ -104,7 +104,7 @@ export default function SalesSocialPage() {
                 <div className="flex items-end justify-between gap-6 translate-y-2">
                   <div className="flex-1 pointer-events-auto">
                     <p className="text-[13px] text-white/90 leading-relaxed font-bold line-clamp-2 mb-3 tracking-tight">
-                      {item.label || 'Latest update from Admin for Sales Executives.'}
+                      {item.label || 'Experience the latest from Ogun Ecosystem.'}
                     </p>
 
                     <div className="flex items-center gap-3 text-[8.5px] font-black text-white/40 uppercase tracking-[2px]">
@@ -155,7 +155,7 @@ export default function SalesSocialPage() {
         <div className="flex items-center justify-between mb-4">
            <div>
               <h2 className="text-xl font-black text-content-primary">Explore</h2>
-              <p className="text-[8px] text-brand-teal font-black uppercase tracking-widest mt-1">Updates from Admin HQ</p>
+              <p className="text-[8px] text-brand-teal font-black uppercase tracking-widest mt-1">Updates from Ogun HQ</p>
            </div>
            <div className="w-10 h-10 rounded-full bg-brand-teal/10 flex items-center justify-center">
               <RiCompass3Fill className="text-brand-teal w-5 h-5" />

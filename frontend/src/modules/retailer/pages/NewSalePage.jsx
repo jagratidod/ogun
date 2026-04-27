@@ -14,6 +14,8 @@ export default function NewSalePage() {
   const [paymentMethod, setPaymentMethod] = useState('Cash');
   const [completedSale, setCompletedSale] = useState(null);
   
+  const [viewMode, setViewMode] = useState('products'); // 'products' or 'cart' (mobile only)
+  
   const { isOpen, open, close } = useModal();
   const { isOpen: isInvoiceOpen, open: openInvoice, close: closeInvoice } = useModal();
 
@@ -25,7 +27,6 @@ export default function NewSalePage() {
     try {
       setLoading(true);
       const res = await retailerService.getMyInventory();
-      // Only show products with stock > 0
       const items = (res.data || [])
         .filter(i => i.quantity > 0)
         .map(i => ({
@@ -52,7 +53,7 @@ export default function NewSalePage() {
 
   const filteredProducts = useMemo(() => {
     return stock.filter(p => {
-      const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      const matchesSearch = searchQuery === '' || p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                            p.sku.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = activeCategory === 'All' || p.category === activeCategory;
       return matchesSearch && matchesCategory;
@@ -103,7 +104,7 @@ export default function NewSalePage() {
         setCustomer({ name: '', phone: '', address: '' });
         close();
         openInvoice();
-        fetchStock(); // Refresh stock
+        fetchStock();
         toast.success('Sale completed successfully!');
     } catch (error) {
         toast.error(error.response?.data?.message || 'Checkout failed');
@@ -112,119 +113,185 @@ export default function NewSalePage() {
     }
   };
 
+
   const printBill = () => {
      window.print();
   };
 
   return (
-    <div className="page-container h-full overflow-hidden flex flex-col">
-      <PageHeader 
-        title="POS Terminal" 
-        subtitle="Process sales and issue invoices for walk-in customers"
-      >
-        <Button icon={RiUserLine} variant="secondary">Loyalty Program</Button>
-      </PageHeader>
+    <div className="page-container h-full overflow-hidden flex flex-col p-0 sm:p-6">
+      {/* Mobile Top Bar (Hidden on Desktop) */}
+      <div className="lg:hidden flex items-center justify-between p-4 bg-white border-b border-border sticky top-0 z-20">
+         <div className="flex flex-col">
+            <h1 className="text-lg font-black text-content-primary leading-none uppercase">POS Terminal</h1>
+            <span className="text-[8px] text-brand-teal font-black uppercase tracking-widest mt-1">Live Inventory</span>
+         </div>
+         <div className="flex items-center gap-2">
+            <button 
+               onClick={() => setViewMode(viewMode === 'products' ? 'cart' : 'products')}
+               className={`relative p-2 rounded-none border transition-all ${viewMode === 'cart' ? 'bg-brand-teal text-white border-brand-teal' : 'bg-surface-secondary text-content-primary border-border'}`}
+            >
+               {viewMode === 'products' ? <RiShoppingBasketLine size={20} /> : <RiAddLine size={20} />}
+               {cart.length > 0 && viewMode === 'products' && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-brand-pink text-white text-[8px] font-black rounded-full flex items-center justify-center border-2 border-white animate-bounce">
+                     {cart.length}
+                  </span>
+               )}
+            </button>
+         </div>
+      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 overflow-hidden mt-2">
-         <div className="lg:col-span-2 flex flex-col gap-4 overflow-hidden h-[calc(100vh-220px)]">
-            <Card className="flex flex-col flex-1 overflow-hidden">
-               <CardHeader className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="flex-1 max-w-sm">
+      {/* Desktop Header */}
+      <div className="hidden lg:block">
+         <PageHeader 
+            title="POS Terminal" 
+            subtitle="Process sales and issue invoices for walk-in customers"
+         >
+            <Button icon={RiUserLine} variant="secondary">Loyalty Program</Button>
+         </PageHeader>
+      </div>
+
+      <div className="flex flex-col lg:grid lg:grid-cols-3 gap-0 lg:gap-6 flex-1 overflow-hidden">
+         {/* Products Section */}
+         <div className={`lg:col-span-2 flex flex-col gap-4 overflow-hidden ${viewMode === 'products' ? 'flex' : 'hidden lg:flex'} h-full lg:h-[calc(100vh-220px)]`}>
+            <div className="flex flex-col flex-1 overflow-hidden bg-white lg:border lg:border-border">
+               <div className="p-4 border-b border-border space-y-4">
+                  <div className="flex-1">
                     <Input 
                       icon={RiSearchLine} 
-                      placeholder="Search available products..." 
+                      placeholder="Search products..." 
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
+                      className="bg-surface-secondary"
                     />
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {categories.map(cat => (
-                      <button 
-                        key={cat} 
-                        onClick={() => setActiveCategory(cat)}
-                        className={`px-3 py-1 text-[10px] uppercase font-black rounded-none border transition-all ${activeCategory === cat ? 'bg-brand-teal text-white border-brand-teal' : 'bg-surface-input text-content-tertiary border-border hover:border-brand-teal'}`}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
-               </CardHeader>
-               <div className="flex-1 overflow-y-auto p-4 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 scrollbar-hide">
+                <div className="flex overflow-x-auto gap-2 pb-1 scrollbar-hide">
+                  {categories.map(cat => (
+                    <button 
+                      key={cat} 
+                      onClick={() => setActiveCategory(cat)}
+                      className={`px-4 py-1.5 text-[9px] uppercase font-black whitespace-nowrap rounded-none border transition-all ${activeCategory === cat ? 'bg-brand-teal text-white border-brand-teal shadow-sm' : 'bg-surface-secondary text-content-tertiary border-border hover:border-brand-teal'}`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+             </div>
+             <div className="flex-1 overflow-y-auto p-3 grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 scrollbar-hide pb-24 lg:pb-3">
+
                   {loading && stock.length === 0 ? (
-                      <div className="col-span-full py-20 text-center animate-pulse">Loading Inventory...</div>
+                      <div className="col-span-full py-20 text-center animate-pulse text-xs font-black text-brand-teal/40">SYNCING INVENTORY...</div>
                   ) : filteredProducts.map(prod => (
-                    <div key={prod.id} className="glass-card p-3 flex flex-col group cursor-pointer hover:border-brand-teal transition-all active:scale-95" onClick={() => addToCart(prod)}>
-                       <div className="w-full aspect-[4/3] rounded-none bg-surface-elevated flex items-center justify-center mb-3 text-brand-teal/20 relative overflow-hidden">
+                    <div key={prod.id} className="bg-surface-primary border border-border/50 p-2.5 flex flex-col group cursor-pointer hover:border-brand-teal transition-all active:scale-95" onClick={() => addToCart(prod)}>
+                       <div className="w-full aspect-square rounded-none bg-surface-secondary flex items-center justify-center mb-2.5 text-brand-teal/20 relative overflow-hidden">
                           <img src={prod.image} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt={prod.name} />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent group-hover:from-brand-teal/60 transition-all" />
-                          <div className="absolute bottom-2 left-2 right-2 flex justify-between items-end">
-                             <Badge size="xs" variant="teal">{prod.category}</Badge>
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent group-hover:from-brand-teal/40 transition-all" />
+                          <div className="absolute top-1.5 right-1.5">
+                             <Badge size="xs" variant={prod.stock < 10 ? 'danger' : 'teal'} className="text-[7px] px-1 py-0">{prod.stock} LEFT</Badge>
                           </div>
                        </div>
-                       <h4 className="text-xs font-bold text-content-primary line-clamp-1">{prod.name}</h4>
-                       <p className="text-[10px] text-content-tertiary mb-2 uppercase">{prod.sku}</p>
-                       <div className="flex items-center justify-between mt-auto pt-2 border-t border-border/40">
+                       <h4 className="text-[11px] font-bold text-content-primary line-clamp-1 leading-tight">{prod.name}</h4>
+                       <div className="flex items-center justify-between mt-2 pt-2 border-t border-border/30">
                           <span className="text-sm font-black text-brand-teal leading-none">{formatCurrency(prod.price)}</span>
-                          <span className={`text-[9px] font-black uppercase ${prod.stock < 5 ? 'text-state-danger' : 'text-state-success'}`}>{prod.stock} Left</span>
+                          <RiAddLine className="w-4 h-4 text-brand-teal opacity-0 group-hover:opacity-100 transition-opacity" />
                        </div>
                     </div>
                   ))}
                </div>
-            </Card>
+               
+               {/* Mobile Floating Checkout Bar */}
+               {cart.length > 0 && viewMode === 'products' && (
+                  <div className="lg:hidden fixed bottom-[72px] left-4 right-4 z-40 bg-brand-teal shadow-2xl p-4 flex items-center justify-between animate-slide-up">
+                     <div className="flex flex-col">
+                        <span className="text-[10px] text-white/70 font-black uppercase tracking-widest">Total Payable</span>
+                        <span className="text-xl font-black text-white leading-none">{formatCurrency(total)}</span>
+                     </div>
+                     <Button 
+                        variant="secondary" 
+                        size="sm" 
+                        className="bg-white text-brand-teal border-none shadow-lg px-6 font-black uppercase text-[11px]"
+                        onClick={() => setViewMode('cart')}
+                     >
+                        View Basket ({cart.length})
+                     </Button>
+                  </div>
+               )}
+            </div>
          </div>
 
-         <div className="flex flex-col h-[calc(100vh-220px)]">
-            <Card className="flex flex-col flex-1 overflow-hidden border-brand-teal/20">
-               <CardHeader className="bg-brand-teal/5">
-                  <div className="flex items-center justify-between w-full">
-                     <CardTitle>Basket Cart</CardTitle>
-                     <Badge variant="teal">{cart.length} Items</Badge>
+         {/* Cart Section */}
+         <div className={`flex flex-col h-full lg:h-[calc(100vh-220px)] ${viewMode === 'cart' ? 'flex' : 'hidden lg:flex'}`}>
+            <div className="flex flex-col flex-1 overflow-hidden bg-white lg:border lg:border-brand-teal/20">
+               <div className="p-4 bg-brand-teal/5 border-b border-brand-teal/10 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                     <RiShoppingBasketLine className="text-brand-teal" size={18} />
+                     <h3 className="text-sm font-black text-gray-800 uppercase tracking-tight">Basket Cart</h3>
                   </div>
-               </CardHeader>
+                  <Badge variant="teal" className="font-black">{cart.length} ITEMS</Badge>
+               </div>
+               
                <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-hide">
                   {cart.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-full opacity-30 text-center space-y-2">
-                       <RiShoppingBasketLine className="w-12 h-12" />
-                       <p className="text-xs font-medium">Cart is empty.<br/>Select products to begin sale.</p>
+                    <div className="flex flex-col items-center justify-center h-full opacity-20 text-center space-y-4">
+                       <div className="w-20 h-20 bg-surface-secondary flex items-center justify-center">
+                          <RiShoppingBasketLine className="w-10 h-10" />
+                       </div>
+                       <p className="text-xs font-black uppercase tracking-widest">Cart is empty</p>
                     </div>
                   ) : cart.map((item, i) => (
-                    <div key={item.id} className="p-3 rounded-none bg-surface-input/50 flex items-center gap-3 group animate-slide-up">
+                    <div key={item.id} className="p-3 bg-surface-secondary/50 border border-border/30 flex items-center gap-3 group animate-slide-up">
+                       <div className="w-10 h-10 bg-surface-elevated flex-shrink-0">
+                          <img src={item.image} className="w-full h-full object-cover" />
+                       </div>
                        <div className="flex-1">
                           <h4 className="text-[11px] font-bold text-content-primary truncate">{item.name}</h4>
                           <h4 className="text-[10px] text-brand-teal font-black">{formatCurrency(item.price)}</h4>
                        </div>
-                       <div className="flex items-center gap-2 bg-surface-elevated px-2 py-1 rounded-none border border-border">
+                       <div className="flex items-center gap-2 bg-white px-2 py-1 border border-border">
                           <span className="text-xs font-black text-content-primary w-4 text-center">x{item.qty}</span>
                        </div>
-                       <RiDeleteBin7Line className="w-4 h-4 text-state-danger opacity-40 hover:opacity-100 cursor-pointer" onClick={() => removeFromCart(item.id)} />
+                       <RiDeleteBin7Line className="w-4 h-4 text-state-danger opacity-40 hover:opacity-100 cursor-pointer transition-opacity" onClick={() => removeFromCart(item.id)} />
                     </div>
                   ))}
                </div>
-               <div className="p-4 border-t border-border bg-surface-elevated/40 space-y-3">
-                  <div className="space-y-1.5 pt-2 border-b border-border/50 pb-3">
-                     <div className="flex justify-between items-center text-[11px] text-content-tertiary uppercase font-bold">
+
+               <div className="p-4 border-t border-border bg-surface-secondary/20 space-y-4 pb-24 lg:pb-4">
+                  <div className="space-y-2">
+                     <div className="flex justify-between items-center text-[10px] text-content-tertiary uppercase font-black tracking-widest">
                         <span>Cart Subtotal</span>
                         <span>{formatCurrency(subtotal)}</span>
                      </div>
-                     <div className="flex justify-between items-center text-[11px] text-content-tertiary uppercase font-bold">
+                     <div className="flex justify-between items-center text-[10px] text-content-tertiary uppercase font-black tracking-widest">
                         <span>Tax / GST (18%)</span>
                         <span>{formatCurrency(tax)}</span>
                      </div>
                   </div>
-                  <div className="flex justify-between items-center">
-                     <span className="text-xs text-content-tertiary font-black uppercase tracking-wider">Final Payable</span>
-                     <span className="text-2xl font-black text-brand-teal">{formatCurrency(total)}</span>
+                  <div className="flex justify-between items-end pt-2 border-t border-border/50">
+                     <span className="text-[10px] text-content-tertiary font-black uppercase tracking-wider mb-1">Final Payable</span>
+                     <span className="text-2xl font-black text-brand-teal leading-none">{formatCurrency(total)}</span>
                   </div>
-                  <div className="grid grid-cols-4 gap-2 pt-2">
-                     <Button variant="secondary" className="col-span-1 h-11" icon={RiQuestionLine} />
-                     <Button className="col-span-3 h-11 shadow-glow" icon={RiHandCoinLine} disabled={cart.length === 0} onClick={() => open()}>
-                        Checkout & Print
+                  <div className="grid grid-cols-1 gap-2">
+                     <Button 
+                        className="h-12 shadow-glow font-black uppercase tracking-widest" 
+                        icon={RiHandCoinLine} 
+                        disabled={cart.length === 0} 
+                        onClick={() => open()}
+                     >
+                        Process Checkout
+                     </Button>
+                     <Button 
+                        variant="secondary" 
+                        className="lg:hidden h-10 border-none font-black uppercase text-[10px] tracking-widest"
+                        onClick={() => setViewMode('products')}
+                     >
+                        Add More Products
                      </Button>
                   </div>
                </div>
-            </Card>
+            </div>
          </div>
       </div>
+
 
       {/* Checkout Modal */}
       <Modal 
