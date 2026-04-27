@@ -52,8 +52,8 @@ export default function HRSection() {
   const tabs = [
     { id: 'leaves', label: 'Leaves', icon: RiCalendarEventLine },
     { id: 'issues', label: 'Issues', icon: RiMessage2Line },
-    { id: 'offer', label: 'Offer Letter', icon: RiFileTextLine },
   ];
+
 
   const handleSubmitLeave = async (e) => {
     e.preventDefault();
@@ -242,24 +242,7 @@ export default function HRSection() {
           </div>
         )}
 
-        {/* OFFER LETTER TAB */}
-        {activeTab === 'offer' && (
-          <div className="space-y-4 py-1">
-             <div className="aspect-[1.6/1] w-full border border-border bg-surface-primary rounded-2xl flex flex-col items-center justify-center p-4 text-center relative overflow-hidden group">
-                <div className="absolute inset-0 bg-brand-teal/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <RiFileTextLine size={24} className="text-brand-teal mb-2" />
-                <h5 className="text-[11px] font-black text-content-primary uppercase tracking-tight">Offer Letter 2024</h5>
-                <p className="text-[8px] text-content-tertiary font-bold uppercase mt-1 tracking-widest">Signed & Verified</p>
-                <div className="mt-4 flex gap-3 text-[8px] font-black text-content-tertiary uppercase">
-                   <span className="px-2 py-0.5 bg-white rounded-lg border border-border">ID: #882</span>
-                   <span className="px-2 py-0.5 bg-white rounded-lg border border-border">Sales Exec</span>
-                </div>
-             </div>
-             <Button variant="primary" className="w-full h-11 uppercase tracking-widest text-[10px] font-black rounded-xl shadow-lg shadow-brand-teal/10" icon={RiDownloadLine}>
-               Download PDF
-             </Button>
-          </div>
-        )}
+
       </Card>
     </div>
   );

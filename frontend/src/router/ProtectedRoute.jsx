@@ -62,7 +62,6 @@ export default function ProtectedRoute({ children, allowedRoles, allowedSubRoles
       '/admin/customers': 'customers',
       '/admin/service': 'service',
       '/admin/content': 'content',
-      '/admin/reports': 'reports',
       '/admin/rewards': 'rewards',
       '/admin/accounts': 'accounts',
       '/admin/rbac': 'rbac',

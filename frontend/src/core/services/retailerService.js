@@ -65,7 +65,19 @@ const retailerService = {
   getSaleDetail: async (id) => {
     const response = await api.get(`/retailer/sales/${id}`);
     return response.data;
+  },
+
+  // Rewards & Loyalty
+  getRewardData: async () => {
+    const response = await api.get('/rewards/my-rewards');
+    return response.data;
+  },
+
+  requestRedemption: async (data) => {
+    const response = await api.post('/rewards/redemptions/request', data);
+    return response.data;
   }
 };
+
 
 export default retailerService;

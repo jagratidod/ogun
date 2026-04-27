@@ -5,3 +5,5 @@ export { default as SalesTerminalPage } from './pages/SalesTerminalPage';
 export { default as SalesProfilePage } from './pages/SalesProfilePage';
 export { default as SalesSocialPage } from './pages/SalesSocialPage';
 export { default as TechnicianServicePage } from './pages/TechnicianServicePage';
+export { default as SalesRewardsPage } from './pages/SalesRewardsPage';
+

@@ -25,9 +25,25 @@ export default function RetailerRewardsPage() {
     }
   };
 
-  const handleRedeem = () => {
-    toast.success(`Redemption request submitted! Points will be deducted after approval.`);
-    close();
+  const handleRedeem = async () => {
+    try {
+      const payload = {
+        points: selectedReward.pointsCost,
+        bankDetails: {
+          bankName: 'Sample Bank',
+          accountNumber: 'XXXXXX1234',
+          ifscCode: 'SMPL0001234',
+          accountHolder: data?.name
+        }
+      };
+      
+      await api.post('/rewards/redemptions/request', payload);
+      toast.success(`Redemption request submitted for ${selectedReward.label}!`);
+      close();
+      fetchRewards(); // Refresh balance and history
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to submit redemption request');
+    }
   };
 
   if (loading) {
@@ -129,6 +145,21 @@ export default function RetailerRewardsPage() {
                   <CardTitle>Earnings History</CardTitle>
                </CardHeader>
                <DataTable columns={columns} data={history} />
+            </Card>
+
+            <Card>
+               <CardHeader>
+                  <CardTitle>Redemption Requests</CardTitle>
+               </CardHeader>
+               <DataTable 
+                  columns={[
+                     { key: 'createdAt', label: 'Date', render: (val) => new Date(val).toLocaleDateString() },
+                     { key: 'pointsRequested', label: 'Points', align: 'center' },
+                     { key: 'cashValue', label: 'Cash Value', align: 'right', render: (val) => `₹${val.toLocaleString()}` },
+                     { key: 'status', label: 'Status', render: (val) => <Badge status={val}>{val}</Badge> }
+                  ]} 
+                  data={data?.redemptions || []} 
+               />
             </Card>
          </div>
 

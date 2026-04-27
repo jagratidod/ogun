@@ -1,8 +1,135 @@
+const mongoose = require('mongoose');
 const Inventory = require('../models/inventory.model');
 const Product = require('../models/product.model');
 const User = require('../models/user.model');
 const catchAsync = require('../utils/catchAsync');
 const ApiResponse = require('../utils/apiResponse');
+const Sale = require('../models/sale.model');
+const ProductOrder = require('../models/productOrder.model');
+
+/**
+ * @desc    Get dashboard statistics for retailer
+ * @route   GET /api/v1/retailer/dashboard-stats
+ * @access  Private (Retailer)
+ */
+exports.getDashboardStats = catchAsync(async (req, res, next) => {
+    const retailerId = new mongoose.Types.ObjectId(req.user._id);
+
+    // 1. KPI: Daily Sales (Today)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const salesToday = await Sale.aggregate([
+        { $match: { retailer: retailerId, createdAt: { $gte: today } } },
+        { $group: { _id: null, total: { $sum: "$totalAmount" } } }
+    ]);
+
+
+    // 2. KPI: Store Network (Unique Customer Phones)
+    const uniqueCustomers = await Sale.distinct('customer.phone', { retailer: retailerId });
+
+    // 3. KPI: Inventory Value
+    const inventory = await Inventory.find({ user: retailerId });
+    const inventoryValue = inventory.reduce((acc, item) => acc + (item.quantity * (item.sellingPrice || 0)), 0);
+
+    // 4. KPI: Reward Points (Corrected field name)
+    const user = await User.findById(retailerId);
+    const pointsBalance = user?.rewardPoints || 0;
+
+    // 5. KPI: Pending Restock (Orders to Distributor)
+    const pendingOrders = await ProductOrder.countDocuments({ 
+        orderer: retailerId, 
+        status: { $in: ['pending', 'confirmed'] } 
+    });
+
+    // 6. Sales Chart: Last 7 Days
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+
+    let salesHistory = [];
+    try {
+        salesHistory = await Sale.aggregate([
+            { $match: { retailer: retailerId, createdAt: { $gte: sevenDaysAgo } } },
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                    total: { $sum: "$totalAmount" }
+                }
+            },
+            { $sort: { _id: 1 } }
+        ]);
+    } catch (e) {
+        console.error('Aggregation error (history):', e);
+    }
+
+    // Fill gaps in sales history
+    const chartData = [];
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(sevenDaysAgo);
+        d.setDate(d.getDate() + i);
+        const dateStr = d.toISOString().split('T')[0];
+        const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
+        const entry = salesHistory.find(s => s._id === dateStr);
+        chartData.push({ day: dayName, sales: entry ? entry.total : 0 });
+    }
+
+    // 7. Recent Transactions (Latest 5)
+    const recentSales = await Sale.find({ retailer: retailerId })
+        .sort('-createdAt')
+        .limit(5);
+
+    // 8. Top Moving Products (Most sold)
+    let topProducts = [];
+    try {
+        topProducts = await Sale.aggregate([
+            { $match: { retailer: retailerId } },
+            { $unwind: "$products" },
+            {
+                $group: {
+                    _id: "$products.product",
+                    totalSold: { $sum: "$products.quantity" }
+                }
+            },
+            { $sort: { totalSold: -1 } },
+            { $limit: 3 },
+            {
+                $lookup: {
+                    from: "products",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "productDetails"
+                }
+            }
+        ]);
+    } catch (e) {
+        console.error('Aggregation error (top):', e);
+    }
+
+    const formattedTopProducts = topProducts.map(p => ({
+        name: p.productDetails?.[0]?.name || 'Unknown Product',
+        sales: p.totalSold,
+        stock: inventory.find(i => i.product?.toString() === p._id.toString())?.quantity || 0
+    }));
+
+    return ApiResponse.success(res, {
+        kpis: {
+            dailySales: salesToday[0]?.total || 0,
+            totalCustomers: uniqueCustomers.length,
+            stockValue: inventoryValue,
+            loyaltyPoints: pointsBalance,
+            pendingRestock: pendingOrders
+        },
+        chartData,
+        recentSales: recentSales.map(s => ({
+            id: s.saleId,
+            customer: s.customer?.name || 'Walk-in',
+            amount: s.totalAmount,
+            date: new Date(s.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        })),
+        topProducts: formattedTopProducts
+    }, 'Dashboard stats fetched successfully');
+});
+
 
 /**
  * @desc    Get ALL Admin products, enriched with distributor's stock data
@@ -12,6 +139,7 @@ const ApiResponse = require('../utils/apiResponse');
  * @access  Private (Retailer)
  */
 exports.getAdminCatalog = catchAsync(async (req, res, next) => {
+
     try {
         // 1. Get assigned distributor ID from retailer's profile
         const retailer = await User.findById(req.user._id).lean();

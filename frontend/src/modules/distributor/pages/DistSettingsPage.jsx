@@ -4,7 +4,7 @@ import {
   RiPaletteLine, RiGlobalLine, RiSmartphoneLine, 
   RiDatabaseLine, RiInformationLine, RiArrowRightSLine, 
   RiLogoutBoxRLine, RiUserLine, RiStore2Line, RiMapPinLine, 
-  RiPhoneLine, RiTruckLine, RiShieldLine, RiLockLine 
+  RiPhoneLine, RiTruckLine, RiShieldLine, RiLockLine, RiCompass3Fill 
 } from 'react-icons/ri';
 import { 
   PageHeader, Card, CardHeader, CardTitle, CardDescription, 
@@ -13,14 +13,17 @@ import {
 import Button from '../../../core/components/ui/Button';
 import { useAuthContext } from '../../../core/context/AuthContext';
 import { toast } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 export default function DistSettingsPage() {
   const { logout, user } = useAuthContext();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('Profile');
   const [isSaving, setIsSaving] = useState(false);
 
   const tabs = [
     { icon: RiUserLine, label: 'Profile' },
+    { icon: RiCompass3Fill, label: 'Explore Reels', path: '/distributor/social' },
     { icon: RiTruckLine, label: 'Logistics' },
     { icon: RiShieldKeyholeLine, label: 'Security' },
     { icon: RiNotification3Line, label: 'Notifications' },
@@ -157,7 +160,13 @@ export default function DistSettingsPage() {
             {tabs.map(item => (
                <button 
                   key={item.label} 
-                  onClick={() => setActiveTab(item.label)}
+                  onClick={() => {
+                     if (item.path) {
+                        navigate(item.path);
+                     } else {
+                        setActiveTab(item.label);
+                     }
+                  }}
                   className={`flex items-center gap-3 w-full px-4 py-3 rounded-none transition-all ${
                   activeTab === item.label ? 'bg-brand-teal text-white shadow-glow' : 'text-content-secondary hover:bg-surface-elevated'
                }`}>

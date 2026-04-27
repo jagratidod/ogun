@@ -11,7 +11,7 @@ import {
   RiCustomerServiceLine, RiBarChartBoxLine, RiSettings3Line,
   RiImage2Line, RiStackLine, RiAlertLine, RiMailSendLine, RiToolsLine,
   RiArrowLeftSLine, RiArrowRightSLine, RiArrowDownSLine,
-  RiMenuLine, RiCloseLine
+  RiMenuLine, RiCloseLine, RiCompass3Fill
 } from 'react-icons/ri';
 
 const hrNav = [
@@ -19,9 +19,16 @@ const hrNav = [
   { label: 'Employees', icon: RiTeamLine, path: '/hr/employees' },
   { label: 'Leave Requests', icon: RiCalendarCheckLine, path: '/hr/leaves' },
   { label: 'My Leaves', icon: RiCalendarCheckLine, path: '/hr/my-leaves' },
-  { label: 'Payroll', icon: RiWalletLine, path: '/hr/payroll' },
-  { label: 'Offer Letters', icon: RiMailSendLine, path: '/hr/offer-letters' },
+  {
+    label: 'Payroll', icon: RiWalletLine, children: [
+      { label: 'Dashboard', path: '/hr/payroll' },
+      { label: 'Salary Setup', path: '/hr/payroll/setup' },
+      { label: 'Run Payroll', path: '/hr/payroll/run' },
+      { label: 'Payroll History', path: '/hr/payroll/history' },
+    ],
+  },
   { label: 'Departments', icon: RiStackLine, path: '/hr/departments' },
+
   { label: 'Grievances', icon: RiAlertLine, path: '/hr/grievances' },
   { label: 'Settings', icon: RiSettings3Line, path: '/hr/settings' },
 ];
@@ -72,21 +79,21 @@ const adminNav = [
     ],
   },
   {
-    label: 'HR', icon: RiTeamLine, permission: 'hr', children: [
-      { label: 'Employees', path: '/admin/hr/employees' },
-      { label: 'HR Leave Requests', path: '/admin/leaves' },
-      { label: 'Offer Letters', path: '/admin/hr/offer-letters' },
-      { label: 'Departments', path: '/admin/hr/departments' },
+    label: 'HR Management', icon: RiTeamLine, permission: 'hr', children: [
+      { label: 'Directory', path: '/hr/employees' },
+      { label: 'Leave Review', path: '/hr/leaves' },
+      { label: 'Departments', path: '/hr/departments' },
     ],
   },
   {
-    label: 'Payroll', icon: RiWalletLine, permission: 'payroll', children: [
-      { label: 'Dashboard', path: '/admin/payroll' },
-      { label: 'Process Salary', path: '/admin/payroll/process' },
-      { label: 'Payslips', path: '/admin/payroll/payslips' },
-      { label: 'Deductions', path: '/admin/payroll/deductions' },
+    label: 'Payroll Control', icon: RiWalletLine, permission: 'payroll', children: [
+      { label: 'Overview', path: '/hr/payroll' },
+      { label: 'Setup', path: '/hr/payroll/setup' },
+      { label: 'Monthly Run', path: '/hr/payroll/run' },
+      { label: 'History', path: '/hr/payroll/history' },
     ],
   },
+
   {
     label: 'Leaves', icon: RiCalendarCheckLine, permission: 'leaves', children: [
       { label: 'Requests', path: '/admin/leaves' },
@@ -115,12 +122,12 @@ const adminNav = [
       { label: 'Social Grid', path: '/admin/content/social-grid' },
     ],
   },
-  { label: 'Reports', icon: RiBarChartBoxLine, path: '/admin/reports', permission: 'reports' },
   { label: 'Settings', icon: RiSettings3Line, path: '/admin/settings' },
 ];
 
 const distributorNav = [
   { label: 'Dashboard', icon: RiDashboardLine, path: '/distributor' },
+  { label: 'Explore', icon: RiCompass3Fill, path: '/distributor/social' },
   { label: 'Marketplace', icon: RiStore2Line, path: '/distributor/marketplace' },
   { label: 'My Stock', icon: RiBox3Line, path: '/distributor/stock' },
   {
@@ -158,6 +165,17 @@ export function getNavItems(role, subRole, permissions) {
   if (role === 'distributor') return distributorNav;
   return [];
 }
+
+const getFilteredHRNav = (user) => {
+  if (user?.subRole === SUB_ROLES.SUPER_ADMIN) {
+    return [
+      { label: 'Admin Panel', icon: RiDashboardLine, path: '/admin', className: 'text-brand-teal font-black border-b border-brand-teal/20 mb-2' },
+      ...hrNav
+    ];
+  }
+  return hrNav;
+};
+
 
 function NavItem({ item, isCollapsed }) {
   const location = useLocation();
@@ -213,12 +231,14 @@ function NavItem({ item, isCollapsed }) {
       end={item.path === '/admin' || item.path === '/distributor'}
       className={({ isActive: active }) => classNames(
         'nav-item',
-        active && 'nav-item-active'
+        active && 'nav-item-active',
+        item.className
       )}
     >
       <item.icon className="w-5 h-5 flex-shrink-0" />
       {!isCollapsed && <span>{item.label}</span>}
     </NavLink>
+
   );
 }
 
@@ -232,8 +252,9 @@ export default function Sidebar({ role = 'admin' }) {
   if (location.pathname.startsWith('/admin')) {
     navItems = adminNav;
   } else if (location.pathname.startsWith('/hr')) {
-    navItems = hrNav;
+    navItems = getFilteredHRNav(user);
   } else if (location.pathname.startsWith('/distributor')) {
+
     navItems = distributorNav;
   } else if (location.pathname.startsWith('/service-center')) {
     navItems = serviceNav;

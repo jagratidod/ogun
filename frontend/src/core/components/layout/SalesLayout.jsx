@@ -11,9 +11,10 @@ import { APP_NAME } from '../../utils/constants';
 
 const bottomNavItems = [
   { label: 'Home', icon: RiDashboardLine, path: '/sales', exact: true },
-  { label: 'Service', icon: RiCustomerServiceLine, path: '/sales/service' },
+  { label: 'Explore', icon: RiCompass3Fill, path: '/sales/social' },
   { label: 'Retailers', icon: RiUserAddLine, path: '/sales/retailers' },
   { label: 'Terminal', icon: RiShoppingCartLine, path: '/sales/terminal' },
+  { label: 'Service', icon: RiCustomerServiceLine, path: '/sales/service' },
   { label: 'Profile', icon: RiUserLine, path: '/sales/profile' },
 ];
 

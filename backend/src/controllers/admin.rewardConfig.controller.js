@@ -14,7 +14,21 @@ exports.getConfig = async (req, res, next) => {
     try {
         const config = await getOrCreate();
         const targets = await Target.find().sort('-createdAt');
-        return ApiResponse.success(res, { config, targets }, 'Reward config fetched');
+        
+        // Aggregate points per role
+        const User = require('../models/user.model');
+        const pointAggregation = await User.aggregate([
+            { $match: { role: { $in: ['retailer', 'distributor', 'sales_executive'] } } },
+            { $group: { _id: '$role', total: { $sum: '$rewardPoints' } } }
+        ]);
+
+        const roleTotals = {
+            retailer: pointAggregation.find(a => a._id === 'retailer')?.total || 0,
+            distributor: pointAggregation.find(a => a._id === 'distributor')?.total || 0,
+            salesExecutive: pointAggregation.find(a => a._id === 'sales_executive')?.total || 0
+        };
+
+        return ApiResponse.success(res, { config, targets, roleTotals }, 'Reward config fetched');
     } catch (err) { next(err); }
 };
 

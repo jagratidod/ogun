@@ -42,6 +42,7 @@ const DEFAULT_RULES = {
 export default function TargetConfigPage() {
   const [targets, setTargets] = useState(rewardsData.targets);
   const [earningRules, setEarningRules] = useState(DEFAULT_RULES);
+  const [roleTotals, setRoleTotals] = useState({ retailer: 0, distributor: 0, salesExecutive: 0 });
   const [loadingRules, setLoadingRules] = useState(true);
   const { systemConfig } = rewardsData;
 
@@ -54,8 +55,10 @@ export default function TargetConfigPage() {
       .then(res => {
         const rules = res.data?.data?.config?.earningRules;
         const tgts = res.data?.data?.targets;
+        const totals = res.data?.data?.roleTotals;
         if (rules) setEarningRules(prev => ({ ...prev, ...rules }));
         if (tgts) setTargets(tgts);
+        if (totals) setRoleTotals(totals);
       })
       .catch(() => {}) 
       .finally(() => setLoadingRules(false));
@@ -165,9 +168,15 @@ export default function TargetConfigPage() {
         {Object.entries(ROLE_META).map(([role, meta]) => (
           <Card key={role}>
             <CardHeader>
-              <div className="flex items-center gap-2">
-                <meta.icon className={`w-5 h-5 ${meta.color}`} />
-                <CardTitle>{meta.label} Earning Rules</CardTitle>
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center gap-2">
+                  <meta.icon className={`w-5 h-5 ${meta.color}`} />
+                  <CardTitle>{meta.label} Earning Rules</CardTitle>
+                </div>
+                <div className="text-right">
+                  <p className="text-[9px] text-content-tertiary font-black uppercase tracking-tighter">Total Held</p>
+                  <p className={`text-sm font-black ${meta.color}`}>{roleTotals[role]?.toLocaleString() || 0} Pts</p>
+                </div>
               </div>
             </CardHeader>
             <div className="p-4 space-y-3">

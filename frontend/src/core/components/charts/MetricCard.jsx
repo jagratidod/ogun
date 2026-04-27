@@ -7,11 +7,11 @@ export default function MetricCard({ title, value, change, changeLabel = 'vs las
   const formattedValue = format === 'currency' ? formatCurrency(value) : format === 'short' ? shortenNumber(value) : value;
 
   return (
-    <div className={classNames('glass-card p-4 group', className)}>
-      <div className="flex items-start justify-between gap-2">
-        <p className="text-sm text-content-secondary font-medium leading-snug min-w-0">{title}</p>
+    <div className={classNames('metric-card group', className)}>
+      <div className="flex items-start justify-between">
+        <p className="text-sm text-content-secondary font-medium">{title}</p>
         {Icon && (
-          <div className="w-10 h-10 flex-shrink-0 rounded-none bg-brand-teal/10 flex items-center justify-center group-hover:bg-brand-teal/20 transition-colors">
+          <div className="w-10 h-10 rounded-none bg-brand-teal/10 flex items-center justify-center group-hover:bg-brand-teal/20 transition-colors">
             <Icon className="w-5 h-5 text-brand-teal" />
           </div>
         )}
@@ -32,3 +32,4 @@ export default function MetricCard({ title, value, change, changeLabel = 'vs las
     </div>
   );
 }
+

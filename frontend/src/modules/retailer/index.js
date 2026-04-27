@@ -12,3 +12,6 @@ export { default as SalesHistoryPage } from './pages/SalesHistoryPage';
 export { default as BrowseDistributorProducts } from './pages/BrowseDistributorProducts';
 export { default as RetailerQueriesPage } from './pages/RetailerQueriesPage';
 export { default as RetailerOrdersPage } from './pages/RetailerOrdersPage';
+export { default as RetailerSocialPage } from './pages/RetailerSocialPage';
+export { default as RetailerSalesPage } from './pages/RetailerSalesPage';
+
