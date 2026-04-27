@@ -81,9 +81,12 @@ import WarrantyExtensionPage from '../modules/customer/pages/WarrantyExtensionPa
 import { HRDashboardPage, HREmployeesPage, HRLeavesPage, HRMyLeavesPage } from '../modules/hr';
 import { ServiceDashboardPage } from '../modules/service-center';
 
+import TechnicianManagerLayout from '../core/components/layout/TechnicianManagerLayout';
+import TechnicianLayout from '../core/components/layout/TechnicianLayout';
+import { TechManagerDashboardPage, TechnicianPortalPage, TechnicianProfilePage } from '../modules/tech-manager';
+
 import SplashPage from '../modules/shared/SplashPage';
 
-// ─── Placeholder component generator ──────────────────
 function Stub(title) {
   return () => <StubPage title={title} />;
 }
@@ -181,6 +184,8 @@ function RootRedirect() {
     case 'admin': 
       if (user?.subRole === SUB_ROLES.HR_MANAGER) return <Navigate to="/hr" replace />;
       if (user?.subRole === SUB_ROLES.SERVICE_MANAGER) return <Navigate to="/technician" replace />;
+      if (user?.subRole === SUB_ROLES.TECHNICIAN_MANAGER) return <Navigate to="/tech-manager" replace />;
+      if (user?.subRole === 'technician') return <Navigate to="/tech-portal" replace />;
       return <Navigate to="/admin" replace />;
     case 'distributor': return <Navigate to="/distributor" replace />;
     case 'retailer': return <Navigate to="/retailer" replace />;
@@ -350,6 +355,26 @@ export default function AppRouter() {
           <Route path="technicians" element={<Employees />} />
           <Route path="analytics" element={<ServiceAnalyticsPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
+        </Route>
+
+        {/* ═══ TECHNICIAN MANAGER ROUTES ═══ */}
+        <Route path="/tech-manager" element={
+          <ProtectedRoute allowedRoles={['admin']} allowedSubRoles={[SUB_ROLES.TECHNICIAN_MANAGER]}>
+            <TechnicianManagerLayout />
+          </ProtectedRoute>
+        }>
+          <Route index element={<TechManagerDashboardPage />} />
+          <Route path="profile" element={<TechnicianProfilePage />} />
+        </Route>
+
+        {/* ═══ PLAIN TECHNICIAN PORTAL ═══ */}
+        <Route path="/tech-portal" element={
+          <ProtectedRoute allowedRoles={['admin']} allowedSubRoles={['technician']}>
+            <TechnicianLayout />
+          </ProtectedRoute>
+        }>
+          <Route index element={<TechnicianPortalPage />} />
+          <Route path="profile" element={<TechnicianProfilePage />} />
         </Route>
 
         {/* Redirect old /service-center URLs */}

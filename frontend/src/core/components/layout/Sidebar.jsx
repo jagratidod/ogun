@@ -34,6 +34,14 @@ const serviceNav = [
   { label: 'Settings', icon: RiSettings3Line, path: '/technician/settings' },
 ];
 
+const techManagerNav = [
+  { label: 'Service Requests', icon: RiCustomerServiceLine, path: '/tech-manager' },
+];
+
+const technicianNav = [
+  { label: 'My Tickets', icon: RiCustomerServiceLine, path: '/tech-portal' },
+];
+
 const adminNav = [
   { label: 'Dashboard', icon: RiDashboardLine, path: '/admin' },
   {
@@ -140,10 +148,10 @@ export function getNavItems(role, subRole, permissions) {
     if (subRole === SUB_ROLES.SUPER_ADMIN) return adminNav;
     if (subRole === SUB_ROLES.HR_MANAGER) return hrNav;
     if (subRole === SUB_ROLES.SERVICE_MANAGER) return serviceNav;
+    if (subRole === SUB_ROLES.TECHNICIAN_MANAGER) return techManagerNav;
+    if (subRole === 'technician') return technicianNav;
     return adminNav.filter(item => {
-      // If no permission is required (e.g., Dashboard, Settings), show it
       if (!item.permission) return true;
-      // Otherwise check if it's in the user's permissions
       return (permissions || []).includes(item.permission);
     });
   }
@@ -231,6 +239,10 @@ export default function Sidebar({ role = 'admin' }) {
     navItems = serviceNav;
   } else if (location.pathname.startsWith('/technician')) {
     navItems = serviceNav;
+  } else if (location.pathname.startsWith('/tech-manager')) {
+    navItems = techManagerNav;
+  } else if (location.pathname.startsWith('/tech-portal')) {
+    navItems = technicianNav;
   } else if (location.pathname.startsWith('/retailer')) {
     navItems = retailerNav || [];
   } else {

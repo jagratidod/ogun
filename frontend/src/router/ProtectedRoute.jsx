@@ -20,6 +20,9 @@ export default function ProtectedRoute({ children, allowedRoles, allowedSubRoles
     if (path.startsWith('/admin')) return <Navigate to="/admin/login" replace />;
     if (path.startsWith('/hr')) return <Navigate to="/hr/login" replace />;
     if (path.startsWith('/service-center')) return <Navigate to="/service/login" replace />;
+    if (path.startsWith('/technician')) return <Navigate to="/technician/login" replace />;
+    if (path.startsWith('/tech-manager')) return <Navigate to="/technician/login" replace />;
+    if (path.startsWith('/tech-portal')) return <Navigate to="/technician/login" replace />;
     if (path.startsWith('/distributor')) return <Navigate to="/distributor/login" replace />;
     if (path.startsWith('/retailer')) return <Navigate to="/retailer/login" replace />;
     if (path.startsWith('/sales')) return <Navigate to="/sales/login" replace />;

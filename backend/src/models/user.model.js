@@ -38,6 +38,11 @@ const userSchema = new mongoose.Schema({
         default: null,
         trim: true
     },
+    // Technician service specializations
+    services: [{
+        type: String,
+        trim: true
+    }],
     approvalStatus: {
         type: String,
         enum: ['pending', 'approved', 'rejected'],

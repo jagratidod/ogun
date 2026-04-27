@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   RiToolsLine, RiUserLine, RiMailLine, RiLockPasswordLine,
   RiPhoneLine, RiMapPinLine, RiArrowRightLine, RiArrowLeftLine,
-  RiEyeLine, RiEyeOffLine, RiCheckLine, RiTimeLine
+  RiEyeLine, RiEyeOffLine, RiCheckLine, RiTimeLine, RiSettings4Line
 } from 'react-icons/ri';
 import api from '../../../core/api';
 import toast from 'react-hot-toast';
 
 const STEPS = [
-  { id: 'personal', label: 'Personal Info', fields: ['name', 'email'] },
-  { id: 'contact',  label: 'Contact',       fields: ['phone', 'location'] },
-  { id: 'security', label: 'Security',      fields: ['password', 'confirmPassword'] },
+  { id: 'personal', label: 'Personal Info' },
+  { id: 'contact',  label: 'Contact' },
+  { id: 'services', label: 'Services' },
+  { id: 'security', label: 'Security' },
 ];
 
 const EMPTY = { name: '', email: '', phone: '', location: '', password: '', confirmPassword: '' };
@@ -20,29 +21,64 @@ export default function TechnicianSignupPage() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [form, setForm] = useState(EMPTY);
+  const [selectedServices, setSelectedServices] = useState([]);
   const [errors, setErrors] = useState({});
   const [showPwd, setShowPwd] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const [serviceOptions, setServiceOptions] = useState([]);
+  const [servicesLoading, setServicesLoading] = useState(true);
+
+  // Fetch admin-configured service types
+  useEffect(() => {
+    api.get('/auth/service-config')
+      .then(res => setServiceOptions(res.data?.data?.serviceTypes || []))
+      .catch(() => setServiceOptions([]))
+      .finally(() => setServicesLoading(false));
+  }, []);
 
   const set = (field) => (e) => setForm(f => ({ ...f, [field]: e.target.value }));
+
+  const setPhone = (e) => {
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
+    setForm(f => ({ ...f, phone: digits }));
+  };
+
+  const setLocation = (e) => {
+    const letters = e.target.value.replace(/[^a-zA-Z\s]/g, '');
+    setForm(f => ({ ...f, location: letters }));
+  };
+
+  const toggleService = (svc) => {
+    setSelectedServices(prev =>
+      prev.includes(svc) ? prev.filter(s => s !== svc) : [...prev, svc]
+    );
+    // clear error on selection
+    if (errors.services) setErrors(e => ({ ...e, services: undefined }));
+  };
 
   const validate = () => {
     const e = {};
     if (step === 0) {
       if (!form.name.trim()) e.name = 'Name is required';
       if (!form.email.trim()) e.email = 'Email is required';
-      else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = 'Invalid email';
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Enter a valid email address';
     }
     if (step === 1) {
-      if (!form.phone.trim()) e.phone = 'Phone is required';
-      if (!form.location.trim()) e.location = 'Location is required';
+      if (!form.phone.trim()) e.phone = 'Phone number is required';
+      else if (!/^\d{10}$/.test(form.phone)) e.phone = 'Phone must be exactly 10 digits';
+      if (!form.location.trim()) e.location = 'City is required';
+      else if (!/^[a-zA-Z\s]+$/.test(form.location.trim())) e.location = 'City must contain only letters';
     }
     if (step === 2) {
+      if (selectedServices.length === 0) e.services = 'Select at least one service';
+    }
+    if (step === 3) {
       if (!form.password) e.password = 'Password is required';
-      else if (form.password.length < 6) e.password = 'Min 6 characters';
-      if (form.password !== form.confirmPassword) e.confirmPassword = 'Passwords do not match';
+      else if (form.password.length < 6) e.password = 'Password must be at least 6 characters';
+      if (!form.confirmPassword) e.confirmPassword = 'Please confirm your password';
+      else if (form.password !== form.confirmPassword) e.confirmPassword = 'Passwords do not match';
     }
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -54,7 +90,6 @@ export default function TechnicianSignupPage() {
       setStep(s => s + 1);
       return;
     }
-    // Final submit
     setLoading(true);
     try {
       await api.post('/auth/technician/register', {
@@ -63,6 +98,7 @@ export default function TechnicianSignupPage() {
         password: form.password,
         phone: form.phone,
         location: form.location,
+        services: selectedServices,
       });
       setDone(true);
     } catch (err) {
@@ -97,7 +133,6 @@ export default function TechnicianSignupPage() {
     );
   }
 
-  // ── Form ────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-white flex flex-col font-sans overflow-hidden">
 
@@ -159,47 +194,102 @@ export default function TechnicianSignupPage() {
       <div className="flex-1 flex flex-col px-8 pt-6 pb-10 w-full max-w-[380px] mx-auto">
         <div className="space-y-5 animate-fade-in">
 
+          {/* Step 0 — Personal Info */}
           {step === 0 && (
             <>
               <Field icon={RiUserLine} label="Full Name" error={errors.name}>
-                <input type="text" placeholder="e.g. Ravi Kumar" value={form.name} onChange={set('name')}
-                  className={inputCls} />
+                <input type="text" placeholder="e.g. Ravi Kumar" value={form.name} onChange={set('name')} className={inputCls} />
               </Field>
               <Field icon={RiMailLine} label="Email Address" error={errors.email}>
-                <input type="email" placeholder="your@email.com" value={form.email} onChange={set('email')}
-                  className={inputCls} />
+                <input type="email" placeholder="your@email.com" value={form.email} onChange={set('email')} className={inputCls} />
               </Field>
             </>
           )}
 
+          {/* Step 1 — Contact */}
           {step === 1 && (
             <>
               <Field icon={RiPhoneLine} label="Phone Number" error={errors.phone}>
-                <input type="tel" placeholder="+91 98765 43210" value={form.phone} onChange={set('phone')}
-                  className={inputCls} />
+                <input
+                  type="tel"
+                  inputMode="numeric"
+                  placeholder="10-digit mobile number"
+                  value={form.phone}
+                  onChange={setPhone}
+                  maxLength={10}
+                  className={inputCls}
+                />
               </Field>
               <Field icon={RiMapPinLine} label="Service Area / City" error={errors.location}>
-                <input type="text" placeholder="e.g. Mumbai, Maharashtra" value={form.location} onChange={set('location')}
-                  className={inputCls} />
+                <input type="text" placeholder="e.g. Mumbai" value={form.location} onChange={setLocation} className={inputCls} />
               </Field>
             </>
           )}
 
+          {/* Step 2 — Services */}
           {step === 2 && (
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <RiSettings4Line className="w-4 h-4 text-brand-teal" />
+                <p className="text-sm font-black text-brand-teal uppercase tracking-wide">Services You Provide</p>
+              </div>
+              <p className="text-[11px] text-gray-400 mb-4">Select all appliances you can repair / service</p>
+
+              {servicesLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="w-6 h-6 border-2 border-brand-teal border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : serviceOptions.length === 0 ? (
+                <p className="text-sm text-gray-400 italic text-center py-6">No service types configured yet. Please contact admin.</p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {serviceOptions.map(svc => {
+                    const active = selectedServices.includes(svc);
+                    return (
+                      <button
+                        key={svc}
+                        type="button"
+                        onClick={() => toggleService(svc)}
+                        className={`flex items-center gap-1.5 px-3 py-2 text-[12px] font-bold rounded-[12px] border transition-all active:scale-95 ${
+                          active
+                            ? 'bg-brand-teal text-white border-brand-teal shadow-md shadow-brand-teal/20'
+                            : 'bg-white text-gray-400 border-gray-100 hover:border-brand-teal/30'
+                        }`}
+                      >
+                        {active && <RiCheckLine className="w-3 h-3" />}
+                        {svc}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {errors.services && (
+                <p className="text-[11px] text-red-400 font-medium mt-3 pl-1">{errors.services}</p>
+              )}
+
+              {selectedServices.length > 0 && (
+                <p className="text-[11px] text-brand-teal font-bold mt-3 pl-1">
+                  {selectedServices.length} service{selectedServices.length > 1 ? 's' : ''} selected
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Step 3 — Security */}
+          {step === 3 && (
             <>
               <Field icon={RiLockPasswordLine} label="Password" error={errors.password}
                 action={<button type="button" onClick={() => setShowPwd(s => !s)} className="text-gray-300 hover:text-brand-teal transition-colors">
                   {showPwd ? <RiEyeOffLine className="w-4 h-4" /> : <RiEyeLine className="w-4 h-4" />}
                 </button>}>
-                <input type={showPwd ? 'text' : 'password'} placeholder="Min 6 characters" value={form.password} onChange={set('password')}
-                  className={inputCls} />
+                <input type={showPwd ? 'text' : 'password'} placeholder="Min 6 characters" value={form.password} onChange={set('password')} className={inputCls} />
               </Field>
               <Field icon={RiLockPasswordLine} label="Confirm Password" error={errors.confirmPassword}
                 action={<button type="button" onClick={() => setShowConfirm(s => !s)} className="text-gray-300 hover:text-brand-teal transition-colors">
                   {showConfirm ? <RiEyeOffLine className="w-4 h-4" /> : <RiEyeLine className="w-4 h-4" />}
                 </button>}>
-                <input type={showConfirm ? 'text' : 'password'} placeholder="Re-enter password" value={form.confirmPassword} onChange={set('confirmPassword')}
-                  className={inputCls} />
+                <input type={showConfirm ? 'text' : 'password'} placeholder="Re-enter password" value={form.confirmPassword} onChange={set('confirmPassword')} className={inputCls} />
               </Field>
             </>
           )}
@@ -220,11 +310,11 @@ export default function TechnicianSignupPage() {
         <div className="mt-8 text-center">
           <p className="text-xs text-gray-400">Already have an account?{' '}
             <Link
-            to="/technician/login"
-            className="inline-flex items-center gap-2 text-[11px] font-black text-brand-teal uppercase tracking-[0.2em] border-b border-brand-teal/30 pb-0.5 hover:border-brand-teal transition-colors"
-          >
-            Sign In
-          </Link>
+              to="/technician/login"
+              className="inline-flex items-center gap-2 text-[11px] font-black text-brand-teal uppercase tracking-[0.2em] border-b border-brand-teal/30 pb-0.5 hover:border-brand-teal transition-colors"
+            >
+              Sign In
+            </Link>
           </p>
         </div>
       </div>
@@ -260,9 +350,7 @@ function Field({ icon: Icon, label, error, action, children }) {
       <div className="relative">
         <Icon className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-teal/40 group-focus-within:text-brand-teal transition-colors pointer-events-none" />
         {children}
-        {action && (
-          <div className="absolute right-4 top-1/2 -translate-y-1/2">{action}</div>
-        )}
+        {action && <div className="absolute right-4 top-1/2 -translate-y-1/2">{action}</div>}
       </div>
       {error && <p className="text-[11px] text-red-400 font-medium mt-1 pl-2">{error}</p>}
     </div>

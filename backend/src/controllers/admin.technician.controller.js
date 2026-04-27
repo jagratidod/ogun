@@ -8,7 +8,7 @@ const bcrypt = require('bcryptjs');
 exports.getTechnicians = async (req, res, next) => {
     try {
         const { status } = req.query; // optional filter: pending | approved | rejected
-        const query = { subRole: 'technician' };
+        const query = { subRole: { $in: ['technician', 'technician_manager'] } };
         if (status) query.approvalStatus = status;
 
         const technicians = await User.find(query)
@@ -37,6 +37,7 @@ exports.getTechnicians = async (req, res, next) => {
                 email: tech.email,
                 phone: tech.phone || null,
                 location: tech.location,
+                services: tech.services || [],
                 isActive: tech.isActive,
                 subRole: tech.subRole,
                 approvalStatus: tech.approvalStatus,
@@ -57,7 +58,7 @@ exports.getTechnicians = async (req, res, next) => {
 // @route   GET /api/v1/admin/technicians/:id
 exports.getTechnicianDetail = async (req, res, next) => {
     try {
-        const tech = await User.findOne({ _id: req.params.id, subRole: 'technician' }).select('-password');
+        const tech = await User.findOne({ _id: req.params.id, subRole: { $in: ['technician', 'technician_manager'] } }).select('-password');
         if (!tech) return ApiResponse.error(res, 'Technician not found', 404);
 
         const serviceRequests = await ServiceRequest.find({ assignedTechnician: tech._id })
@@ -79,6 +80,10 @@ exports.createTechnician = async (req, res, next) => {
 
         if (!name || !email || !password) {
             return ApiResponse.error(res, 'Name, email and password are required', 400);
+        }
+
+        if (phone && !/^[6-9]\d{9}$/.test(String(phone).trim())) {
+            return ApiResponse.error(res, 'Enter a valid 10-digit mobile number', 400);
         }
 
         const existing = await User.findOne({ email });
@@ -108,16 +113,26 @@ exports.createTechnician = async (req, res, next) => {
 // @route   PUT /api/v1/admin/technicians/:id
 exports.updateTechnician = async (req, res, next) => {
     try {
-        const { name, email, phone, location, isActive } = req.body;
+        const { name, email, phone, location, isActive, subRole } = req.body;
 
-        const tech = await User.findOne({ _id: req.params.id, subRole: 'technician' });
+        const tech = await User.findOne({ _id: req.params.id, subRole: { $in: ['technician', 'technician_manager'] } });
         if (!tech) return ApiResponse.error(res, 'Technician not found', 404);
 
         if (name) tech.name = name;
         if (email) tech.email = email;
-        if (phone !== undefined) tech.phone = phone;
+        if (phone !== undefined) {
+            if (phone && !/^[6-9]\d{9}$/.test(String(phone).trim())) {
+                return ApiResponse.error(res, 'Enter a valid 10-digit mobile number', 400);
+            }
+            tech.phone = phone;
+        }
         if (location !== undefined) tech.location = location;
         if (isActive !== undefined) tech.isActive = isActive;
+        if (subRole !== undefined) {
+            const allowed = ['technician', 'technician_manager'];
+            if (!allowed.includes(subRole)) return ApiResponse.error(res, 'Invalid subRole for technician', 400);
+            tech.subRole = subRole;
+        }
 
         await tech.save();
 
@@ -134,7 +149,7 @@ exports.updateTechnician = async (req, res, next) => {
 // @route   DELETE /api/v1/admin/technicians/:id
 exports.deleteTechnician = async (req, res, next) => {
     try {
-        const tech = await User.findOne({ _id: req.params.id, subRole: 'technician' });
+        const tech = await User.findOne({ _id: req.params.id, subRole: { $in: ['technician', 'technician_manager'] } });
         if (!tech) return ApiResponse.error(res, 'Technician not found', 404);
 
         // Unassign from open tickets
@@ -160,7 +175,7 @@ exports.updateApprovalStatus = async (req, res, next) => {
             return ApiResponse.error(res, 'Status must be approved or rejected', 400);
         }
 
-        const tech = await User.findOne({ _id: req.params.id, subRole: 'technician' });
+        const tech = await User.findOne({ _id: req.params.id, subRole: { $in: ['technician', 'technician_manager'] } });
         if (!tech) return ApiResponse.error(res, 'Technician not found', 404);
 
         tech.approvalStatus = status;

@@ -17,9 +17,11 @@ const ROLE_KEY_MAP = {
 const getRoleKey = (role) => ROLE_KEY_MAP[role] || role;
 
 export const getTokenKeys = (role, subRole) => {
-  // Use subRole for HR and Service to get specific prefixes (hr_token, service_token)
+  // Use subRole for HR and Service to get specific prefixes
   const keyPrefix = (subRole === 'hr_manager') ? 'hr' : 
-                   (subRole === 'service_manager') ? 'service' : 
+                   (subRole === 'service_manager') ? 'service' :
+                   (subRole === 'technician') ? 'service' :
+                   (subRole === 'technician_manager') ? 'service' :
                    getRoleKey(role);
                    
   return {
@@ -37,6 +39,8 @@ const detectStoredSession = () => {
     '/hr': 'hr_manager',
     '/service-center': 'service_manager',
     '/technician': 'service_manager',
+    '/tech-manager': 'service_manager',
+    '/tech-portal': 'service_manager',
     '/distributor': 'distributor',
     '/retailer': 'retailer',
     '/sales': 'sales_executive',

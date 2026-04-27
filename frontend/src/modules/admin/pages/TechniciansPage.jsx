@@ -3,7 +3,8 @@ import {
   RiToolsLine, RiUserAddLine, RiSearchLine, RiEyeLine,
   RiEditLine, RiDeleteBin7Line, RiCheckLine, RiCloseLine,
   RiLoader4Line, RiShieldCheckLine, RiTimeLine, RiMapPinLine,
-  RiThumbUpLine, RiThumbDownLine
+  RiThumbUpLine, RiThumbDownLine, RiUserStarLine, RiSettings4Line,
+  RiAddLine
 } from 'react-icons/ri';
 import {
   PageHeader, Card, CardHeader, DataTable, Badge, Button,
@@ -18,7 +19,7 @@ export default function TechniciansPage() {
   const [technicians, setTechnicians] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [activeTab, setActiveTab] = useState('approved'); // 'pending' | 'approved' | 'rejected'
+  const [activeTab, setActiveTab] = useState('pending'); // 'pending' | 'approved' | 'rejected'
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
@@ -28,7 +29,50 @@ export default function TechniciansPage() {
   const { isOpen: isDetailOpen, open: openDetail, close: closeDetail, data: detailData } = useModal();
   const { isOpen: isDeleteOpen, open: openDelete, close: closeDelete, data: deletingTech } = useModal();
 
-  useEffect(() => { fetchTechnicians(); }, []);
+  // Service type config state
+  const [serviceTypes, setServiceTypes] = useState([]);
+  const [newServiceType, setNewServiceType] = useState('');
+  const [savingConfig, setSavingConfig] = useState(false);
+
+  useEffect(() => {
+    fetchTechnicians();
+    fetchServiceConfig();
+  }, []);
+
+  const fetchServiceConfig = async () => {
+    try {
+      const res = await api.get('/admin/service-config');
+      setServiceTypes(res.data?.data?.serviceTypes || []);
+    } catch {
+      // silently fail
+    }
+  };
+
+  const handleAddServiceType = () => {
+    const val = newServiceType.trim();
+    if (!val) return;
+    if (serviceTypes.includes(val)) return toast.error('Already exists');
+    setServiceTypes(prev => [...prev, val]);
+    setNewServiceType('');
+  };
+
+  const handleRemoveServiceType = (svc) => {
+    setServiceTypes(prev => prev.filter(s => s !== svc));
+  };
+
+  const handleSaveServiceConfig = async () => {
+    if (serviceTypes.length === 0) return toast.error('Add at least one service type');
+    setSavingConfig(true);
+    const t = toast.loading('Saving service types...');
+    try {
+      await api.put('/admin/service-config', { serviceTypes });
+      toast.success('Service types saved', { id: t });
+    } catch {
+      toast.error('Failed to save', { id: t });
+    } finally {
+      setSavingConfig(false);
+    }
+  };
 
   const fetchTechnicians = async () => {
     setLoading(true);
@@ -56,6 +100,7 @@ export default function TechniciansPage() {
     if (!form.name.trim()) errors.name = 'Name is required';
     if (!form.email.trim()) errors.email = 'Email is required';
     if (!editingTech && !form.password.trim()) errors.password = 'Password is required';
+    if (form.phone && !/^[6-9]\d{9}$/.test(form.phone.replace(/\D/g, ''))) errors.phone = 'Enter a valid 10-digit mobile number';
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -121,6 +166,18 @@ export default function TechniciansPage() {
     }
   };
 
+  const handlePromoteToManager = async (tech) => {
+    if (!window.confirm(`Promote ${tech.name} to Technician Manager? They will get a dedicated portal to view and assign service requests.`)) return;
+    const t = toast.loading('Promoting to manager...');
+    try {
+      await api.put(`/admin/technicians/${tech._id}`, { subRole: 'technician_manager' });
+      toast.success(`${tech.name} is now a Technician Manager`, { id: t });
+      fetchTechnicians();
+    } catch {
+      toast.error('Promotion failed', { id: t });
+    }
+  };
+
   const handleViewDetail = async (tech) => {
     const t = toast.loading('Loading details...');
     try {
@@ -145,7 +202,12 @@ export default function TechniciansPage() {
         <div className="flex items-center gap-3">
           <Avatar name={val} size="sm" />
           <div>
-            <p className="text-sm font-semibold text-content-primary">{val}</p>
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-semibold text-content-primary">{val}</p>
+              {row.subRole === 'technician_manager' && (
+                <span className="text-[9px] font-black px-1.5 py-0.5 bg-amber-100 text-amber-600 rounded-sm uppercase tracking-wide">Manager</span>
+              )}
+            </div>
             <p className="text-xs text-content-tertiary">{row.email}</p>
           </div>
         </div>
@@ -206,6 +268,11 @@ export default function TechniciansPage() {
                   ? <RiCloseLine className="w-4 h-4 text-state-danger" />
                   : <RiCheckLine className="w-4 h-4 text-state-success" />}
               </Button>
+              {row.subRole !== 'technician_manager' && (
+                <Button variant="icon" title="Promote to Manager" onClick={() => handlePromoteToManager(row)}>
+                  <RiUserStarLine className="w-4 h-4 text-amber-500" />
+                </Button>
+              )}
               <Button variant="icon" title="Delete" onClick={() => openDelete(row)}>
                 <RiDeleteBin7Line className="w-4 h-4 text-state-danger" />
               </Button>
@@ -240,6 +307,54 @@ export default function TechniciansPage() {
           </div>
         ))}
       </div>
+
+      {/* Service Types Config */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-2">
+              <RiSettings4Line className="w-4 h-4 text-brand-teal" />
+              <span className="text-sm font-bold text-content-primary">Service Types</span>
+              <span className="text-[10px] text-content-tertiary ml-1">— shown to technicians during registration</span>
+            </div>
+            <Button size="sm" onClick={handleSaveServiceConfig} loading={savingConfig} icon={RiCheckLine}>
+              Save
+            </Button>
+          </div>
+        </CardHeader>
+        <div className="p-4 space-y-3">
+          {/* Add new */}
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="e.g. Washing Machine"
+              value={newServiceType}
+              onChange={e => setNewServiceType(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleAddServiceType()}
+              className="flex-1 h-9 px-3 text-sm bg-surface-input border border-border outline-none focus:border-brand-teal rounded-none transition-colors"
+            />
+            <Button size="sm" icon={RiAddLine} onClick={handleAddServiceType}>Add</Button>
+          </div>
+          {/* Chips */}
+          <div className="flex flex-wrap gap-2 min-h-[36px]">
+            {serviceTypes.length === 0 && (
+              <p className="text-xs text-content-tertiary italic">No service types yet. Add some above.</p>
+            )}
+            {serviceTypes.map(svc => (
+              <span key={svc} className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-bold bg-brand-teal/10 text-brand-teal border border-brand-teal/20 rounded-md">
+                {svc}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveServiceType(svc)}
+                  className="text-brand-teal/50 hover:text-state-danger transition-colors ml-0.5"
+                >
+                  <RiCloseLine className="w-3.5 h-3.5" />
+                </button>
+              </span>
+            ))}
+          </div>
+        </div>
+      </Card>
 
       {/* Tabs */}
       <div className="flex gap-1 border-b border-border">
@@ -335,12 +450,17 @@ export default function TechniciansPage() {
               />
               {formErrors.password && <p className="text-xs text-state-danger mt-1">{formErrors.password}</p>}
             </div>
-            <Input
-              label="Phone Number"
-              placeholder="+91 98765 43210"
-              value={form.phone}
-              onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
-            />
+            <div>
+              <Input
+                label="Phone Number"
+                placeholder="10-digit mobile number"
+                value={form.phone}
+                inputMode="numeric"
+                maxLength={10}
+                onChange={e => setForm(f => ({ ...f, phone: e.target.value.replace(/\D/g, '').slice(0, 10) }))}
+              />
+              {formErrors.phone && <p className="text-xs text-state-danger mt-1">{formErrors.phone}</p>}
+            </div>
           </div>
           <Input
             label="Service Area / Location"
@@ -403,6 +523,18 @@ export default function TechniciansPage() {
 
             {/* Service History */}
             <div>
+              {detailData.technician.services?.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-xs font-bold text-content-tertiary uppercase tracking-wider mb-2">Services Provided</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {detailData.technician.services.map(svc => (
+                      <span key={svc} className="px-2.5 py-1 text-[11px] font-bold bg-brand-teal/10 text-brand-teal rounded-md border border-brand-teal/20">
+                        {svc}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
               <p className="text-xs font-bold text-content-tertiary uppercase tracking-wider mb-3">Service History</p>
               {detailData.serviceRequests.length === 0 ? (
                 <p className="text-sm text-content-tertiary italic text-center py-6">No tickets assigned yet</p>

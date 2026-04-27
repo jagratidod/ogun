@@ -23,7 +23,8 @@ export default function ServiceLoginPage() {
     setLoading(false);
     if (success) {
       toast.success(`Welcome, ${user.name}`);
-      navigate('/technician');
+      if (user.subRole === 'technician_manager') navigate('/tech-manager');
+      else navigate('/tech-portal');
     } else {
       toast.error(message || 'Login failed');
     }

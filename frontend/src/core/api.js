@@ -22,6 +22,9 @@ const PATH_ROLE_MAP = {
   '/admin': 'admin',
   '/hr': 'hr',
   '/service-center': 'service',
+  '/technician': 'service',
+  '/tech-manager': 'service',
+  '/tech-portal': 'service',
   '/distributor': 'distributor',
   '/retailer': 'retailer',
   '/sales': 'sales',
@@ -117,6 +120,8 @@ api.interceptors.response.use(
           retailer: '/retailer/login',
           sales_executive: '/sales/login',
           customer: '/customer/login',
+          service: '/technician/login',
+          hr: '/hr/login',
         };
         window.location.href = roleLoginMap[keys?.role] || '/login';
         return Promise.reject(err);

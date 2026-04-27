@@ -97,5 +97,10 @@ router.put('/technicians/:id', checkPermission('service'), technicianController.
 router.patch('/technicians/:id/approval', checkPermission('service'), technicianController.updateApprovalStatus);
 router.delete('/technicians/:id', checkPermission('service'), technicianController.deleteTechnician);
 
+// Service Type Config (admin manages what services technicians can offer)
+const serviceConfigController = require('../controllers/admin.serviceConfig.controller');
+router.get('/service-config', checkPermission('service'), serviceConfigController.getServiceConfig);
+router.put('/service-config', checkPermission('service'), serviceConfigController.updateServiceConfig);
+
 module.exports = router;
 

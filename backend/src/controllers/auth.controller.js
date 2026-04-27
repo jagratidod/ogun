@@ -397,11 +397,19 @@ exports.logout = async (req, res, next) => {
 // @route   POST /api/v1/auth/technician/register
 exports.registerTechnician = async (req, res, next) => {
     try {
-        const { name, email, password, phone, location } = req.body;
+        const { name, email, password, phone, location, services } = req.body;
         const normalizedEmail = String(email || '').trim().toLowerCase();
 
         if (!name || !normalizedEmail || !password) {
             return ApiResponse.error(res, 'Name, email and password are required', 400);
+        }
+
+        if (!phone || !/^[6-9]\d{9}$/.test(String(phone).trim())) {
+            return ApiResponse.error(res, 'A valid 10-digit mobile number is required', 400);
+        }
+
+        if (!services || !Array.isArray(services) || services.length === 0) {
+            return ApiResponse.error(res, 'Please select at least one service you can provide', 400);
         }
 
         const existing = await User.findOne({ email: normalizedEmail });
@@ -415,6 +423,7 @@ exports.registerTechnician = async (req, res, next) => {
             password,
             phone: phone || null,
             location: location || null,
+            services,
             role: 'admin',
             subRole: 'technician',
             isActive: false,
@@ -443,7 +452,7 @@ exports.technicianLogin = async (req, res, next) => {
             return ApiResponse.error(res, 'Email and password are required', 400);
         }
 
-        const user = await User.findOne({ email: normalizedEmail, subRole: 'technician' }).select('+password');
+        const user = await User.findOne({ email: normalizedEmail, subRole: { $in: ['technician', 'technician_manager'] } }).select('+password');
 
         if (!user) {
             return ApiResponse.error(res, 'No technician account found with this email', 401);
