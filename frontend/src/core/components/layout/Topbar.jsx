@@ -6,6 +6,7 @@ import Avatar from '../ui/Avatar';
 import { useState, useEffect } from 'react';
 import notificationsData from '../../../data/notifications.json';
 import { formatRelativeTime } from '../../utils/formatters';
+import GlobalSearch from './GlobalSearch';
 
 export default function Topbar() {
   const { user, logout } = useAuthContext();
@@ -41,12 +42,7 @@ export default function Topbar() {
           <RiMenuLine className="w-5 h-5" />
         </button>
         <div className="hidden sm:flex items-center relative">
-          <RiSearchLine className="absolute left-3 w-4 h-4 text-content-tertiary" />
-          <input
-            type="text"
-            placeholder="Search anything..."
-            className="input-field pl-10 pr-4 w-64 lg:w-80"
-          />
+          <GlobalSearch />
         </div>
       </div>
 

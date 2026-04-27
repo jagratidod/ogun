@@ -19,15 +19,20 @@ export default function AdminLoginPage() {
     otp: ''
   });
 
+  const [emailError, setEmailError] = useState('');
+
   const handleNext = async (e) => {
     e.preventDefault();
     if (step === 0) {
       if (!formData.email) {
-        return toast.error('Identification required.');
+        setEmailError('Email is required.');
+        return;
       }
       if (!validateEmail(formData.email)) {
-        return toast.error('Invalid corporate email format.');
+        setEmailError('Enter a valid email address (e.g. staff@ogun.in)');
+        return;
       }
+      setEmailError('');
       setLoading(true);
       const { success, message } = await requestOTP(formData.email, 'admin');
       setLoading(false);
@@ -144,14 +149,14 @@ export default function AdminLoginPage() {
                   <div className="relative">
                     <RiMailLine className="absolute left-0 top-1/2 -translate-y-1/2 text-content-tertiary group-focus-within:text-brand-teal transition-colors w-5 h-5" />
                     <input 
-                      type="email"
+                      type="text"
                       placeholder="staff@ogun.in"
                       value={formData.email}
-                      onChange={(e) => setFormData({...formData, email: e.target.value})}
-                      className="w-full h-12 pl-8 border-b-2 border-gray-100 focus:border-brand-teal transition-all text-base font-bold text-[#0F172A] outline-none placeholder:text-gray-200 placeholder:font-normal"
-                      required
+                      onChange={(e) => { setFormData({...formData, email: e.target.value}); setEmailError(''); }}
+                      className={`w-full h-12 pl-8 border-b-2 transition-all text-base font-bold text-[#0F172A] outline-none placeholder:text-gray-200 placeholder:font-normal ${emailError ? 'border-red-400' : 'border-gray-100 focus:border-brand-teal'}`}
                     />
                   </div>
+                  {emailError && <p className="text-[11px] text-red-400 font-medium pl-1 mt-1">{emailError}</p>}
                 </div>
               ) : (
                 <div className="space-y-2.5 group">
@@ -172,7 +177,7 @@ export default function AdminLoginPage() {
                       placeholder="Enter 6-digit code"
                       maxLength={6}
                       value={formData.otp}
-                      onChange={(e) => setFormData({...formData, otp: e.target.value.replace(/\D/g, '')})}
+                      onChange={(e) => setFormData({...formData, otp: e.target.value.replace(/\D/g, '').slice(0, 6)})}
                       className="w-full h-12 pl-8 border-b-2 border-gray-100 focus:border-brand-pink transition-all text-base font-bold text-[#0F172A] outline-none placeholder:text-gray-200 placeholder:font-normal"
                       required
                     />

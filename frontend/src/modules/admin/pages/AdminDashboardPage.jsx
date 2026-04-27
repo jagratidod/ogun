@@ -1,46 +1,53 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   RiShoppingCartLine, RiMoneyDollarCircleLine, RiTruckLine, RiStore2Line,
   RiAlertLine, RiCustomerServiceLine, RiArrowRightLine, RiTimeLine,
-  RiCheckboxCircleLine, RiErrorWarningLine, RiUserAddLine, RiTrophyLine,
-  RiGroupLine, RiCalendarLine, RiWalletLine
+  RiUserAddLine, RiGroupLine, RiLoader4Line, RiToolsLine
 } from 'react-icons/ri';
 import MetricCard from '../../../core/components/charts/MetricCard';
 import AreaChartComponent from '../../../core/components/charts/AreaChart';
 import BarChartComponent from '../../../core/components/charts/BarChart';
-import PieChartComponent from '../../../core/components/charts/PieChart';
 import Badge from '../../../core/components/ui/Badge';
 import Button from '../../../core/components/ui/Button';
 import PageHeader from '../../../core/components/layout/PageHeader';
 import { formatCurrency, formatRelativeTime } from '../../../core/utils/formatters';
 import { usePermissions } from '../../../core';
-import dashboardData from '../../../data/adminDashboard.json';
-
-const { metrics, salesTrend, topDistributors, topRetailers, salesByCategory, recentActivity, lowStockAlerts, pendingRequests } = dashboardData;
+import api from '../../../core/api';
 
 const activityIcons = {
   order: RiShoppingCartLine,
-  restock: RiTruckLine,
   service: RiCustomerServiceLine,
-  stock: RiAlertLine,
-  payment: RiMoneyDollarCircleLine,
-  hr: RiUserAddLine,
-  reward: RiTrophyLine,
-};
-
-const activityColors = {
-  placed: 'text-state-info',
-  approved: 'text-state-success',
-  assigned: 'text-brand-teal',
-  warning: 'text-state-warning',
-  completed: 'text-state-success',
-  active: 'text-state-success',
-  closed: 'text-content-tertiary',
 };
 
 export default function AdminDashboardPage() {
   const navigate = useNavigate();
   const { canAccess, isSuperAdmin, user } = usePermissions();
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get('/admin/dashboard')
+      .then(res => setData(res.data?.data))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="page-container flex items-center justify-center min-h-[60vh]">
+        <RiLoader4Line className="w-10 h-10 text-brand-teal animate-spin" />
+      </div>
+    );
+  }
+
+  const m = data?.metrics || {};
+  const salesTrend = data?.salesTrend || [];
+  const topDistributors = data?.topDistributors || [];
+  const topRetailers = data?.topRetailers || [];
+  const lowStockAlerts = data?.lowStockAlerts || [];
+  const pendingRequests = data?.pendingRequests || [];
+  const recentActivity = data?.recentActivity || [];
 
   return (
     <div className="page-container">
@@ -54,156 +61,111 @@ export default function AdminDashboardPage() {
       </PageHeader>
 
       {/* ── Metric Cards ──────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         {(canAccess('orders') || canAccess('accounts')) && (
           <div className="cursor-pointer" onClick={() => navigate('/admin/orders')}>
-            <MetricCard
-              title="Today's Sales"
-              value={metrics.totalSalesToday.value}
-              change={metrics.totalSalesToday.change}
-              format="currency"
-              icon={RiMoneyDollarCircleLine}
-            />
+            <MetricCard title="Today's Revenue" value={m.todayRevenue ?? 0} format="currency" icon={RiMoneyDollarCircleLine} />
           </div>
         )}
         {canAccess('orders') && (
           <div className="cursor-pointer" onClick={() => navigate('/admin/orders')}>
-            <MetricCard
-              title="Total Orders"
-              value={metrics.totalOrders.value}
-              change={metrics.totalOrders.change}
-              icon={RiShoppingCartLine}
-            />
+            <MetricCard title="Total Orders" value={m.totalOrders ?? 0} icon={RiShoppingCartLine} />
           </div>
         )}
         {canAccess('distributors') && (
           <div className="cursor-pointer" onClick={() => navigate('/admin/distributors')}>
-            <MetricCard
-              title="Active Distributors"
-              value={metrics.activeDistributors.value}
-              change={metrics.activeDistributors.change}
-              icon={RiTruckLine}
-            />
+            <MetricCard title="Active Distributors" value={m.activeDistributors ?? 0} icon={RiTruckLine} />
           </div>
         )}
         {canAccess('retailers') && (
           <div className="cursor-pointer" onClick={() => navigate('/admin/retailers')}>
+            <MetricCard title="Active Retailers" value={m.activeRetailers ?? 0} icon={RiStore2Line} />
+          </div>
+        )}
+        {canAccess('customers') && (
+          <div className="cursor-pointer" onClick={() => navigate('/admin/customers')}>
+            <MetricCard title="Total Customers" value={m.totalCustomers ?? 0} icon={RiGroupLine} />
+          </div>
+        )}
+        {canAccess('service') && (
+          <div className="cursor-pointer" onClick={() => navigate('/admin/service')}>
             <MetricCard
-              title="Active Retailers"
-              value={metrics.activeRetailers.value}
-              change={metrics.activeRetailers.change}
-              icon={RiStore2Line}
+              title="Open Service Tickets"
+              value={m.openServiceRequests ?? 0}
+              icon={RiCustomerServiceLine}
+              variant={m.openServiceRequests > 0 ? 'warning' : 'default'}
             />
           </div>
         )}
-        {/* HR Metrics for HR Managers */}
-        {canAccess('hr') && !isSuperAdmin && (
-          <>
-            <div className="cursor-pointer" onClick={() => navigate('/admin/hr/employees')}>
-              <MetricCard
-                title="Total Employees"
-                value="452"
-                change="+12"
-                icon={RiGroupLine}
-              />
-            </div>
-            <div className="cursor-pointer" onClick={() => navigate('/admin/leaves')}>
-              <MetricCard
-                title="On Leave Today"
-                value="14"
-                change="-2"
-                icon={RiCalendarLine}
-              />
-            </div>
-          </>
-        )}
-        {canAccess('payroll') && !isSuperAdmin && (
-          <div className="cursor-pointer" onClick={() => navigate('/admin/payroll')}>
+        {canAccess('service') && m.pendingTechnicians > 0 && (
+          <div className="cursor-pointer" onClick={() => navigate('/admin/technicians')}>
             <MetricCard
-              title="Payroll Disbursed"
-              value="84.2"
-              format="percentage"
-              icon={RiWalletLine}
+              title="Pending Technicians"
+              value={m.pendingTechnicians}
+              icon={RiToolsLine}
+              variant="danger"
             />
           </div>
         )}
       </div>
 
-      {/* ── Charts Row ─────────────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Sales Trend */}
-        {(canAccess('reports') || canAccess('orders')) && (
-          <div className="lg:col-span-2 glass-card p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="section-title">Sales Trend</h3>
-                <p className="text-sm text-content-secondary mt-0.5">Last 12 months revenue</p>
-              </div>
-              <span className="text-sm font-semibold text-brand-teal">{formatCurrency(metrics.totalSalesMonth.value)} this month</span>
+      {/* ── Sales Trend ─────────────────────────────────────── */}
+      {(canAccess('reports') || canAccess('orders')) && salesTrend.length > 0 && (
+        <div className="glass-card p-5">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="section-title">Sales Trend</h3>
+              <p className="text-sm text-content-secondary mt-0.5">Last 6 months revenue</p>
             </div>
-            <AreaChartComponent data={salesTrend} dataKey="sales" xKey="month" name="Revenue" height={280} />
+            <span className="text-sm font-semibold text-brand-teal">{formatCurrency(m.monthRevenue ?? 0)} this month</span>
           </div>
-        )}
-
-        {/* Sales by Category */}
-        {canAccess('inventory') && (
-          <div className="glass-card p-5">
-            <h3 className="section-title mb-4">Sales by Category</h3>
-            <PieChartComponent data={salesByCategory} height={280} innerRadius={55} outerRadius={90} />
-          </div>
-        )}
-      </div>
+          <AreaChartComponent data={salesTrend} dataKey="sales" xKey="month" name="Revenue" height={260} />
+        </div>
+      )}
 
       {/* ── Top Performers ─────────────────────────────────── */}
       {(canAccess('distributors') || canAccess('retailers')) && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Top Distributors */}
-          {canAccess('distributors') && (
+          {canAccess('distributors') && topDistributors.length > 0 && (
             <div className="glass-card p-5">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="section-title">Top Distributors</h3>
-                <button 
-                  onClick={() => navigate('/admin/distributors')}
-                  className="text-sm text-brand-teal hover:text-brand-teal-light flex items-center gap-1 transition-colors"
-                >
+                <button onClick={() => navigate('/admin/distributors')} className="text-sm text-brand-teal flex items-center gap-1">
                   View all <RiArrowRightLine className="w-4 h-4" />
                 </button>
               </div>
-              <BarChartComponent data={topDistributors} dataKey="sales" xKey="name" layout="horizontal" height={250} name="Sales" />
+              <BarChartComponent data={topDistributors} dataKey="sales" xKey="name" layout="horizontal" height={220} name="Sales" />
             </div>
           )}
-
-          {/* Top Retailers */}
-          {canAccess('retailers') && (
+          {canAccess('retailers') && topRetailers.length > 0 && (
             <div className="glass-card p-5">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="section-title">Top Retailers</h3>
-                <button 
-                  onClick={() => navigate('/admin/retailers')}
-                  className="text-sm text-brand-teal hover:text-brand-teal-light flex items-center gap-1 transition-colors"
-                >
+                <button onClick={() => navigate('/admin/retailers')} className="text-sm text-brand-teal flex items-center gap-1">
                   View all <RiArrowRightLine className="w-4 h-4" />
                 </button>
               </div>
-              <BarChartComponent data={topRetailers} dataKey="sales" xKey="name" layout="horizontal" height={250} color="#E0128A" name="Sales" />
+              <BarChartComponent data={topRetailers} dataKey="sales" xKey="name" layout="horizontal" height={220} color="#E0128A" name="Sales" />
             </div>
           )}
         </div>
       )}
 
-      {/* ── Bottom Row: Activity, Alerts, Requests ─────── */}
+      {/* ── Bottom Row ─────────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Recent Activity - Accessible to all but filtered by content later maybe */}
+
+        {/* Recent Activity */}
         <div className="glass-card p-5">
           <h3 className="section-title mb-4">Recent Activity</h3>
-          <div className="space-y-3 max-h-[380px] overflow-y-auto scrollbar-hide">
-            {recentActivity
-              .filter(item => isSuperAdmin || canAccess(item.type))
-              .map((item) => {
+          {recentActivity.length === 0 ? (
+            <p className="text-sm text-content-tertiary italic text-center py-8">No recent activity</p>
+          ) : (
+            <div className="space-y-3 max-h-[360px] overflow-y-auto scrollbar-hide">
+              {recentActivity.map((item) => {
                 const Icon = activityIcons[item.type] || RiTimeLine;
                 return (
-                  <div key={item.id} className="flex items-start gap-3 p-2.5 rounded-none hover:bg-surface-hover/50 transition-colors">
-                    <div className={`w-8 h-8 rounded-none flex items-center justify-center flex-shrink-0 bg-surface-input ${activityColors[item.status] || 'text-content-secondary'}`}>
+                  <div key={item.id} className="flex items-start gap-3 p-2.5 hover:bg-surface-hover/50 transition-colors">
+                    <div className="w-8 h-8 flex items-center justify-center flex-shrink-0 bg-surface-input text-content-secondary">
                       <Icon className="w-4 h-4" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -213,7 +175,8 @@ export default function AdminDashboardPage() {
                   </div>
                 );
               })}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Low Stock Alerts */}
@@ -221,48 +184,60 @@ export default function AdminDashboardPage() {
           <div className="glass-card p-5">
             <div className="flex items-center justify-between mb-4">
               <h3 className="section-title">Low Stock Alerts</h3>
-              <span className="badge-danger">{lowStockAlerts.length} items</span>
+              {lowStockAlerts.length > 0 && (
+                <span className="badge-danger">{lowStockAlerts.length} items</span>
+              )}
             </div>
-            <div className="space-y-3">
-              {lowStockAlerts.map((item) => (
-                <div key={item.id} className="flex items-center justify-between p-3 rounded-none bg-surface-input/50 border border-border/50">
-                  <div>
-                    <p className="text-sm font-medium text-content-primary">{item.name}</p>
-                    <p className="text-xs text-content-tertiary">{item.sku} · {item.category}</p>
+            {lowStockAlerts.length === 0 ? (
+              <p className="text-sm text-content-tertiary italic text-center py-8">All stock levels healthy</p>
+            ) : (
+              <div className="space-y-3">
+                {lowStockAlerts.map((item) => (
+                  <div key={item.id} className="flex items-center justify-between p-3 bg-surface-input/50 border border-border/50">
+                    <div>
+                      <p className="text-sm font-medium text-content-primary">{item.name}</p>
+                      <p className="text-xs text-content-tertiary">{item.sku} · {item.category}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className={`text-sm font-bold ${item.stock <= 5 ? 'text-state-danger' : 'text-state-warning'}`}>
+                        {item.stock} left
+                      </p>
+                      <p className="text-xs text-content-tertiary">min: {item.minStock}</p>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className={`text-sm font-bold ${item.stock <= 5 ? 'text-state-danger' : 'text-state-warning'}`}>
-                      {item.stock} left
-                    </p>
-                    <p className="text-xs text-content-tertiary">min: {item.minStock}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
-        {/* Pending Requests */}
+        {/* Pending Orders */}
         {canAccess('orders') && (
           <div className="glass-card p-5">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="section-title">Pending Requests</h3>
-              <span className="badge-warning">{pendingRequests.filter(r => r.status === 'requested').length} pending</span>
+              <h3 className="section-title">Pending Orders</h3>
+              {pendingRequests.length > 0 && (
+                <span className="badge-warning">{pendingRequests.length} pending</span>
+              )}
             </div>
-            <div className="space-y-3">
-              {pendingRequests.map((req) => (
-                <div key={req.id} className="flex items-center justify-between p-3 rounded-none bg-surface-input/50 border border-border/50">
-                  <div>
-                    <p className="text-sm font-medium text-content-primary">{req.id}</p>
-                    <p className="text-xs text-content-tertiary">{req.retailer} · {req.items} items</p>
+            {pendingRequests.length === 0 ? (
+              <p className="text-sm text-content-tertiary italic text-center py-8">No pending orders</p>
+            ) : (
+              <div className="space-y-3">
+                {pendingRequests.map((req) => (
+                  <div key={req.id} className="flex items-center justify-between p-3 bg-surface-input/50 border border-border/50">
+                    <div>
+                      <p className="text-sm font-medium text-content-primary">{req.id}</p>
+                      <p className="text-xs text-content-tertiary">{req.retailer} · {req.items} items</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-semibold text-content-primary">{formatCurrency(req.total)}</p>
+                      <Badge status={req.status} />
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm font-semibold text-content-primary">{formatCurrency(req.total)}</p>
-                    <Badge status={req.status} />
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
