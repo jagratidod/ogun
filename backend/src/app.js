@@ -29,6 +29,7 @@ const routes = require('./routes');
 
 // Use Routes
 app.use('/api/v1', routes);
+app.use('/api', routes); // Fallback for calls without v1 prefix
 
 // Error Handler
 app.use(errorHandler);

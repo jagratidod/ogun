@@ -86,7 +86,7 @@ export default function AdminLoginPage() {
           {/* Intense Theme Gradient Background */}
           <div className="absolute inset-0 bg-gradient-to-br from-brand-teal via-[#3FAFB0] to-brand-magenta" />
           <div className="absolute top-0 left-0 w-full h-full opacity-20" style={{ 
-             backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")',
+             backgroundImage: 'url("/noise.svg")',
              filter: 'contrast(120%) brightness(120%)'
           }} />
 

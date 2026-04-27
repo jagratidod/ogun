@@ -58,7 +58,7 @@ export default function AdminForgotPasswordPage() {
         <div className="w-full md:w-[45%] p-12 lg:p-16 flex flex-col justify-between relative bg-brand-teal overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-[#3FAFB0] via-[#E0128A] to-[#2D8F9C] opacity-90" />
           <div className="absolute top-0 left-0 w-full h-full opacity-20" style={{ 
-             backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")',
+             backgroundImage: 'url("/noise.svg")',
              filter: 'contrast(120%) brightness(120%)'
           }} />
 
