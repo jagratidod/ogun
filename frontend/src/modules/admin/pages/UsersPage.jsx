@@ -196,6 +196,7 @@ export default function UsersPage() {
   const handleSave = async () => {
     if (!formData.name.trim()) return toast.error('Name is required.');
     if (!formData.email.trim()) return toast.error('Email is required.');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) return toast.error('Enter a valid email address.');
     if (!formData.roleId) return toast.error('Please assign a role.');
 
     const role = roles.find(r => r.id === formData.roleId);
@@ -292,9 +293,6 @@ export default function UsersPage() {
     {
       key: 'actions', label: 'Actions', align: 'right', render: (_, row) => (
         <div className="flex justify-end gap-1">
-          <Button variant="icon" title="Resend Invite" onClick={() => handleResendInvite(row)}>
-            <RiMailSendLine className="w-4 h-4 text-brand-teal" />
-          </Button>
           <Button variant="icon" onClick={() => open(row)} title="Edit User">
             <RiEditLine className="w-4 h-4" />
           </Button>
@@ -394,10 +392,11 @@ export default function UsersPage() {
                 label="Full Name"
                 placeholder="e.g. Vikram Singh"
                 value={formData.name}
-                onChange={(e) => setFormData(f => ({ ...f, name: e.target.value }))}
+                onChange={(e) => setFormData(f => ({ ...f, name: e.target.value.replace(/[0-9]/g, '') }))}
               />
               <Input
                 label="Staff Email"
+                type="email"
                 placeholder="staff@ogun.in"
                 value={formData.email}
                 disabled={selectedUser}
@@ -407,9 +406,9 @@ export default function UsersPage() {
             </div>
           </div>
 
-          {/* Role & Department */}
+          {/* Role & Status */}
           <div>
-            <p className="text-[10px] font-black text-content-tertiary uppercase tracking-[0.2em] mb-3">Role & Department</p>
+            <p className="text-[10px] font-black text-content-tertiary uppercase tracking-[0.2em] mb-3">Role & Status</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-content-secondary">Assign Role</label>
@@ -431,23 +430,30 @@ export default function UsersPage() {
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-content-secondary">Status</label>
-                <select
-                  className="input-field"
-                  value={formData.status}
-                  onChange={(e) => setFormData(f => ({ ...f, status: e.target.value }))}
-                  disabled={selectedUser?.subRole === 'super_admin'}
-                >
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                </select>
-              </div>
-              <div className="md:col-span-2">
-                <Input
-                  label="Department"
-                  placeholder="e.g. Sales, Finance, HR"
-                  value={formData.department}
-                  onChange={(e) => setFormData(f => ({ ...f, department: e.target.value }))}
-                />
+                <div className="flex items-center gap-2 mt-1">
+                  <button
+                    type="button"
+                    onClick={() => { if (selectedUser?.subRole !== 'super_admin') setFormData(f => ({ ...f, status: 'active' })); }}
+                    className={`flex-1 py-2 text-xs font-bold border transition-all ${
+                      formData.status === 'active'
+                        ? 'bg-state-success/10 text-state-success border-state-success/30'
+                        : 'bg-surface-input text-content-tertiary border-border hover:border-state-success/30'
+                    }`}
+                  >
+                    Active
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { if (selectedUser?.subRole !== 'super_admin') setFormData(f => ({ ...f, status: 'inactive' })); }}
+                    className={`flex-1 py-2 text-xs font-bold border transition-all ${
+                      formData.status === 'inactive'
+                        ? 'bg-state-danger/10 text-state-danger border-state-danger/30'
+                        : 'bg-surface-input text-content-tertiary border-border hover:border-state-danger/30'
+                    }`}
+                  >
+                    Inactive
+                  </button>
+                </div>
               </div>
             </div>
           </div>

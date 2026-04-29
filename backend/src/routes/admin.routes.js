@@ -12,9 +12,12 @@ router.get('/', (req, res) => {
 router.use(protect);
 router.use(restrictTo('admin'));
 
+// Dashboard
+const dashboardController = require('../controllers/admin.dashboard.controller');
+router.get('/dashboard', dashboardController.getDashboard);
+
 // Admin User Management Routes (Requires rbac permission or super_admin)
-router.get('/users', checkPermission('rbac'), adminController.getUsers);
-router.post('/users', checkPermission('rbac'), adminController.createUser);
+router.get('/users', checkPermission('rbac'), adminController.getUsers);router.post('/users', checkPermission('rbac'), adminController.createUser);
 router.put('/users/:id', checkPermission('rbac'), adminController.updateUser);
 router.delete('/users/:id', checkPermission('rbac'), adminController.deleteUser);
 
