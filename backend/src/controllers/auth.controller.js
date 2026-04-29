@@ -499,3 +499,31 @@ exports.technicianLogin = async (req, res, next) => {
         next(error);
     }
 };
+
+// @desc    Update User Preferences (Theme, Notifications, etc.)
+// @route   PATCH /api/v1/auth/preferences
+exports.updatePreferences = async (req, res, next) => {
+    try {
+        const { theme, compactMode, notifications } = req.body;
+
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return ApiResponse.error(res, "User not found", 404);
+        }
+
+        // Deep merge or specific updates
+        if (theme) user.preferences.theme = theme;
+        if (compactMode !== undefined) user.preferences.compactMode = compactMode;
+        if (notifications) {
+            if (notifications.email !== undefined) user.preferences.notifications.email = notifications.email;
+            if (notifications.sms !== undefined) user.preferences.notifications.sms = notifications.sms;
+            if (notifications.push !== undefined) user.preferences.notifications.push = notifications.push;
+        }
+
+        await user.save();
+
+        return ApiResponse.success(res, user.preferences, "Preferences updated successfully");
+    } catch (error) {
+        next(error);
+    }
+};

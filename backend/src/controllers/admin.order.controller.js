@@ -61,6 +61,8 @@ exports.updateOrderStatus = catchAsync(async (req, res, next) => {
 
     const mongoose = require('mongoose');
     const InventoryModel = mongoose.model('Inventory');
+    const Invoice = mongoose.model('Invoice');
+    const Transaction = mongoose.model('Transaction');
 
     const fulfillmentStatuses = ['Confirmed', 'Processing', 'In Transit', 'Completed'];
     const currentStatus = (status || '').trim();
@@ -69,6 +71,51 @@ exports.updateOrderStatus = catchAsync(async (req, res, next) => {
 
     const isFulfillment = fulfillmentStatuses.some(s => s.toLowerCase() === currentStatus.toLowerCase());
     
+    // --- Phase 3: Auto-Invoice Logic ---
+    if (currentStatus.toLowerCase() === 'confirmed' && oldStatus.toLowerCase() !== 'confirmed') {
+        const invoiceId = `INV-${order.orderId.split('-').pop()}`;
+        
+        // Check if invoice already exists
+        const existingInvoice = await Invoice.findOne({ invoiceId });
+        if (!existingInvoice) {
+            log(`- Creating Auto-Invoice: ${invoiceId}`);
+            
+            const dueDate = new Date();
+            dueDate.setDate(dueDate.getDate() + 30); // 30 days credit period
+
+            await Invoice.create({
+                invoiceId,
+                order: order._id,
+                buyer: order.buyer,
+                items: order.products.map(p => ({
+                    product: p.product,
+                    quantity: p.quantity,
+                    price: p.priceAtOrder,
+                    lineTotal: p.quantity * p.priceAtOrder
+                })),
+                subtotal: order.totalAmount,
+                taxAmount: 0, // GST 0 for now as per current schema, can add 18% later
+                totalAmount: order.totalAmount,
+                dueDate,
+                status: 'unpaid'
+            });
+
+            // Create a pending transaction for the ledger (Debit from Admin side/Receivable)
+            await Transaction.create({
+                transactionId: `TXN-ORD-${order.orderId.split('-').pop()}`,
+                type: 'income',
+                category: 'order_payment',
+                description: `Invoice raised for Order ${order.orderId}`,
+                amount: order.totalAmount,
+                status: 'pending',
+                relatedOrder: order._id,
+                party: order.buyer,
+                partyRole: 'distributor',
+                createdBy: req.user._id
+            });
+        }
+    }
+
     if (isFulfillment && !order.stockDeducted) {
       log(`Triggering deduction... Items: ${order.products?.length}`);
       

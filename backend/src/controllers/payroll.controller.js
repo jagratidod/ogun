@@ -245,6 +245,27 @@ exports.approvePayroll = async (req, res, next) => {
         
         await run.save();
 
+        // --- Phase 4: Payroll Ledger Integration ---
+        try {
+            const Transaction = require('../models/transaction.model');
+            const { v4: uuidv4 } = require('uuid');
+
+            await Transaction.create({
+                transactionId: `TXN-PAY-${uuidv4().substring(0, 8).toUpperCase()}`,
+                type: 'expense',
+                category: 'payroll',
+                description: `Payroll disbursed for ${run.monthLabel}`,
+                amount: run.totalNet,
+                status: 'completed',
+                relatedPayroll: run._id,
+                partyRole: 'admin',
+                paymentMethod: 'system',
+                createdBy: req.user._id
+            });
+        } catch (txnError) {
+            console.error('Failed to create payroll transaction:', txnError.message);
+        }
+
         return ApiResponse.success(res, run, 'All employees marked as paid and payroll disbursed');
     } catch (err) { next(err); }
 };

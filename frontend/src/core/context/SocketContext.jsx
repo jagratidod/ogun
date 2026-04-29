@@ -14,7 +14,7 @@ export const SocketProvider = ({ children }) => {
       return;
     }
 
-    const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+    const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://127.0.0.1:5000';
     const newSocket = io(socketUrl, {
       withCredentials: true,
       transports: ['websocket', 'polling'],
@@ -22,6 +22,7 @@ export const SocketProvider = ({ children }) => {
     });
 
     newSocket.on('connect', () => console.log('[Socket] Connected to server'));
+    newSocket.on('connect_error', (err) => console.error('[Socket] Connection error:', err));
     newSocket.connect();
     setSocket(newSocket);
 

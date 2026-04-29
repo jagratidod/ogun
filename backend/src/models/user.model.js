@@ -119,7 +119,16 @@ const userSchema = new mongoose.Schema({
         reason: { type: String, required: true }, // e.g., "Product Sale Bonus", "Target Achievement"
         type: { type: String, enum: ['credit', 'debit'], default: 'credit' },
         timestamp: { type: Date, default: Date.now }
-    }]
+    }],
+    preferences: {
+        theme: { type: String, enum: ['light', 'dark', 'system'], default: 'light' },
+        compactMode: { type: Boolean, default: false },
+        notifications: {
+            email: { type: Boolean, default: true },
+            sms: { type: Boolean, default: true },
+            push: { type: Boolean, default: true }
+        }
+    }
 }, {
     timestamps: true
 });

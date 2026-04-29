@@ -19,8 +19,16 @@ app.set('io', io);
 
 // Connect to Database and start server
 connectDB().then(() => {
-    server.listen(PORT, () => {
+    server.listen(PORT, '0.0.0.0', () => {
         console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
         console.log(`Real-time services (Socket.io) initialized`);
+    });
+
+    server.on('error', (error) => {
+        if (error.code === 'EADDRINUSE') {
+            console.error(`Port ${PORT} is already in use. Please kill the process or use a different port.`);
+        } else {
+            console.error('Server error:', error);
+        }
     });
 });

@@ -8,8 +8,13 @@ const { protect, restrictTo, checkPermission } = require('../middleware/auth.mid
 router.use(protect);
 router.use(restrictTo('admin'));
 
+// Protect all HR routes
+router.use(protect);
+router.use(restrictTo('admin'));
+
 // Employee Management
 router.get('/employees', checkPermission('hr'), hrController.getEmployees);
+router.get('/employees/list', hrController.getEmployees); // Simple list for dropdowns
 router.get('/departments', checkPermission('hr'), hrController.getDepartments);
 
 // Leave Management

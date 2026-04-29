@@ -30,22 +30,22 @@ export default function RetailerLayout() {
       <div className="flex flex-col h-screen overflow-hidden bg-surface-primary">
         {/* Simple header for Sub-pages */}
         {!isDashboard && (
-          <header className="sticky top-0 z-30 bg-gradient-to-b from-brand-teal/30 via-brand-teal/10 to-white/95 backdrop-blur-xl border-b border-gray-100/50 px-4 pt-3 pb-2.5">
+          <header className="sticky top-0 z-30 bg-surface-primary/80 backdrop-blur-xl border-b border-border px-4 pt-3 pb-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <button 
                   onClick={() => navigate(-1)}
-                  className="w-8 h-8 flex items-center justify-center rounded-none bg-white/50 border border-border active:scale-90 transition-all"
+                  className="w-8 h-8 flex items-center justify-center rounded-none bg-surface-hover border border-border active:scale-90 transition-all"
                 >
-                  <RiArrowLeftSLine className="w-5 h-5 text-gray-800" />
+                  <RiArrowLeftSLine className="w-5 h-5 text-content-primary" />
                 </button>
                 <div className="flex flex-col">
-                  <h2 className="text-[14px] font-black text-gray-800 tracking-tight leading-none uppercase">{pageTitle}</h2>
+                  <h2 className="text-[14px] font-black text-content-primary tracking-tight leading-none uppercase">{pageTitle}</h2>
                   <span className="text-[7px] text-brand-teal font-black uppercase tracking-widest mt-1">Retail Partner</span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                 <div className="relative w-8 h-8 flex items-center justify-center rounded-full bg-white/20 border border-white/30 text-gray-400">
+                 <div className="relative w-8 h-8 flex items-center justify-center rounded-none bg-surface-hover border border-border text-content-tertiary">
                     <RiNotification3Line className="w-4.5 h-4.5" />
                  </div>
               </div>

@@ -11,6 +11,7 @@ const Inventory = require('../models/inventory.model');
 const catchAsync = require('../utils/catchAsync');
 
 const retailerSalesController = require('../controllers/retailer.sales.controller');
+const retailerPanelController = require('../controllers/retailer.panel.controller');
 
 router.get('/', (req, res) => {
     return ApiResponse.success(res, null, 'Retailer Module');
@@ -18,6 +19,10 @@ router.get('/', (req, res) => {
 
 // Protect all retailer routes
 router.use(protect);
+
+// Financials & Analytics
+router.get('/analytics', restrictTo('retailer'), retailerPanelController.getRetailerAnalytics);
+router.get('/ledger', restrictTo('retailer'), retailerPanelController.getRetailerLedger);
 
 // Dashboard Stats
 router.get('/dashboard-stats', restrictTo('retailer'), retailerController.getDashboardStats);

@@ -4,6 +4,7 @@ const ApiResponse = require('../utils/apiResponse');
 const { protect, restrictTo } = require('../middleware/auth.middleware');
 
 const distributorShipmentController = require('../controllers/distributor.shipment.controller');
+const distributorPanelController = require('../controllers/distributor.panel.controller');
 const Inventory = require('../models/inventory.model');
 const catchAsync = require('../utils/catchAsync');
 
@@ -14,6 +15,12 @@ router.get('/', (req, res) => {
 // Protect all distributor routes
 router.use(protect);
 router.use(restrictTo('distributor', 'admin'));
+
+// Financials & Analytics
+router.get('/analytics', distributorPanelController.getDistributorAnalytics);
+router.get('/ledger', distributorPanelController.getDistributorLedger);
+router.get('/payments', distributorPanelController.getDistributorPayments);
+router.post('/payments', distributorPanelController.recordCollection);
 
 // Inventory Flow
 router.get('/inventory', catchAsync(async (req, res) => {

@@ -4,7 +4,7 @@ import ProtectedRoute from './ProtectedRoute';
 import { SUB_ROLES } from '../core/utils/constants';
 
 // Layouts
-import LaunchpadPage from '../modules/auth/pages/LaunchpadPage';
+import AuthPortalPage from '../modules/auth/pages/AuthPortalPage';
 import AdminLoginPage from '../modules/auth/pages/AdminLoginPage';
 import AdminSignUpPage from '../modules/auth/pages/AdminSignUpPage';
 import AdminForgotPasswordPage from '../modules/auth/pages/AdminForgotPasswordPage';
@@ -206,7 +206,7 @@ export default function AppRouter() {
         <Route path="/" element={<Navigate to="/login" replace />} />
 
         {/* Auth Pages */}
-        <Route path="/login" element={<LaunchpadPage />} />
+        <Route path="/login" element={<AuthPortalPage />} />
         <Route path="/admin/login" element={<AdminLoginPage />} />
         <Route path="/admin/signup" element={<AdminSignUpPage />} />
         <Route path="/admin/forgot-password" element={<AdminForgotPasswordPage />} />

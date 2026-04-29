@@ -29,7 +29,7 @@ export default function Input({
         <input
           id={inputId}
           className={classNames(
-            'w-full h-11 bg-white border border-border rounded-xl text-[10px] font-black uppercase tracking-tight outline-none focus:border-brand-teal/40 transition-all shadow-sm placeholder:text-gray-300',
+            'w-full h-11 bg-surface-input border border-border rounded-xl text-[10px] font-black uppercase tracking-tight outline-none focus:border-brand-teal/40 transition-all shadow-sm placeholder:text-content-tertiary/50 text-content-primary',
             Icon ? 'pl-11' : 'pl-4',
             'pr-4',
             error ? 'border-state-danger' : 'hover:border-brand-teal/20'

@@ -9,25 +9,19 @@ import { formatRelativeTime } from '../../utils/formatters';
 import GlobalSearch from './GlobalSearch';
 
 export default function Topbar() {
-  const { user, logout } = useAuthContext();
+  const { user, logout, updatePreferences } = useAuthContext();
   const { openMobile } = useSidebarContext();
   const { unreadCount, notifications, loadNotifications, markAsRead, markAllRead } = useNotificationContext();
   const [showProfile, setShowProfile] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [isDark, setIsDark] = useState(() => localStorage.getItem('theme') === 'dark');
 
-  useEffect(() => {
-    // Sync theme with document class
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  }, [isDark]);
+  const currentTheme = user?.preferences?.theme || 'light';
+  const isDark = currentTheme === 'dark';
 
-  const toggleTheme = () => setIsDark(!isDark);
+  const toggleTheme = async () => {
+    const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
+    await updatePreferences({ theme: nextTheme });
+  };
 
   useEffect(() => {
     // Load mock notifications on mount

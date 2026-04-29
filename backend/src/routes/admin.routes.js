@@ -116,5 +116,20 @@ router.patch('/explore/reorder', exploreController.reorderItems);
 router.put('/explore/:id', localUpload.single('file'), exploreController.updateExploreItem);
 router.delete('/explore/:id', exploreController.deleteExploreItem);
 
+// ─── Accounts & Financial Section ──────────────────────────────────────────
+const accountsController = require('../controllers/admin.accounts.controller');
+const deductionsController = require('../controllers/admin.deductions.controller');
+
+router.get('/accounts/ledger', accountsController.getLedger);
+router.get('/accounts/invoices', accountsController.getInvoices);
+router.get('/accounts/invoices/:id', accountsController.getInvoiceById);
+router.post('/accounts/invoices/:id/payment', accountsController.recordPayment);
+router.get('/accounts/payments', accountsController.getPayments);
+router.get('/accounts/financial-report', accountsController.getFinancialReport);
+
+router.get('/accounts/adjustments', deductionsController.getAdjustments);
+router.post('/accounts/adjustments', deductionsController.createAdjustment);
+router.patch('/accounts/adjustments/:id/approve', deductionsController.approveAdjustment);
+
 module.exports = router;
 

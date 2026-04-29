@@ -107,14 +107,6 @@ export default function RetailerOrdersPage() {
 
   return (
     <div className="page-container">
-      <PageHeader 
-        title="My Orders" 
-        subtitle="Track and manage your stock orders placed to your distributor"
-      >
-        <Button icon={RiRefreshLine} variant="secondary" onClick={fetchOrders} disabled={loading}>
-          Refresh
-        </Button>
-      </PageHeader>
 
       <Card>
         <DataTable columns={columns} data={orders} loading={loading} />

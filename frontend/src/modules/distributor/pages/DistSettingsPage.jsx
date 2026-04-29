@@ -4,7 +4,8 @@ import {
   RiPaletteLine, RiGlobalLine, RiSmartphoneLine, 
   RiDatabaseLine, RiInformationLine, RiArrowRightSLine, 
   RiLogoutBoxRLine, RiUserLine, RiStore2Line, RiMapPinLine, 
-  RiPhoneLine, RiTruckLine, RiShieldLine, RiLockLine, RiCompass3Fill 
+  RiPhoneLine, RiTruckLine, RiShieldLine, RiLockLine, RiCompass3Fill,
+  RiBarChartLine, RiTableLine, RiHistoryLine
 } from 'react-icons/ri';
 import { 
   PageHeader, Card, CardHeader, CardTitle, CardDescription, 
@@ -15,6 +16,11 @@ import { useAuthContext } from '../../../core/context/AuthContext';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
+// Import components to embed
+import DistLedgerPage from './DistLedgerPage';
+import DistAnalyticsPage from './DistAnalyticsPage';
+import DistPaymentsPage from './DistPaymentsPage';
+
 export default function DistSettingsPage() {
   const { logout, user } = useAuthContext();
   const navigate = useNavigate();
@@ -23,6 +29,9 @@ export default function DistSettingsPage() {
 
   const tabs = [
     { icon: RiUserLine, label: 'Profile' },
+    { icon: RiTableLine, label: 'Account Ledger' },
+    { icon: RiBarChartLine, label: 'Regional Analytics' },
+    { icon: RiHistoryLine, label: 'Payment Log' },
     { icon: RiCompass3Fill, label: 'Explore Reels', path: '/distributor/social' },
     { icon: RiTruckLine, label: 'Logistics' },
     { icon: RiShieldKeyholeLine, label: 'Security' },
@@ -82,6 +91,12 @@ export default function DistSettingsPage() {
             </Card>
           </div>
         );
+      case 'Account Ledger':
+        return <DistLedgerPage />;
+      case 'Regional Analytics':
+        return <DistAnalyticsPage />;
+      case 'Payment Log':
+        return <DistPaymentsPage />;
       case 'Logistics':
         return (
           <Card>

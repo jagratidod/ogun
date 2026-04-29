@@ -87,6 +87,28 @@ export function AuthProvider({ children }) {
     setLoading(false);
   }, []);
 
+  // Theme Application Logic
+  useEffect(() => {
+    const applyTheme = (theme) => {
+      const root = document.documentElement;
+      if (theme === 'dark') {
+        root.classList.add('dark');
+      } else if (theme === 'system') {
+        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        root.classList.toggle('dark', isDark);
+      } else {
+        root.classList.remove('dark');
+      }
+    };
+
+    if (user?.preferences?.theme) {
+      applyTheme(user.preferences.theme);
+    } else {
+      // Default to light if no user or no preference
+      document.documentElement.classList.remove('dark');
+    }
+  }, [user?.preferences?.theme]);
+
   const requestOTP = useCallback(async (email, role) => {
     try {
       const response = await api.post('/auth/request-otp', { email, role });
@@ -198,6 +220,29 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  const updatePreferences = useCallback(async (prefs) => {
+    try {
+      const response = await api.patch('/auth/preferences', prefs);
+      const newPrefs = response.data?.data;
+      
+      if (newPrefs) {
+        setUser(prev => {
+          if (!prev) return null;
+          const updated = { ...prev, preferences: newPrefs };
+          const keys = getTokenKeys(updated.role, updated.subRole);
+          localStorage.setItem(keys.user, JSON.stringify(updated));
+          return updated;
+        });
+      }
+      return { success: true, data: newPrefs };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to update preferences'
+      };
+    }
+  }, []);
+
   const logout = useCallback(async () => {
     try {
       const role = user?.role;
@@ -209,7 +254,6 @@ export function AuthProvider({ children }) {
     } catch (error) {
       console.error('Logout error', error);
     } finally {
-      // Clear all possible role keys on logout
       ['admin', 'distributor', 'retailer', 'customer', 'sales_executive'].forEach((role) => {
         const keys = getTokenKeys(role);
         localStorage.removeItem(keys.user);
@@ -231,7 +275,8 @@ export function AuthProvider({ children }) {
       registerPartner,
       loginWithPassword,
       loginTechnician,
-      logout
+      logout,
+      updatePreferences
     }}>
       {!loading && children}
     </AuthContext.Provider>

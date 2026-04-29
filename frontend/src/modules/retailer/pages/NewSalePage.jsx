@@ -120,37 +120,6 @@ export default function NewSalePage() {
 
   return (
     <div className="page-container h-full overflow-hidden flex flex-col p-0 sm:p-6">
-      {/* Mobile Top Bar (Hidden on Desktop) */}
-      <div className="lg:hidden flex items-center justify-between p-4 bg-white border-b border-border sticky top-0 z-20">
-         <div className="flex flex-col">
-            <h1 className="text-lg font-black text-content-primary leading-none uppercase">POS Terminal</h1>
-            <span className="text-[8px] text-brand-teal font-black uppercase tracking-widest mt-1">Live Inventory</span>
-         </div>
-         <div className="flex items-center gap-2">
-            <button 
-               onClick={() => setViewMode(viewMode === 'products' ? 'cart' : 'products')}
-               className={`relative p-2 rounded-none border transition-all ${viewMode === 'cart' ? 'bg-brand-teal text-white border-brand-teal' : 'bg-surface-secondary text-content-primary border-border'}`}
-            >
-               {viewMode === 'products' ? <RiShoppingBasketLine size={20} /> : <RiAddLine size={20} />}
-               {cart.length > 0 && viewMode === 'products' && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-brand-pink text-white text-[8px] font-black rounded-full flex items-center justify-center border-2 border-white animate-bounce">
-                     {cart.length}
-                  </span>
-               )}
-            </button>
-         </div>
-      </div>
-
-      {/* Desktop Header */}
-      <div className="hidden lg:block">
-         <PageHeader 
-            title="POS Terminal" 
-            subtitle="Process sales and issue invoices for walk-in customers"
-         >
-            <Button icon={RiUserLine} variant="secondary">Loyalty Program</Button>
-         </PageHeader>
-      </div>
-
       <div className="flex flex-col lg:grid lg:grid-cols-3 gap-0 lg:gap-6 flex-1 overflow-hidden">
          {/* Products Section */}
          <div className={`lg:col-span-2 flex flex-col gap-4 overflow-hidden ${viewMode === 'products' ? 'flex' : 'hidden lg:flex'} h-full lg:h-[calc(100vh-220px)]`}>

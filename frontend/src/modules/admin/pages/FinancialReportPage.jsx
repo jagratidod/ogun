@@ -1,16 +1,38 @@
-import { RiBarChartLine, RiPieChartLine, RiDownloadLine, RiArrowUpLine, RiArrowDownLine, RiInformationLine, RiPulseLine } from 'react-icons/ri';
+import { useState, useEffect } from 'react';
+import { RiBarChartLine, RiPieChartLine, RiDownloadLine, RiArrowUpLine, RiArrowDownLine, RiInformationLine, RiPulseLine, RiLoader4Line, RiHistoryLine } from 'react-icons/ri';
 import { PageHeader, Card, CardHeader, CardTitle, CardDescription, AreaChart, BarChart, PieChart, MetricCard, formatCurrency, Button } from '../../../core';
-import accountsData from '../../../data/accounts.json';
-
-const revenueExpenseTrend = [
-  { "month": "Jan", "revenue": 8500000, "expense": 6200000 },
-  { "month": "Feb", "revenue": 9200000, "expense": 6800000 },
-  { "month": "Mar", "revenue": 10500000, "expense": 7100000 },
-  { "month": "Apr", "revenue": 12560000, "expense": 8450000 }
-];
+import api from '../../../core/api';
+import { toast } from 'react-hot-toast';
 
 export default function FinancialReportPage() {
-  const { financials } = accountsData;
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    fetchReport();
+  }, []);
+
+  const fetchReport = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get('/admin/accounts/financial-report');
+      setData(res.data.data);
+    } catch (error) {
+      toast.error('Failed to fetch financial report');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading || !data) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <RiLoader4Line className="w-10 h-10 text-brand-teal animate-spin" />
+      </div>
+    );
+  }
+
+  const { metrics, revenueExpenseTrend, expenseBreakdown } = data;
 
   return (
     <div className="page-container">
@@ -18,29 +40,27 @@ export default function FinancialReportPage() {
         title="Financial Reports" 
         subtitle="Consolidated business performance, profit/loss, and budget tracking"
       >
-        <Button icon={RiDownloadLine}>Download FY Report</Button>
+        <div className="flex gap-2">
+            <Button variant="secondary" icon={RiHistoryLine} onClick={fetchReport}>Refresh</Button>
+            <Button icon={RiDownloadLine}>Download FY Report</Button>
+        </div>
       </PageHeader>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <MetricCard title="Monthly Revenue" value={financials.monthlyRevenue} format="currency" icon={RiPulseLine} change={15.4} />
-        <MetricCard title="Monthly Expense" value={financials.monthlyExpense} format="currency" icon={RiBarChartLine} change={8.2} changeLabel="increased" />
-        <MetricCard title="Net Profit" value={financials.netProfit} format="currency" icon={RiPieChartLine} change={24.2} />
+        <MetricCard title="Monthly Revenue" value={metrics.monthlyRevenue} format="currency" icon={RiPulseLine} />
+        <MetricCard title="Monthly Expense" value={metrics.monthlyExpense} format="currency" icon={RiBarChartLine} changeLabel="increased" />
+        <MetricCard title="Net Profit" value={metrics.netProfit} format="currency" icon={RiPieChartLine} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="glass-card p-5">
            <h3 className="section-title mb-4">Revenue vs Expense Trend</h3>
-           <AreaChart data={revenueExpenseTrend} dataKey="revenue" xKey="month" name="Revenue" height={320} />
+           <AreaChart data={revenueExpenseTrend} dataKey="revenue" xKey="name" name="Revenue" height={320} />
         </div>
         <div className="glass-card p-5">
            <h3 className="section-title mb-4">Expense Breakdown</h3>
            <PieChart 
-             data={[
-               { name: 'Salary', value: 4500000 },
-               { name: 'Rent', value: 1200000 },
-               { name: 'Marketing', value: 850000 },
-               { name: 'Ops', value: 1900000 }
-             ]} 
+             data={expenseBreakdown} 
              height={320} 
              innerRadius={65} 
              outerRadius={105} 
@@ -50,20 +70,15 @@ export default function FinancialReportPage() {
 
       <Card>
         <CardHeader>
-           <CardTitle>Profit & Loss Summary</CardTitle>
-           <CardDescription>Fiscal year to date performance comparison</CardDescription>
+           <CardTitle>Profit & Loss Summary (All Time)</CardTitle>
+           <CardDescription>Overall performance comparison</CardDescription>
         </CardHeader>
         <div className="p-6">
            <div className="space-y-4 max-w-2xl">
               {[
-                 { label: 'Gross Revenue (Total Sales)', val: 42560000, type: 'plus' },
-                 { label: 'Cost of Goods Sold (COGS)', val: 18450000, type: 'minus' },
-                 { label: 'Gross Profit', val: 24110000, type: 'total' },
-                 { label: 'Operating Expenses', val: 12450000, type: 'minus' },
-                 { label: 'Marketing & Sales Spends', val: 3200000, type: 'minus' },
-                 { label: 'Net Operating Income', val: 8460000, type: 'total' },
-                 { label: 'Taxes & Compliance', val: 1522000, type: 'minus' },
-                 { label: 'Net Result', val: 6938000, type: 'final' }
+                 { label: 'Gross Revenue (Total Sales)', val: metrics.totalRevenue, type: 'plus' },
+                 { label: 'Operating Expenses (Inc. Payroll)', val: metrics.totalExpense, type: 'minus' },
+                 { label: 'Net Profit', val: metrics.totalNetProfit, type: 'final' }
               ].map((row, idx) => (
                  <div key={idx} className={`flex items-center justify-between p-3 rounded-none ${
                     row.type === 'total' ? 'bg-surface-elevated font-semibold' : 

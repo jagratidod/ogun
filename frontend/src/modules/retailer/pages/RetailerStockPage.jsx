@@ -134,14 +134,6 @@ export default function RetailerStockPage() {
 
   return (
     <div className="p-3 space-y-5 bg-surface-primary min-h-screen pb-24">
-      {/* Header */}
-      <section className="flex justify-between items-center px-1 pt-2">
-         <div>
-            <h2 className="text-xl font-black text-content-primary tracking-tighter uppercase">Inventory</h2>
-            <p className="text-[9px] text-brand-teal font-black uppercase tracking-widest leading-none mt-1">Stock Control Center</p>
-         </div>
-         <Button variant="secondary" size="sm" className="h-9 px-3 text-[9px] font-black uppercase" icon={RiRefreshLine} onClick={fetchInventory} disabled={loading}>Sync</Button>
-      </section>
 
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-2 gap-3">

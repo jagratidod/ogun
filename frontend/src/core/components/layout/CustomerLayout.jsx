@@ -28,30 +28,30 @@ export default function CustomerLayout() {
 
   return (
     <SidebarProvider>
-      <div className="flex flex-col h-screen overflow-hidden bg-white">
+      <div className="flex flex-col h-screen overflow-hidden bg-surface-primary">
         {/* Simple header - Hidden on Home Page for custom boutique header */}
         {!isBasePage && (
-          <header className="sticky top-0 z-30 bg-gradient-to-b from-brand-teal/30 via-brand-teal/10 to-white/95 backdrop-blur-xl border-b border-gray-50/50 px-4 pt-4 pb-3">
+          <header className="sticky top-0 z-30 bg-surface-primary/80 backdrop-blur-xl border-b border-border px-4 pt-4 pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <button 
                   onClick={() => navigate(-1)} 
-                  className="w-9 h-9 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 border border-white/30 text-gray-800 transition-all active:scale-90"
+                  className="w-9 h-9 flex items-center justify-center rounded-full bg-surface-hover hover:bg-surface-hover/80 border border-border text-content-primary transition-all active:scale-90"
                   title="Go Back"
                 >
                   <RiArrowLeftSLine className="w-5 h-5" />
                 </button>
                 <div className="flex flex-col">
-                  <span className="text-[14px] font-black text-gray-800 tracking-tight leading-none uppercase tracking-widest">{location.pathname.split('/').pop().toUpperCase()}</span>
+                  <span className="text-[14px] font-black text-content-primary tracking-tight leading-none uppercase tracking-widest">{location.pathname.split('/').pop().toUpperCase()}</span>
                   <span className="text-[7px] text-brand-teal font-black uppercase tracking-[0.3em] mt-1 opacity-70">Ogun Boutique</span>
                 </div>
               </div>
 
               <div className="flex items-center gap-2">
-                <button className="relative w-9 h-9 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 border border-white/30 text-gray-300 transition-all">
+                <button className="relative w-9 h-9 flex items-center justify-center rounded-full bg-surface-hover hover:bg-surface-hover/80 border border-border text-content-tertiary transition-all">
                   <RiNotification3Fill className="w-4.5 h-4.5" />
                   {unreadCount > 0 && (
-                    <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-brand-pink rounded-full border border-white" />
+                    <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-brand-pink rounded-full border border-surface-card" />
                   )}
                 </button>
               </div>

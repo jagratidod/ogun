@@ -41,29 +41,33 @@
   }
 
   .dark {
-    /* Dark Mode Tokens */
-    --color-surface-primary: #000000;
-    --color-surface-card: #0D1117;
-    --color-surface-sidebar: #080C12;
-    --color-surface-input: #161B22;
-    --color-surface-hover: #1C2128;
-    --color-surface-elevated: #131920;
+    /* Premium Dark Mode Tokens (Deep Space) */
+    --color-surface-primary: #050505;
+    --color-surface-card: #0F0F0F;
+    --color-surface-sidebar: #080808;
+    --color-surface-input: #1A1A1A;
+    --color-surface-hover: #222222;
+    --color-surface-elevated: #151515;
 
-    --color-border: #21262D;
-    --color-border-light: #30363D;
+    --color-border: #2A2A2A;
+    --color-border-light: #333333;
 
-    --color-content-primary: #F0F6FC;
-    --color-content-secondary: #8B949E;
-    --color-content-tertiary: #484F58;
-    --color-content-inverse: #0D1117;
+    --color-content-primary: #FFFFFF;
+    --color-content-secondary: #A0A0A0;
+    --color-content-tertiary: #666666;
+    --color-content-inverse: #000000;
 
-    --color-state-success: #2EA043;
-    --color-state-warning: #D29922;
-    --color-state-danger: #F85149;
-    --color-state-info: #58A6FF;
+    --color-state-success: #10B981;
+    --color-state-warning: #F59E0B;
+    --color-state-danger: #EF4444;
+    --color-state-info: #3B82F6;
 
-    --shadow-glow: 0 0 20px rgba(63, 175, 176, 0.15);
-    --shadow-card: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+    --shadow-glow: 0 0 30px rgba(63, 175, 176, 0.1);
+    --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+    
+    /* Specific overrides for dark mode feel */
+    --color-brand-teal: #4FD1C5;
+    --color-brand-pink: #F687B3;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -399,5 +403,29 @@
 
 .animate-slide-from-bottom {
   animation: slide-from-bottom 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@utility table-header {
+  background-color: var(--color-surface-elevated);
+  color: var(--color-content-tertiary);
+  font-size: 0.7rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-bottom: 1px solid var(--color-border);
+}
+
+@utility table-row {
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-surface-card);
+  transition: all 0.2s ease;
+  &:hover {
+    background-color: var(--color-surface-hover);
+  }
+}
+
+/* Global Transitions */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.1s ease;
 }
 

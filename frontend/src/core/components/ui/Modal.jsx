@@ -45,7 +45,7 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md', f
         {/* Drag Handle for Bottom Sheet */}
         {variant === 'bottom' && (
           <div className="flex justify-center pt-3 pb-1">
-            <div className="w-12 h-1.5 rounded-full bg-gray-200" />
+            <div className="w-12 h-1.5 rounded-full bg-content-tertiary/30" />
           </div>
         )}
 
@@ -55,9 +55,9 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md', f
           variant !== 'bottom' && "border-b border-border"
         )}>
           <div>
-            <h2 className="text-lg font-black text-gray-800 tracking-tight">{title}</h2>
+            <h2 className="text-lg font-black text-content-primary tracking-tight">{title}</h2>
           </div>
-          <button onClick={onClose} className="p-2 rounded-full text-gray-400 hover:bg-gray-50 hover:text-gray-800 transition-all active:scale-95">
+          <button onClick={onClose} className="p-2 rounded-full text-content-tertiary hover:bg-surface-hover hover:text-content-primary transition-all active:scale-95">
             <RiCloseLine className="w-6 h-6" />
           </button>
         </div>
@@ -70,7 +70,7 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md', f
         </div>
         {/* Footer */}
         {footer && (
-          <div className="flex items-center justify-end gap-3 px-6 py-6 border-t border-border bg-gray-50/30">
+          <div className="flex items-center justify-end gap-3 px-6 py-6 border-t border-border bg-surface-elevated/50">
             {footer}
           </div>
         )}

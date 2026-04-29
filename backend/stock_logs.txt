@@ -54,3 +54,26 @@
 [2026-04-25T11:55:33.590Z] - Searching for Product: 69e76c0bf85601f793e04946 under User: 69e716bf365988f5075f5e01
 [2026-04-25T11:55:33.656Z] - SUCCESS: 1 units. 78 -> 77
 [2026-04-25T11:55:33.658Z] END: Logic finished for RET-5GFUYDD7
+[2026-04-29T07:32:10.577Z] START: Order ORD-8C685040, Status: Completed, Deducted: false
+[2026-04-29T07:32:10.585Z] Triggering deduction... Items: 4
+[2026-04-29T07:32:10.589Z] - Searching for Product: 69e8a5aad1cff19c107fce08 under User: 69e615c9e97145424e9ac2d3
+[2026-04-29T07:32:11.213Z] - SUCCESS: 2 units. 1099 -> 1097
+[2026-04-29T07:32:11.249Z] - Searching for Product: 69e89d291b7bd2954d8fd713 under User: 69e615c9e97145424e9ac2d3
+[2026-04-29T07:32:11.769Z] START: Order ORD-8C685040, Status: Confirmed, Deducted: false
+[2026-04-29T07:32:12.168Z] - SUCCESS: 1 units. 2204 -> 2203
+[2026-04-29T07:32:12.170Z] - Searching for Product: 69e76c0bf85601f793e04946 under User: 69e615c9e97145424e9ac2d3
+[2026-04-29T07:32:12.173Z] - Creating Auto-Invoice: INV-8C685040
+[2026-04-29T07:32:12.552Z] Triggering deduction... Items: 4
+[2026-04-29T07:32:12.555Z] - Searching for Product: 69e8a5aad1cff19c107fce08 under User: 69e615c9e97145424e9ac2d3
+[2026-04-29T07:32:12.590Z] - SUCCESS: 1 units. 1014 -> 1013
+[2026-04-29T07:32:12.592Z] - Searching for Product: 69e76822f1580471a865f3a7 under User: 69e615c9e97145424e9ac2d3
+[2026-04-29T07:32:12.629Z] - SUCCESS: 2 units. 1097 -> 1095
+[2026-04-29T07:32:12.631Z] - Searching for Product: 69e89d291b7bd2954d8fd713 under User: 69e615c9e97145424e9ac2d3
+[2026-04-29T07:32:12.664Z] - SUCCESS: 1 units. 96 -> 95
+[2026-04-29T07:32:12.665Z] END: Logic finished for ORD-8C685040
+[2026-04-29T07:32:12.704Z] - SUCCESS: 1 units. 2203 -> 2202
+[2026-04-29T07:32:12.706Z] - Searching for Product: 69e76c0bf85601f793e04946 under User: 69e615c9e97145424e9ac2d3
+[2026-04-29T07:32:12.771Z] - SUCCESS: 1 units. 1013 -> 1012
+[2026-04-29T07:32:12.773Z] - Searching for Product: 69e76822f1580471a865f3a7 under User: 69e615c9e97145424e9ac2d3
+[2026-04-29T07:32:13.022Z] - SUCCESS: 1 units. 95 -> 94
+[2026-04-29T07:32:13.027Z] END: Logic finished for ORD-8C685040
