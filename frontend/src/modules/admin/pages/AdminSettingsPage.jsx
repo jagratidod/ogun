@@ -159,23 +159,6 @@ export default function AdminSettingsPage() {
          <main className="md:col-span-3 space-y-6">
             {renderContent()}
 
-            <Card className="bg-state-danger/5 border-state-danger/10">
-               <CardHeader>
-                  <CardTitle className="text-state-warning">System Maintenance</CardTitle>
-                  <CardDescription>High-risk actions that cannot be undone</CardDescription>
-               </CardHeader>
-               <div className="p-6 flex items-center justify-between bg-surface-primary/30 border-t border-state-danger/10">
-                  <div className="flex items-center gap-3">
-                     <RiInformationLine className="text-state-warning w-5 h-5 flex-shrink-0" />
-                     <div>
-                        <p className="text-sm font-bold text-content-primary">Cache Purge</p>
-                        <p className="text-xs text-content-tertiary underline cursor-pointer hover:text-state-danger transition-colors">Confirm password to proceed</p>
-                     </div>
-                  </div>
-                  <Button variant="secondary" size="sm" className="text-state-danger border-state-danger/20">Execute Wipe</Button>
-               </div>
-            </Card>
-
             <div className="flex justify-end gap-3 pt-6 border-t border-border">
                <Button variant="secondary" disabled={isSaving}>Discard Changes</Button>
                <Button onClick={handleSave} loading={isSaving}>Save Configuration</Button>

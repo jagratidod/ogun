@@ -102,5 +102,16 @@ const serviceConfigController = require('../controllers/admin.serviceConfig.cont
 router.get('/service-config', checkPermission('service'), serviceConfigController.getServiceConfig);
 router.put('/service-config', checkPermission('service'), serviceConfigController.updateServiceConfig);
 
+// ─── Explore Section (Reels / Images / Videos) ───────────────────────────────
+// Uses local disk storage (NOT Cloudinary) – files saved to backend/uploads/explore/
+const exploreController = require('../controllers/admin.explore.controller');
+const localUpload = require('../middleware/localUpload.middleware');
+
+router.get('/explore', exploreController.getAllExploreItems);
+router.post('/explore', localUpload.single('file'), exploreController.createExploreItem);
+router.patch('/explore/reorder', exploreController.reorderItems);
+router.put('/explore/:id', localUpload.single('file'), exploreController.updateExploreItem);
+router.delete('/explore/:id', exploreController.deleteExploreItem);
+
 module.exports = router;
 

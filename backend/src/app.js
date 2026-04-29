@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
@@ -9,7 +10,9 @@ const ApiResponse = require('./utils/apiResponse');
 const app = express();
 
 // Middlewares
-app.use(helmet());
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' }, // allow media to load cross-origin
+}));
 app.use(cors({
     origin: (origin, callback) => callback(null, true),
     credentials: true,
@@ -18,6 +21,9 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(compression());
+
+// Serve uploaded files (explore section images/videos) as static assets
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
 // Health Check
 app.get('/health', (req, res) => {

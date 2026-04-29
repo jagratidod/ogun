@@ -11,6 +11,7 @@ const salesExecutiveRoutes = require('./salesExecutive.routes');
 const rewardRoutes = require('./reward.routes');
 const redemptionRoutes = require('./redemption.routes');
 const technicianRoutes = require('./technician.routes');
+const exploreRoutes = require('./explore.routes');
 
 router.use('/auth', authRoutes);
 router.use('/admin', adminRoutes);
@@ -22,5 +23,6 @@ router.use('/sales-executive', salesExecutiveRoutes);
 router.use('/rewards', rewardRoutes);
 router.use('/rewards/redemptions', redemptionRoutes);
 router.use('/technician', technicianRoutes);
+router.use('/explore', exploreRoutes);
 
 module.exports = router;
