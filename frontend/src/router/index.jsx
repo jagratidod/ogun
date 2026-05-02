@@ -18,6 +18,7 @@ import CustomerForgotPasswordPage from '../modules/customer/pages/CustomerForgot
 import SalesLoginPage from '../modules/auth/pages/SalesLoginPage';
 import HRLoginPage from '../modules/auth/pages/HRLoginPage';
 import ServiceLoginPage from '../modules/auth/pages/ServiceLoginPage';
+import LogisticsLoginPage from '../modules/auth/pages/LogisticsLoginPage';
 import TechnicianSignupPage from '../modules/auth/pages/TechnicianSignupPage';
 import UnauthorizedPage from '../modules/auth/pages/UnauthorizedPage';
 
@@ -82,9 +83,16 @@ import WarrantyExtensionPage from '../modules/customer/pages/WarrantyExtensionPa
 
 import { HRDashboardPage, HREmployeesPage, HRLeavesPage, HRMyLeavesPage, HRPayrollDashboardPage, HRSalarySetupPage, HRRunPayrollPage, HRPayslipsPage } from '../modules/hr';
 import { ServiceDashboardPage } from '../modules/service-center';
+import { 
+  LogisticsDashboardPage, AllShipmentsPage, CreateShipmentPage, 
+  OrderPipelinePage, TrackingPage, DeliveryAgentsPage, 
+  RestockRequestsPage as LogisticsRestockPage, LogisticsAnalyticsPage, LogisticsSettingsPage,
+  ShipmentDetailPage
+} from '../modules/logistics';
 
 import TechnicianManagerLayout from '../core/components/layout/TechnicianManagerLayout';
 import TechnicianLayout from '../core/components/layout/TechnicianLayout';
+import LogisticsLayout from '../core/components/layout/LogisticsLayout';
 import { TechManagerDashboardPage, TechnicianPortalPage, TechnicianProfilePage } from '../modules/tech-manager';
 
 import SplashPage from '../modules/shared/SplashPage';
@@ -188,7 +196,9 @@ function RootRedirect() {
       if (user?.subRole === SUB_ROLES.HR_MANAGER) return <Navigate to="/hr" replace />;
       if (user?.subRole === SUB_ROLES.SERVICE_MANAGER) return <Navigate to="/technician" replace />;
       if (user?.subRole === SUB_ROLES.TECHNICIAN_MANAGER) return <Navigate to="/tech-manager" replace />;
+      if (user?.subRole === SUB_ROLES.LOGISTICS_MANAGER) return <Navigate to="/logistics" replace />;
       if (user?.subRole === 'technician') return <Navigate to="/tech-portal" replace />;
+      if (user?.subRole === 'logistics_manager') return <Navigate to="/logistics" replace />;
       return <Navigate to="/admin" replace />;
     case 'distributor': return <Navigate to="/distributor" replace />;
     case 'retailer': return <Navigate to="/retailer" replace />;
@@ -221,7 +231,8 @@ export default function AppRouter() {
 
         <Route path="/sales/login" element={<SalesLoginPage />} />
         <Route path="/hr/login" element={<HRLoginPage />} />
-        <Route path="/technician/login" element={<ServiceLoginPage />} />
+         <Route path="/technician/login" element={<ServiceLoginPage />} />
+        <Route path="/logistics/login" element={<LogisticsLoginPage />} />
         <Route path="/technician/signup" element={<TechnicianSignupPage />} />
 
         <Route path="/customer/login" element={<CustomerLoginPage />} />
@@ -408,6 +419,24 @@ export default function AppRouter() {
 
           <Route path="service" element={<TechnicianServicePage />} />
           <Route path="profile" element={<SalesProfilePage />} />
+        </Route>
+
+        {/* ═══ LOGISTICS PANEL ROUTES ═══ */}
+        <Route path="/logistics" element={
+          <ProtectedRoute allowedRoles={['admin']} allowedSubRoles={[SUB_ROLES.LOGISTICS_MANAGER, SUB_ROLES.SUPER_ADMIN]}>
+            <LogisticsLayout />
+          </ProtectedRoute>
+        }>
+          <Route index element={<LogisticsDashboardPage />} />
+          <Route path="shipments" element={<AllShipmentsPage />} />
+          <Route path="shipments/:id" element={<ShipmentDetailPage />} />
+          <Route path="shipments/create" element={<CreateShipmentPage />} />
+          <Route path="orders" element={<OrderPipelinePage />} />
+          <Route path="tracking" element={<TrackingPage />} />
+          <Route path="agents" element={<DeliveryAgentsPage />} />
+          <Route path="analytics" element={<LogisticsAnalyticsPage />} />
+          <Route path="restock" element={<LogisticsRestockPage />} />
+          <Route path="settings" element={<LogisticsSettingsPage />} />
         </Route>
 
         {/* ═══ CUSTOMER ROUTES ═══ */}

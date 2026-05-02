@@ -70,6 +70,10 @@ const productOrderSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  shipmentCreated: {
+    type: Boolean,
+    default: false
+  },
   notes: String
 }, {
   timestamps: true

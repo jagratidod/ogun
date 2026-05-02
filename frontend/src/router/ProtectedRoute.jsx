@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuthContext } from '../core/context/AuthContext';
-import { SUB_ROLES } from '../core/utils/constants';
+import { SUB_ROLES, ROLE_PERMISSIONS } from '../core/utils/constants';
 
 export default function ProtectedRoute({ children, allowedRoles, allowedSubRoles }) {
   const { isAuthenticated, user, loading } = useAuthContext();
@@ -46,8 +46,10 @@ export default function ProtectedRoute({ children, allowedRoles, allowedSubRoles
   // Sub-role permission checking (for main Admin panel sections)
   if (user?.role === 'admin' && user?.subRole !== SUB_ROLES.SUPER_ADMIN && location.pathname.startsWith('/admin')) {
     const path = location.pathname;
-// ...
-    const permissions = user?.permissions || [];
+    // Combine database permissions with default role permissions
+    const dbPermissions = user?.permissions || [];
+    const defaultPermissions = ROLE_PERMISSIONS[user?.subRole] || [];
+    const allPermissions = [...new Set([...dbPermissions, ...defaultPermissions])];
     
     // Define route section mapping
     const sectionToPermission = {
@@ -71,7 +73,7 @@ export default function ProtectedRoute({ children, allowedRoles, allowedSubRoles
     const requiredSection = Object.keys(sectionToPermission).find(s => path.startsWith(s));
     const requiredPermission = sectionToPermission[requiredSection];
 
-    if (requiredPermission && !permissions.includes(requiredPermission)) {
+    if (requiredPermission && !allPermissions.includes(requiredPermission)) {
       return <Navigate to="/admin/unauthorized" replace />;
     }
   }

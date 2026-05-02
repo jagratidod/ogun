@@ -35,10 +35,29 @@ const shipmentSchema = new mongoose.Schema({
     enum: ['Pending', 'In Transit', 'Out for Delivery', 'Delivered', 'Cancelled'],
     default: 'Pending'
   },
+  direction: {
+    type: String,
+    enum: ['admin_to_distributor', 'distributor_to_retailer', 'retailer_to_customer'],
+    required: true
+  },
+  assignedAgent: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
   carrier: String,
   trackingNumber: String,
   dispatchedAt: Date,
   deliveredAt: Date,
+  expectedDeliveryDate: Date,
+  trackingTimeline: [
+    {
+      status: String,
+      location: String,
+      timestamp: { type: Date, default: Date.now },
+      note: String
+    }
+  ],
   notes: String
 }, {
   timestamps: true

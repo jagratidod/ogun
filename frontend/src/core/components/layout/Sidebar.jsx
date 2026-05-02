@@ -11,7 +11,7 @@ import {
   RiCustomerServiceLine, RiBarChartBoxLine, RiSettings3Line,
   RiImage2Line, RiStackLine, RiAlertLine, RiMailSendLine, RiToolsLine,
   RiArrowLeftSLine, RiArrowRightSLine, RiArrowDownSLine,
-  RiMenuLine, RiCloseLine, RiCompass3Fill
+  RiMenuLine, RiCloseLine, RiCompass3Fill, RiLogoutCircleLine
 } from 'react-icons/ri';
 
 const hrNav = [
@@ -43,6 +43,22 @@ const serviceNav = [
 
 const techManagerNav = [
   { label: 'Service Requests', icon: RiCustomerServiceLine, path: '/tech-manager' },
+];
+
+const logisticsNav = [
+  { label: 'Dashboard', icon: RiDashboardLine, path: '/logistics' },
+  {
+    label: 'Shipments', icon: RiTruckLine, children: [
+      { label: 'All Shipments', path: '/logistics/shipments' },
+      { label: 'Create Shipment', path: '/logistics/shipments/create' },
+    ]
+  },
+  { label: 'Order Pipeline', icon: RiShoppingCartLine, path: '/logistics/orders' },
+  { label: 'Tracking', icon: RiCompass3Fill, path: '/logistics/tracking' },
+  { label: 'Delivery Agents', icon: RiUserLine, path: '/logistics/agents' },
+  { label: 'Restock Requests', icon: RiAlertLine, path: '/logistics/restock' },
+  { label: 'Analytics', icon: RiBarChartBoxLine, path: '/logistics/analytics' },
+  { label: 'Settings', icon: RiSettings3Line, path: '/logistics/settings' },
 ];
 
 const technicianNav = [
@@ -156,6 +172,7 @@ export function getNavItems(role, subRole, permissions) {
     if (subRole === SUB_ROLES.HR_MANAGER) return hrNav;
     if (subRole === SUB_ROLES.SERVICE_MANAGER) return serviceNav;
     if (subRole === SUB_ROLES.TECHNICIAN_MANAGER) return techManagerNav;
+    if (subRole === SUB_ROLES.LOGISTICS_MANAGER) return logisticsNav;
     if (subRole === 'technician') return technicianNav;
     return adminNav.filter(item => {
       if (!item.permission) return true;
@@ -243,7 +260,7 @@ function NavItem({ item, isCollapsed }) {
 }
 
 export default function Sidebar({ role = 'admin' }) {
-  const { user } = useAuthContext();
+  const { user, logout } = useAuthContext();
   const { isCollapsed, toggle, isMobileOpen, closeMobile } = useSidebarContext();
   const location = useLocation();
 
@@ -253,6 +270,8 @@ export default function Sidebar({ role = 'admin' }) {
     navItems = adminNav;
   } else if (location.pathname.startsWith('/hr')) {
     navItems = getFilteredHRNav(user);
+  } else if (location.pathname.startsWith('/logistics')) {
+    navItems = logisticsNav;
   } else if (location.pathname.startsWith('/distributor')) {
 
     navItems = distributorNav;
@@ -314,6 +333,15 @@ export default function Sidebar({ role = 'admin' }) {
                  {user?.subRole ? user.subRole.replace('_', ' ') : user?.role || 'Guest'}
                </span>
             </div>
+            {location.pathname.startsWith('/logistics') && (
+              <button 
+                onClick={logout}
+                className="w-full py-2 text-[10px] font-black text-state-danger uppercase tracking-widest border border-state-danger/20 hover:bg-state-danger/5 transition-colors flex items-center justify-center gap-2"
+              >
+                <RiLogoutCircleLine className="w-4 h-4" />
+                Sign Out Control
+              </button>
+            )}
             <p className="text-xs text-content-tertiary text-center">© 2026 OGUN CRM</p>
           </div>
         )}

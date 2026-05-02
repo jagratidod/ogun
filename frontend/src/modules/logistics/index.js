@@ -1,0 +1,10 @@
+export { default as LogisticsDashboardPage } from './pages/LogisticsDashboardPage';
+export { default as AllShipmentsPage } from './pages/AllShipmentsPage';
+export { default as CreateShipmentPage } from './pages/CreateShipmentPage';
+export { default as OrderPipelinePage } from './pages/OrderPipelinePage';
+export { default as TrackingPage } from './pages/TrackingPage';
+export { default as DeliveryAgentsPage } from './pages/DeliveryAgentsPage';
+export { default as RestockRequestsPage } from './pages/RestockRequestsPage';
+export { default as LogisticsAnalyticsPage } from './pages/LogisticsAnalyticsPage';
+export { default as LogisticsSettingsPage } from './pages/LogisticsSettingsPage';
+export { default as ShipmentDetailPage } from './pages/ShipmentDetailPage';

@@ -246,22 +246,36 @@ export function AuthProvider({ children }) {
   const logout = useCallback(async () => {
     try {
       const role = user?.role;
+      const subRole = user?.subRole;
+      const currentPath = window.location.pathname;
+      
       if (role) {
-        const keys = getTokenKeys(role);
+        const keys = getTokenKeys(role, subRole);
         const refreshToken = localStorage.getItem(keys.refreshToken);
         await api.post('/auth/logout', { refreshToken });
       }
-    } catch (error) {
-      console.error('Logout error', error);
-    } finally {
-      ['admin', 'distributor', 'retailer', 'customer', 'sales_executive'].forEach((role) => {
-        const keys = getTokenKeys(role);
-        localStorage.removeItem(keys.user);
-        localStorage.removeItem(keys.accessToken);
-        localStorage.removeItem(keys.refreshToken);
+
+      // Clear all possible session tokens
+      ['admin', 'distributor', 'retailer', 'customer', 'sales', 'hr', 'service'].forEach((prefix) => {
+        localStorage.removeItem(`${prefix}_user`);
+        localStorage.removeItem(`${prefix}_token`);
+        localStorage.removeItem(`${prefix}_refresh_token`);
       });
+
       setUser(null);
       setIsAuthenticated(false);
+
+      // Dedicated redirect logic
+      if (currentPath.startsWith('/logistics')) {
+        window.location.href = '/logistics/login';
+      } else if (currentPath.startsWith('/admin')) {
+        window.location.href = '/admin/login';
+      } else {
+        window.location.href = '/login';
+      }
+    } catch (error) {
+      console.error('Logout error', error);
+      window.location.href = '/login';
     }
   }, [user]);
 

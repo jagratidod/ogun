@@ -175,6 +175,35 @@ exports.updateOrderStatus = catchAsync(async (req, res, next) => {
       }
       order.stockDeducted = false;
     }
+
+    // --- SHIPMENT CREATION FOR LOGISTICS PANEL ---
+    if (currentStatus.toLowerCase() === 'in transit' && !order.shipmentCreated) {
+        const Shipment = mongoose.model('Shipment');
+        const { v4: uuidv4 } = require('uuid');
+
+        log(`- Generating Shipment for Order ${order.orderId}`);
+        await Shipment.create({
+            shipmentId: `SHP-${uuidv4().substring(0, 8).toUpperCase()}`,
+            sender: order.seller?._id || order.seller || req.user._id,
+            recipient: order.buyer?._id || order.buyer,
+            products: order.products.map(p => ({
+                product: p.product?._id || p.product,
+                quantity: p.quantity
+            })),
+            status: 'In Transit',
+            direction: 'admin_to_distributor',
+            dispatchedAt: Date.now(),
+            trackingTimeline: [{
+                status: 'Dispatched',
+                location: 'Central Distribution Center',
+                note: `Order ${order.orderId} dispatched by Admin.`
+            }],
+            notes: `Auto-generated from Admin Order ${order.orderId}`
+        });
+        order.shipmentCreated = true;
+        log(`- SUCCESS: Shipment created.`);
+    }
+
     log(`END: Logic finished for ${order.orderId}`);
   } catch (stockError) {
     const fs = require('fs');

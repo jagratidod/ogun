@@ -147,6 +147,32 @@ exports.updateRetailerOrderStatus = catchAsync(async (req, res, next) => {
             order.stockDeducted = true;
         }
 
+        // --- SHIPMENT CREATION FOR LOGISTICS PANEL ---
+        if (status === 'In Transit' && !order.shipmentCreated) {
+            const Shipment = require('../models/shipment.model');
+            const { v4: uuidv4 } = require('uuid');
+
+            await Shipment.create({
+                shipmentId: `SHP-${uuidv4().substring(0, 8).toUpperCase()}`,
+                sender: order.seller,
+                recipient: order.buyer,
+                products: order.products.map(p => ({
+                    product: p.product,
+                    quantity: p.quantity
+                })),
+                status: 'In Transit',
+                direction: 'distributor_to_retailer',
+                dispatchedAt: Date.now(),
+                trackingTimeline: [{
+                    status: 'Dispatched',
+                    location: 'Distributor Warehouse',
+                    note: `Order ${order.orderId} has been dispatched to retailer.`
+                }],
+                notes: `Automatically generated from Order ${order.orderId}`
+            });
+            order.shipmentCreated = true;
+        }
+
         // --- STOCK ADDITION FOR BUYER (Retailer) ---
         if (status === 'Completed' && !order.stockAddedToBuyer) {
             const Inventory = require('../models/inventory.model');

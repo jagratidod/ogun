@@ -12,6 +12,7 @@ const rewardRoutes = require('./reward.routes');
 const redemptionRoutes = require('./redemption.routes');
 const technicianRoutes = require('./technician.routes');
 const exploreRoutes = require('./explore.routes');
+const logisticsRoutes = require('./logistics.routes');
 
 router.use('/auth', authRoutes);
 router.use('/admin', adminRoutes);
@@ -24,5 +25,6 @@ router.use('/rewards', rewardRoutes);
 router.use('/rewards/redemptions', redemptionRoutes);
 router.use('/technician', technicianRoutes);
 router.use('/explore', exploreRoutes);
+router.use('/logistics', logisticsRoutes);
 
 module.exports = router;

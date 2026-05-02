@@ -6,7 +6,8 @@ import {
   RiStore2Fill,
   RiUserHeartFill,
   RiSettings4Fill,
-  RiLayoutGridFill
+  RiLayoutGridFill,
+  RiLogoutCircleLine
 } from 'react-icons/ri';
 
 const AuthPortalPage = () => {
@@ -68,6 +69,15 @@ const AuthPortalPage = () => {
       theme: 'from-brand-teal to-brand-teal-dark',
     },
     {
+      id: 'logistics_manager',
+      title: 'Operations',
+      role: 'Logistics Control',
+      description: 'Supply Chain Engine',
+      icon: RiTruckFill,
+      path: '/logistics/login',
+      theme: 'from-slate-900 to-brand-teal',
+    },
+    {
       id: 'customer',
       title: 'Experience',
       role: 'Customer',
@@ -84,7 +94,7 @@ const AuthPortalPage = () => {
       <nav className="h-16 bg-surface-card border-b border-border flex items-center justify-between px-6 md:px-12 z-50 sticky top-0">
         <div className="flex items-center gap-3">
           <div className="bg-brand-teal p-1.5 rounded-lg shadow-lg">
-            <img src="/remove bg logo .png" alt="Ogun" className="h-5 w-5 object-contain" />
+            <img src="/logo.png" alt="Ogun" className="h-5 w-5 object-contain invert grayscale" />
           </div>
           <div>
             <h1 className="text-lg font-black text-brand-teal tracking-tighter uppercase italic">OGUN</h1>

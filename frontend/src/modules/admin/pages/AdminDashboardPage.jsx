@@ -55,9 +55,19 @@ export default function AdminDashboardPage() {
         title="Dashboard"
         subtitle={`Welcome back, ${user?.name || 'Admin'}. Here's your business overview.`}
       >
-        {canAccess('accounts') && (
-          <Button icon={RiArrowRightLine} onClick={() => navigate('/admin/accounts/reports')}>Financial Pulse</Button>
-        )}
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="secondary" 
+            className="hidden md:flex bg-slate-900 text-white border-none hover:bg-slate-800" 
+            icon={RiTruckLine} 
+            onClick={() => navigate('/logistics')}
+          >
+            Logistics Pulse
+          </Button>
+          {canAccess('accounts') && (
+            <Button icon={RiArrowRightLine} onClick={() => navigate('/admin/accounts/reports')}>Financial Pulse</Button>
+          )}
+        </div>
       </PageHeader>
 
       {/* ── Metric Cards ──────────────────────────────────── */}

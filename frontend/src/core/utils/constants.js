@@ -12,6 +12,8 @@ export const SUB_ROLES = {
   ACCOUNTS_MANAGER: 'accounts_manager',
   SERVICE_MANAGER: 'service_manager',
   TECHNICIAN_MANAGER: 'technician_manager',
+  LOGISTICS_MANAGER: 'logistics_manager',
+  DELIVERY_AGENT: 'delivery_agent',
 };
 
 export const ROLE_PERMISSIONS = {
@@ -20,6 +22,7 @@ export const ROLE_PERMISSIONS = {
   [SUB_ROLES.SALES_MANAGER]: ['inventory', 'orders', 'distributors', 'retailers', 'customers', 'reports', 'rewards', 'service'],
   [SUB_ROLES.ACCOUNTS_MANAGER]: ['accounts', 'reports'],
   [SUB_ROLES.SERVICE_MANAGER]: ['service', 'orders'],
+  [SUB_ROLES.LOGISTICS_MANAGER]: ['inventory', 'orders', 'logistics', 'reports'],
 };
 
 export const ORDER_STATUS = {

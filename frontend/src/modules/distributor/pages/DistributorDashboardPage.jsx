@@ -1,9 +1,11 @@
-import { RiTruckLine, RiStore2Line, RiMoneyDollarBoxLine, RiStockLine, RiTrophyLine, RiPulseLine, RiArrowRightUpLine, RiEyeLine } from 'react-icons/ri';
+import { useNavigate } from 'react-router-dom';
+import { RiTruckLine, RiStore2Line, RiMoneyDollarBoxLine, RiStockLine, RiTrophyLine, RiPulseLine, RiArrowRightUpLine, RiEyeLine, RiRadarLine } from 'react-icons/ri';
 import { PageHeader, MetricCard, AreaChart, Card, CardHeader, CardTitle, CardDescription, DataTable, Badge, Button, Avatar, formatCurrency } from '../../../core';
 import stats from '../../../data/distributor_stats.json';
 import { useDistributorStore } from '../store/useDistributorStore';
 
 export default function DistributorDashboardPage() {
+  const navigate = useNavigate();
   const { kpis, restockRequests } = useDistributorStore();
 
   const recentIncoming = (restockRequests || [])
@@ -35,7 +37,10 @@ export default function DistributorDashboardPage() {
         title="Distributor Hub" 
         subtitle="Manage your regional supply chain and retailer network performance"
       >
-        <Button icon={RiTruckLine}>Ship New Order</Button>
+        <div className="flex items-center gap-2">
+          <Button variant="secondary" icon={RiRadarLine} onClick={() => navigate('/logistics')}>Network Tracking</Button>
+          <Button icon={RiTruckLine}>Ship New Order</Button>
+        </div>
       </PageHeader>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
