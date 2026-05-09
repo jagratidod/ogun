@@ -176,3 +176,36 @@ exports.getSalesRepDetail = async (req, res, next) => {
         next(error);
     }
 };
+
+/**
+ * @desc    Get Sales Executive Leaderboard
+ * @route   GET /api/v1/admin/sales-reps/leaderboard
+ */
+exports.getLeaderboard = async (req, res, next) => {
+    try {
+        const reps = await User.find({ role: 'sales_executive', isActive: true });
+        
+        const leaderboard = await Promise.all(reps.map(async (rep) => {
+            const retailerCount = await User.countDocuments({ role: 'retailer', onboardedBy: rep._id });
+            const orders = await ProductOrder.find({ createdBy: rep._id, status: 'Completed' });
+            const salesVolume = orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+
+            return {
+               id: rep._id,
+               name: rep.name,
+               area: rep.salesExecutiveData?.assignedArea || 'N/A',
+               points: rep.rewardPoints || 0,
+               retailers: retailerCount,
+               sales: salesVolume
+            };
+        }));
+
+        // Sort by points descending
+        leaderboard.sort((a, b) => b.points - a.points);
+
+        return ApiResponse.success(res, leaderboard, 'Leaderboard fetched successfully');
+    } catch (error) {
+        next(error);
+    }
+};
+

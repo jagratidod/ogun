@@ -33,8 +33,10 @@ exports.createShipment = catchAsync(async (req, res, next) => {
   }
 
   // 3. Create Shipment record
+  const podNumber = `POD-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
   const shipment = await Shipment.create({
     shipmentId: `SHP-${uuidv4().substring(0, 8).toUpperCase()}`,
+    podNumber,
     sender: req.user._id,
     recipient: recipientId,
     products,

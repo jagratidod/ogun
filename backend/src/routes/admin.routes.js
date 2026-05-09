@@ -42,7 +42,9 @@ router.delete('/reward-config/targets/:id', rewardConfigController.deleteTarget)
 
 // Sales Representatives Management
 const salesRepsController = require('../controllers/admin.salesReps.controller');
+router.get('/sales-reps/leaderboard', salesRepsController.getLeaderboard);
 router.get('/sales-reps', salesRepsController.getSalesReps);
+
 router.post('/sales-reps', salesRepsController.createSalesRep);
 router.get('/sales-reps/:id', salesRepsController.getSalesRepDetail);
 router.put('/sales-reps/:id', salesRepsController.updateSalesRep);
@@ -85,7 +87,7 @@ router.patch('/product-queries/:id/status', checkPermission('inventory'), adminQ
 
 // Service Requests Management
 const adminServiceController = require('../controllers/admin.service.controller');
-router.get('/service-requests', checkPermission('service'), adminServiceController.getAllServiceRequests);
+router.get('/service-requests', checkPermission('service', 'logistics'), adminServiceController.getAllServiceRequests);
 router.get('/service-requests/:id', checkPermission('service'), adminServiceController.getServiceRequestDetail);
 router.patch('/service-requests/:id/status', checkPermission('service'), adminServiceController.updateServiceRequestStatus);
 router.get('/registered-products', checkPermission('service'), adminServiceController.getAllRegisteredProducts);
@@ -121,6 +123,8 @@ const accountsController = require('../controllers/admin.accounts.controller');
 const deductionsController = require('../controllers/admin.deductions.controller');
 
 router.get('/accounts/ledger', accountsController.getLedger);
+router.get('/accounts/ledger/:partyId', accountsController.getPartyLedger);
+
 router.get('/accounts/invoices', accountsController.getInvoices);
 router.get('/accounts/invoices/:id', accountsController.getInvoiceById);
 router.post('/accounts/invoices/:id/payment', accountsController.recordPayment);
@@ -130,6 +134,15 @@ router.get('/accounts/financial-report', accountsController.getFinancialReport);
 router.get('/accounts/adjustments', deductionsController.getAdjustments);
 router.post('/accounts/adjustments', deductionsController.createAdjustment);
 router.patch('/accounts/adjustments/:id/approve', deductionsController.approveAdjustment);
+
+// ─── Carrier & Logistics Management ──────────────────────────────────────────
+const carrierController = require('../controllers/carrier.controller');
+router.get('/carriers', checkPermission('logistics'), carrierController.getAllCarriers);
+router.post('/carriers', checkPermission('logistics'), carrierController.createCarrier);
+router.get('/carriers/rate-engine', checkPermission('logistics'), carrierController.calculateFreight);
+router.get('/carriers/:id', checkPermission('logistics'), carrierController.getCarrierById);
+router.put('/carriers/:id', checkPermission('logistics'), carrierController.updateCarrier);
+router.delete('/carriers/:id', checkPermission('logistics'), carrierController.deleteCarrier);
 
 module.exports = router;
 

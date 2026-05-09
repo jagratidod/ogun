@@ -8,3 +8,5 @@ export { default as RestockRequestsPage } from './pages/RestockRequestsPage';
 export { default as LogisticsAnalyticsPage } from './pages/LogisticsAnalyticsPage';
 export { default as LogisticsSettingsPage } from './pages/LogisticsSettingsPage';
 export { default as ShipmentDetailPage } from './pages/ShipmentDetailPage';
+export { default as PackagingDeskPage } from './pages/PackagingDeskPage';
+export { default as DispatchQueuePage } from './pages/DispatchQueuePage';

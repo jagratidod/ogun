@@ -30,6 +30,7 @@ router.get('/inventory', catchAsync(async (req, res) => {
 
 // Shipment Flow
 router.get('/shipments', distributorShipmentController.getReceivedShipments);
+router.get('/shipments/outbound', distributorShipmentController.getOutboundShipments);
 router.patch('/shipments/:id/receive', distributorShipmentController.receiveShipment);
 router.post('/shipments/dispatch', distributorShipmentController.dispatchToRetailer);
 

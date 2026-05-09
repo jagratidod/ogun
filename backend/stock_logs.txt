@@ -77,3 +77,13 @@
 [2026-04-29T07:32:12.773Z] - Searching for Product: 69e76822f1580471a865f3a7 under User: 69e615c9e97145424e9ac2d3
 [2026-04-29T07:32:13.022Z] - SUCCESS: 1 units. 95 -> 94
 [2026-04-29T07:32:13.027Z] END: Logic finished for ORD-8C685040
+[2026-05-09T07:29:51.538Z] START: Order ORD-4705DA0F, Status: Confirmed, Deducted: false
+[2026-05-09T07:29:51.616Z] - Creating Auto-Invoice: INV-4705DA0F
+[2026-05-09T07:29:51.841Z] Triggering deduction... Items: 1
+[2026-05-09T07:29:51.844Z] - Searching for Product: 69fee195260f43c4784a1fdf under User: 69f46600479af72cdc8563ba
+[2026-05-09T07:29:51.956Z] - SUCCESS: 100 units. 1000 -> 900
+[2026-05-09T07:29:51.958Z] END: Logic finished for ORD-4705DA0F
+[2026-05-09T07:31:33.963Z] START: Order ORD-4705DA0F, Status: In Transit, Deducted: true
+[2026-05-09T07:31:33.971Z] - Generating Shipment for Order ORD-4705DA0F
+[2026-05-09T07:31:34.160Z] - SUCCESS: Shipment created.
+[2026-05-09T07:31:34.172Z] END: Logic finished for ORD-4705DA0F

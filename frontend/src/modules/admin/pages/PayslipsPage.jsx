@@ -27,34 +27,35 @@ export default function PayslipsPage() {
 
   // Flatten all records from all runs for the table
   const allPayslips = runs.flatMap(run => 
-    run.records.map(record => ({
+    (run.records || []).map(record => ({
         ...record,
-        runId: run.runId,
+        runId: run._id,
         monthLabel: run.monthLabel,
-        status: run.status
+        runStatus: run.status
     }))
-  ).filter(p => 
-    p.employeeName.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    p.runId.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ).filter(p => {
+    const search = searchTerm.toLowerCase();
+    return (p.employeeName || '').toLowerCase().includes(search) || 
+           (p.monthLabel || '').toLowerCase().includes(search);
+  });
 
   const columns = [
     { key: 'employeeName', label: 'Employee', render: (val, row) => (
       <div className="flex items-center gap-3">
         <div className="w-8 h-8 bg-surface-hover flex items-center justify-center text-brand-teal font-bold border border-border">
-          {val.charAt(0)}
+          {(val || 'E').charAt(0)}
         </div>
         <div className="flex flex-col">
           <span className="text-sm font-semibold text-content-primary">{val}</span>
-          <span className="text-[10px] text-content-tertiary uppercase font-bold tracking-tight">{row.employeeId}</span>
+          <span className="text-[10px] text-content-tertiary uppercase font-bold tracking-tight">{row.department}</span>
         </div>
       </div>
     )},
     { key: 'monthLabel', label: 'Period' },
-    { key: 'baseSalary', label: 'Gross Pay', align: 'right', render: (val) => <span className="font-medium">{formatCurrency(val)}</span> },
-    { key: 'deductions', label: 'Deductions', align: 'right', render: (val) => <span className="text-state-danger">{formatCurrency(val)}</span> },
-    { key: 'netSalary', label: 'Net Pay', align: 'right', render: (val) => <span className="font-bold text-brand-teal">{formatCurrency(val)}</span> },
-    { key: 'status', label: 'Status', render: (val) => <Badge status={val === 'disbursed' ? 'success' : 'warning'}>{val === 'disbursed' ? 'Released' : 'Processing'}</Badge> },
+    { key: 'grossPay', label: 'Gross Pay', align: 'right', render: (val) => <span className="font-medium text-xs uppercase font-bold text-content-secondary tracking-tighter">{formatCurrency(val)}</span> },
+    { key: 'leaveDeduction', label: 'Deduction', align: 'right', render: (val) => <span className="text-state-danger font-bold text-xs">-{formatCurrency(val)}</span> },
+    { key: 'netPay', label: 'Net Pay', align: 'right', render: (val) => <span className="font-bold text-brand-teal">{formatCurrency(val)}</span> },
+    { key: 'runStatus', label: 'Status', render: (val) => <Badge status={val === 'disbursed' ? 'success' : 'warning'}>{val === 'disbursed' ? 'Released' : 'Processing'}</Badge> },
     { key: 'actions', label: 'Actions', align: 'right', render: () => (
       <Button variant="icon" title="Download PDF">
         <RiDownloadLine className="w-4 h-4" />
@@ -97,7 +98,7 @@ export default function PayslipsPage() {
               <div>
                 <p className="text-[10px] text-content-tertiary font-bold uppercase tracking-widest">Total Disbursed</p>
                 <h4 className="text-xl font-black text-content-primary mt-1">
-                    {formatCurrency(allPayslips.reduce((acc, curr) => acc + curr.netSalary, 0))}
+                    {formatCurrency(allPayslips.reduce((acc, curr) => acc + (curr.netPay || 0), 0))}
                 </h4>
               </div>
               <RiCalendarLine className="w-5 h-5 text-brand-teal opacity-50" />

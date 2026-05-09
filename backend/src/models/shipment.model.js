@@ -6,6 +6,11 @@ const shipmentSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
+  podNumber: {
+    type: String,
+    unique: true,
+    sparse: true
+  },
   sender: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -45,11 +50,40 @@ const shipmentSchema = new mongoose.Schema({
     ref: 'User',
     default: null
   },
-  carrier: String,
-  trackingNumber: String,
+  carrierId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Carrier',
+    default: null
+  },
+  carrier: String, // Legacy text field
+  trackingNumber: String, // Legacy text field
+  packages: [
+    {
+      weight: Number, // Actual weight in kg
+      length: Number, // cm
+      width: Number,  // cm
+      height: Number, // cm
+      boxCount: { type: Number, default: 1 },
+      fragileType: { type: String, enum: ['None', 'Glass', 'Electronic', 'Liquid'], default: 'None' }
+    }
+  ],
+  volumetricWeight: Number,
+  billedWeight: Number,
+  zone: String,
+  freightCost: Number,
   dispatchedAt: Date,
   deliveredAt: Date,
   expectedDeliveryDate: Date,
+  podClosed: {
+    type: Boolean,
+    default: false
+  },
+  deliveryProof: String, // URL/Path to image
+  hasComplaint: {
+    type: Boolean,
+    default: false
+  },
+  complaintDetails: String,
   trackingTimeline: [
     {
       status: String,

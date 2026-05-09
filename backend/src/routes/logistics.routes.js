@@ -3,20 +3,31 @@ const router = express.Router();
 const logisticsController = require('../controllers/logistics.controller');
 const { protect, restrictTo, checkPermission } = require('../middleware/auth.middleware');
 
-// All logistics routes are protected and restricted to admin role
+// Public tracking lookup (No auth required)
+router.get('/public/track/:identifier', logisticsController.getPublicTracking);
+
+// All other logistics routes are protected and restricted to admin/logistics roles
 router.use(protect);
 router.use(restrictTo('admin'));
-
-// Check for logistics permission (assigned to logistics_manager)
 router.use(checkPermission('logistics'));
 
 // Dashboard Stats
 router.get('/stats', logisticsController.getDashboardStats);
 
-// Shipments
+// Shipments Lifecycle
+router.post('/shipments', logisticsController.createShipmentFromOrder);
 router.get('/shipments', logisticsController.getAllShipments);
 router.patch('/shipments/:id/status', logisticsController.updateShipmentStatus);
 router.patch('/shipments/:id/assign', logisticsController.assignAgent);
+router.patch('/shipments/:id/packaging', logisticsController.addPackagingDetails);
+router.patch('/shipments/:id/carrier', logisticsController.selectCarrier);
+router.patch('/shipments/:id/dispatch', logisticsController.dispatchShipment);
+router.post('/shipments/:id/tracking', logisticsController.addTrackingUpdate);
+router.patch('/shipments/:id/deliver', logisticsController.confirmDelivery);
+
+// Queues
+router.get('/packaging-queue', logisticsController.getPackagingQueue);
+router.get('/dispatch-queue', logisticsController.getDispatchQueue);
 
 // Orders
 router.get('/orders', logisticsController.getOrderPipeline);

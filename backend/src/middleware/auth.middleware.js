@@ -48,7 +48,7 @@ exports.restrictTo = (...roles) => {
 };
 
 // @desc    Authorize Admin sub-role permissions
-exports.checkPermission = (permission) => {
+exports.checkPermission = (...permissions) => {
     return (req, res, next) => {
         // Super admins have access to all
         if (req.user.subRole === 'super_admin') return next();
@@ -56,7 +56,9 @@ exports.checkPermission = (permission) => {
         // If it's a main admin (role: admin) with no specific subRole, grant full access
         if (req.user.role === 'admin' && !req.user.subRole) return next();
 
-        if (!req.user.permissions || !req.user.permissions.includes(permission)) {
+        const hasPermission = permissions.some(p => req.user.permissions && req.user.permissions.includes(p));
+
+        if (!hasPermission) {
             return ApiResponse.error(res, "Insufficient privileges for this operation", 403);
         }
         next();

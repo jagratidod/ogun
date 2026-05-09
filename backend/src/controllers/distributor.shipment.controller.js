@@ -98,14 +98,15 @@ exports.dispatchToRetailer = catchAsync(async (req, res, next) => {
   }
 
   // 3. Create Shipment record
+  const podNumber = `POD-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
   const shipment = await Shipment.create({
     shipmentId: `SHP-DR-${Date.now()}`,
+    podNumber,
     sender: req.user._id,
     recipient: recipientId,
     products: products.map(p => ({
       product: p.product,
-      quantity: p.quantity,
-      status: 'In Transit'
+      quantity: p.quantity
     })),
     status: 'In Transit',
     dispatchedAt: Date.now()
@@ -113,4 +114,18 @@ exports.dispatchToRetailer = catchAsync(async (req, res, next) => {
 
   return ApiResponse.success(res, shipment, 'Shipment dispatched to retailer and stock deducted');
 });
+
+/**
+ * @desc    Get all shipments dispatched by Distributor
+ * @route   GET /api/v1/distributor/shipments/outbound
+ */
+exports.getOutboundShipments = catchAsync(async (req, res, next) => {
+  const shipments = await Shipment.find({ sender: req.user._id })
+    .populate('recipient', 'name email businessName shopName location')
+    .populate('products.product', 'name sku')
+    .sort('-createdAt');
+
+  return ApiResponse.success(res, shipments, 'Outbound shipments fetched successfully');
+});
+
 

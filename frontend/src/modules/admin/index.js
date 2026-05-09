@@ -34,3 +34,8 @@ export { default as UsersPage } from './pages/UsersPage';
 export { default as SalesRepsPage } from './pages/SalesRepsPage';
 export { default as SocialGridManagerPage } from './pages/SocialGridManagerPage';
 export { default as TechniciansPage } from './pages/TechniciansPage';
+export { default as CarrierManagementPage } from './pages/CarrierManagementPage';
+export { default as ShipmentControlTowerPage } from './pages/ShipmentControlTowerPage';
+export { default as FreightAnalyticsPage } from './pages/FreightAnalyticsPage';
+export { default as SparePartCenterPage } from './pages/SparePartCenterPage';
+

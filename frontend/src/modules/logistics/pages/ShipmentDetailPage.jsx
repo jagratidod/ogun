@@ -4,7 +4,7 @@ import {
   RiTruckLine, RiArrowLeftLine, RiMapPinLine, RiHistoryLine, 
   RiCheckDoubleLine, RiTimeLine, RiAlertLine, RiUserLine 
 } from 'react-icons/ri';
-import { PageHeader, Card, Button, Badge, formatDateTime, Select, Modal, useModal } from '../../../core';
+import { PageHeader, Card, Button, Badge, formatDateTime, Select, Modal, useModal, Input } from '../../../core';
 import logisticsService from '../../../core/services/logisticsService';
 import { toast } from 'react-hot-toast';
 

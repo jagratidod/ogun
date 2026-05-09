@@ -128,6 +128,10 @@ const userSchema = new mongoose.Schema({
             sms: { type: Boolean, default: true },
             push: { type: Boolean, default: true }
         }
+    },
+    ledgerBalance: {
+        type: Number,
+        default: 0
     }
 }, {
     timestamps: true

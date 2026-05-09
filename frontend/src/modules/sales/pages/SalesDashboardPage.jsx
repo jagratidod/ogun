@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   RiUserAddFill, RiShoppingCartFill, RiTimeFill, RiTrophyFill, 
-  RiArrowRightUpLine, RiStore2Fill, RiCustomerService2Fill, RiPlayFill 
+  RiArrowRightUpLine, RiStore2Fill, RiCustomerService2Fill, RiPlayFill,
+  RiTruckLine
 } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
 import executiveService from '../../../core/services/executiveService';
@@ -156,6 +157,36 @@ export default function SalesDashboardPage() {
           </div>
         )}
       </Card>
+      
+      {/* Shipment Visibility */}
+      <section className="space-y-3">
+        <div className="flex justify-between items-center px-1">
+           <h3 className="text-[10px] font-black text-content-primary uppercase tracking-widest opacity-80">Retailer Shipment Status</h3>
+           <RiTruckLine className="text-brand-teal w-4 h-4" />
+        </div>
+        
+        <div className="space-y-2">
+           {[
+             { id: 'SHP-9021', store: 'Global Electronics', status: 'In Transit', loc: 'Mumbai Hub' },
+             { id: 'SHP-8842', store: 'Apex Mobile', status: 'Dispatched', loc: 'Bangalore WH' }
+           ].map((shp, i) => (
+             <div key={i} className="p-3 bg-white border border-border rounded-xl flex items-center justify-between shadow-sm">
+                <div className="flex items-center gap-3">
+                   <div className="w-8 h-8 bg-brand-teal/5 flex items-center justify-center text-brand-teal rounded-lg">
+                      <RiTruckLine className="w-4 h-4" />
+                   </div>
+                   <div>
+                      <p className="text-[10px] font-black text-content-primary tracking-tight">{shp.store}</p>
+                      <p className="text-[9px] text-content-tertiary font-bold">{shp.id} • {shp.loc}</p>
+                   </div>
+                </div>
+                <Badge variant={shp.status === 'Delivered' ? 'teal' : 'warning'} className="text-[8px] px-1.5 py-0">{shp.status}</Badge>
+             </div>
+           ))}
+           <Button variant="ghost" size="xs" className="w-full text-[9px] font-black tracking-widest opacity-60">VIEW ALL SHIPMENTS</Button>
+        </div>
+      </section>
     </div>
   );
 }
+

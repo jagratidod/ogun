@@ -26,5 +26,7 @@ router.get('/warranty-history', customerController.getWarrantyHistory);
 router.post('/service-requests', customerController.raiseServiceRequest);
 router.get('/service-requests', customerController.getMyServiceRequests);
 router.get('/service-requests/:id', customerController.getServiceRequestDetail);
+router.post('/service-requests/:id/feedback', customerController.submitServiceFeedback);
+
 
 module.exports = router;

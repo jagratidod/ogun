@@ -208,8 +208,7 @@ exports.getPayrollRuns = async (req, res, next) => {
         const runs = await Payroll.find()
             .populate('processedBy', 'name')
             .populate('approvedBy', 'name')
-            .sort('-createdAt')
-            .select('-records'); // Exclude heavy records from list view
+            .sort('-createdAt');
 
         return ApiResponse.success(res, runs, 'Payroll runs fetched');
     } catch (err) { next(err); }

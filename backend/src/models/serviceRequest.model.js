@@ -31,7 +31,7 @@ const serviceRequestSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['Open', 'Assigned', 'In Progress', 'Resolved', 'Closed'],
+    enum: ['Open', 'Assigned', 'Reached Site', 'Diagnosis', 'Parts Pending', 'In Progress', 'Resolved', 'Closed'],
     default: 'Open'
   },
   assignedTechnician: {
@@ -49,6 +49,18 @@ const serviceRequestSchema = new mongoose.Schema({
   adminRemarks: {
     type: String
   },
+  technicianNotes: {
+    type: String
+  },
+  spareParts: [{
+    product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+    quantity: { type: Number, default: 1 },
+    status: { type: String, enum: ['Pending', 'Approved', 'Dispatched', 'Installed'], default: 'Pending' }
+  }],
+  faultImages: [{
+    url: String,
+    caption: String
+  }],
   resolvedAt: {
     type: Date
   },
@@ -67,7 +79,15 @@ const serviceRequestSchema = new mongoose.Schema({
   resolutionImages: [{
     url: String,
     public_id: String
-  }]
+  }],
+  rating: {
+    type: Number,
+    min: 1,
+    max: 5
+  },
+  feedback: {
+    type: String
+  }
 }, {
   timestamps: true
 });

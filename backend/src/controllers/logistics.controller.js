@@ -1,7 +1,16 @@
+const mongoose = require('mongoose');
 const Shipment = require('../models/shipment.model');
+
 const ProductOrder = require('../models/productOrder.model');
 const User = require('../models/user.model');
+const TrackingLog = require('../models/trackingLog.model');
+const Carrier = require('../models/carrier.model');
 const ApiResponse = require('../utils/apiResponse');
+const { v4: uuidv4 } = require('uuid');
+
+// Helper to generate POD number
+const generatePODNumber = () => `POD-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
+
 
 // @desc    Get Logistics Dashboard Stats
 // @route   GET /api/v1/logistics/stats
@@ -81,9 +90,16 @@ exports.getOrderPipeline = async (req, res, next) => {
 // @route   GET /api/v1/logistics/tracking/:id
 exports.getTrackingInfo = async (req, res, next) => {
     try {
-        const shipment = await Shipment.findOne({ 
-            $or: [{ shipmentId: req.params.id }, { trackingNumber: req.params.id }] 
-        })
+        const query = {
+            $or: [{ shipmentId: req.params.id }, { trackingNumber: req.params.id }]
+        };
+
+        if (mongoose.Types.ObjectId.isValid(req.params.id)) {
+            query.$or.push({ _id: req.params.id });
+        }
+
+        const shipment = await Shipment.findOne(query)
+
         .populate('sender', 'name businessName location')
         .populate('recipient', 'name businessName location')
         .populate('products.product', 'name sku images');
@@ -288,3 +304,264 @@ exports.createDeliveryAgent = async (req, res, next) => {
         next(error);
     }
 };
+
+// @desc    Create Shipment from Order (Start of Logistics Lifecycle)
+// @route   POST /api/v1/logistics/shipments
+exports.createShipmentFromOrder = async (req, res, next) => {
+    try {
+        const { orderId, direction } = req.body;
+        const order = await ProductOrder.findById(orderId);
+
+        if (!order) return ApiResponse.error(res, 'Order not found', 404);
+        if (order.shipmentCreated) return ApiResponse.error(res, 'Shipment already exists for this order', 400);
+
+        const podNumber = generatePODNumber();
+        const shipment = await Shipment.create({
+            shipmentId: `SHP-${uuidv4().substring(0, 8).toUpperCase()}`,
+            podNumber,
+            sender: order.seller,
+            recipient: order.buyer,
+            products: order.products.map(p => ({ product: p.product, quantity: p.quantity })),
+            direction: direction || (order.orderType === 'distributor_to_admin' ? 'admin_to_distributor' : 'distributor_to_retailer'),
+            status: 'Pending'
+        });
+
+        order.shipmentCreated = true;
+        await order.save();
+
+        // Log initial tracking
+        await TrackingLog.create({
+            shipment: shipment._id,
+            podNumber,
+            status: 'Shipment Created',
+            location: 'System',
+            remarks: 'Shipment initialized from order',
+            updatedBy: req.user._id
+        });
+
+        return ApiResponse.success(res, shipment, 'Shipment intelligence initialized', 201);
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Add Packaging Details
+// @route   PATCH /api/v1/logistics/shipments/:id/packaging
+exports.addPackagingDetails = async (req, res, next) => {
+    try {
+        const { packages } = req.body; // Array of { weight, length, width, height, boxCount, fragileType }
+        const shipment = await Shipment.findById(req.params.id);
+
+        if (!shipment) return ApiResponse.error(res, 'Shipment not found', 404);
+
+        shipment.packages = packages;
+        
+        // Calculate weights
+        let totalActualWeight = 0;
+        let totalVolumetricWeight = 0;
+
+        packages.forEach(pkg => {
+            totalActualWeight += pkg.weight * (pkg.boxCount || 1);
+            totalVolumetricWeight += ((pkg.length * pkg.width * pkg.height) / 5000) * (pkg.boxCount || 1);
+        });
+
+        shipment.volumetricWeight = totalVolumetricWeight;
+        shipment.billedWeight = Math.max(totalActualWeight, totalVolumetricWeight);
+        shipment.status = 'Pending'; // Remains pending until carrier is assigned
+
+        await shipment.save();
+
+        await TrackingLog.create({
+            shipment: shipment._id,
+            podNumber: shipment.podNumber,
+            status: 'Packed',
+            location: 'Packaging Desk',
+            remarks: `Total weight: ${shipment.billedWeight}kg`,
+            updatedBy: req.user._id
+        });
+
+        return ApiResponse.success(res, shipment, 'Packaging details updated');
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Select Carrier and Assign Cost
+// @route   PATCH /api/v1/logistics/shipments/:id/carrier
+exports.selectCarrier = async (req, res, next) => {
+    try {
+        const { carrierId, cost, zone } = req.body;
+        const shipment = await Shipment.findById(req.params.id);
+
+        if (!shipment) return ApiResponse.error(res, 'Shipment not found', 404);
+
+        shipment.carrierId = carrierId;
+        shipment.freightCost = cost;
+        shipment.zone = zone;
+
+        await shipment.save();
+
+        return ApiResponse.success(res, shipment, 'Carrier selected and cost assigned');
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Dispatch Shipment
+// @route   PATCH /api/v1/logistics/shipments/:id/dispatch
+exports.dispatchShipment = async (req, res, next) => {
+    try {
+        const shipment = await Shipment.findById(req.params.id);
+
+        if (!shipment) return ApiResponse.error(res, 'Shipment not found', 404);
+        if (!shipment.carrierId) return ApiResponse.error(res, 'Carrier must be assigned before dispatch', 400);
+
+        shipment.status = 'In Transit';
+        shipment.dispatchedAt = Date.now();
+
+        await shipment.save();
+
+        await TrackingLog.create({
+            shipment: shipment._id,
+            podNumber: shipment.podNumber,
+            status: 'Dispatched',
+            location: 'Logistics Hub',
+            remarks: 'Shipment handed over to carrier',
+            updatedBy: req.user._id
+        });
+
+        return ApiResponse.success(res, shipment, 'Shipment dispatched successfully');
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Add Tracking Update
+// @route   POST /api/v1/logistics/shipments/:id/tracking
+exports.addTrackingUpdate = async (req, res, next) => {
+    try {
+        const { status, location, remarks } = req.body;
+        const shipment = await Shipment.findById(req.params.id);
+
+        if (!shipment) return ApiResponse.error(res, 'Shipment not found', 404);
+
+        const log = await TrackingLog.create({
+            shipment: shipment._id,
+            podNumber: shipment.podNumber,
+            status,
+            location,
+            remarks,
+            updatedBy: req.user._id
+        });
+
+        shipment.status = status;
+        // Legacy timeline sync
+        shipment.trackingTimeline.push({
+            status,
+            location,
+            timestamp: Date.now(),
+            note: remarks
+        });
+
+        await shipment.save();
+
+        return ApiResponse.success(res, log, 'Tracking update added');
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Confirm Delivery (POD Closure)
+// @route   PATCH /api/v1/logistics/shipments/:id/deliver
+exports.confirmDelivery = async (req, res, next) => {
+    try {
+        const { deliveryProof, remarks } = req.body;
+        const shipment = await Shipment.findById(req.params.id);
+
+        if (!shipment) return ApiResponse.error(res, 'Shipment not found', 404);
+
+        shipment.status = 'Delivered';
+        shipment.deliveredAt = Date.now();
+        shipment.podClosed = true;
+        shipment.deliveryProof = deliveryProof;
+
+        await shipment.save();
+
+        await TrackingLog.create({
+            shipment: shipment._id,
+            podNumber: shipment.podNumber,
+            status: 'Delivered',
+            location: 'Destination',
+            remarks: remarks || 'Delivered successfully',
+            updatedBy: req.user._id
+        });
+
+        return ApiResponse.success(res, shipment, 'Delivery confirmed and POD closed');
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Public Tracking Lookup
+// @route   GET /api/v1/logistics/public/track/:identifier
+exports.getPublicTracking = async (req, res, next) => {
+    try {
+        const identifier = req.params.identifier;
+        
+        const shipment = await Shipment.findOne({
+            $or: [
+                { podNumber: identifier },
+                { trackingNumber: identifier },
+                { shipmentId: identifier }
+            ]
+        })
+        .populate('sender', 'name businessName location')
+        .populate('recipient', 'name businessName location')
+        .populate('carrierId', 'name trackingUrl')
+        .populate('products.product', 'name sku images');
+
+        if (!shipment) return ApiResponse.error(res, 'Shipment not found', 404);
+
+        const timeline = await TrackingLog.find({ shipment: shipment._id }).sort({ timestamp: -1 });
+
+        return ApiResponse.success(res, { shipment, timeline }, 'Tracking data fetched');
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Get Packaging Queue (Pending Packaging)
+// @route   GET /api/v1/logistics/packaging-queue
+exports.getPackagingQueue = async (req, res, next) => {
+    try {
+        const shipments = await Shipment.find({
+            status: 'Pending',
+            'packages.0': { $exists: false }
+        })
+        .populate('recipient', 'name businessName location')
+        .sort({ createdAt: -1 });
+
+        return ApiResponse.success(res, shipments, 'Packaging queue fetched');
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Get Dispatch Queue (Awaiting Carrier/Dispatch)
+// @route   GET /api/v1/logistics/dispatch-queue
+exports.getDispatchQueue = async (req, res, next) => {
+    try {
+        const shipments = await Shipment.find({
+            status: 'Pending',
+            'packages.0': { $exists: true }
+        })
+        .populate('recipient', 'name businessName location')
+        .populate('carrierId', 'name')
+        .sort({ createdAt: -1 });
+
+        return ApiResponse.success(res, shipments, 'Dispatch queue fetched');
+    } catch (error) {
+        next(error);
+    }
+};
+

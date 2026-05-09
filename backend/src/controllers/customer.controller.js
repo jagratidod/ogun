@@ -249,3 +249,33 @@ exports.getServiceRequestDetail = async (req, res, next) => {
         next(error);
     }
 };
+
+// @desc    Submit feedback for a resolved service request
+// @route   POST /api/v1/customer/service-requests/:id/feedback
+exports.submitServiceFeedback = async (req, res, next) => {
+    try {
+        const { rating, feedback } = req.body;
+        const request = await ServiceRequest.findOne({ _id: req.params.id, customer: req.user._id });
+
+        if (!request) return ApiResponse.error(res, 'Service request not found', 404);
+        if (request.status !== 'Resolved' && request.status !== 'Closed') {
+            return ApiResponse.error(res, 'Can only provide feedback for resolved requests', 400);
+        }
+
+        request.rating = rating;
+        request.feedback = feedback;
+        request.status = 'Closed';
+        
+        request.history.push({
+            status: 'Closed',
+            note: `Customer submitted feedback (${rating}/5). Ticket closed.`,
+            updatedBy: req.user._id
+        });
+
+        await request.save();
+        return ApiResponse.success(res, request, 'Feedback submitted and ticket closed');
+    } catch (error) {
+        next(error);
+    }
+};
+

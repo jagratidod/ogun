@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
+import {
   RiMailLine, RiShieldKeyholeLine, RiPulseFill,
   RiFingerprintLine, RiLayoutGridFill, RiArrowRightLine, RiUserLine
 } from 'react-icons/ri';
@@ -36,7 +36,7 @@ export default function AdminLoginPage() {
       setLoading(true);
       const { success, message } = await requestOTP(formData.email, 'admin');
       setLoading(false);
-      
+
       if (success) {
         toast.success(message || 'Access key sent to your mail');
         setStep(1);
@@ -50,20 +50,20 @@ export default function AdminLoginPage() {
       if (!validateOTP(formData.otp)) {
         return toast.error('Access key must be 6 digits.');
       }
-      
+
       setLoading(true);
       const { success, role, user: userData, message } = await verifyOTP(formData.email, formData.otp, 'admin', formData.name);
       setLoading(false);
-      
+
       if (success && role === 'admin') {
         toast.success('System Access Granted');
         // Check subRole to redirect to the correct panel
         if (userData?.subRole === 'hr_manager') {
-           navigate('/hr');
+          navigate('/hr');
         } else if (userData?.subRole === 'service_manager') {
-           navigate('/technician');
+          navigate('/technician');
         } else {
-           navigate('/admin');
+          navigate('/admin');
         }
       } else {
         toast.error(message || 'Identity Mismatch');
@@ -77,22 +77,22 @@ export default function AdminLoginPage() {
       <div className="absolute inset-0 z-0 opacity-10 pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-teal/20 blur-[100px] rounded-full" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-brand-pink/20 blur-[100px] rounded-full" />
-        <div className="absolute inset-0" style={{ 
+        <div className="absolute inset-0" style={{
           backgroundImage: `radial-gradient(#3FAFB0 0.5px, transparent 0.5px)`,
-          backgroundSize: '30px 30px' 
+          backgroundSize: '30px 30px'
         }} />
       </div>
 
       {/* ─── Main Content Frame ─── */}
       <div className="relative z-10 w-full max-w-[1040px] h-full md:h-auto flex flex-col md:flex-row bg-white shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] overflow-hidden border border-gray-100">
-        
+
         {/* ─── Left Panel: Vibrant Theme Side (Stays Colorful) ─── */}
         <div className="w-full md:w-[45%] p-12 lg:p-16 flex flex-col justify-between relative bg-brand-teal overflow-hidden">
           {/* Intense Theme Gradient Background */}
           <div className="absolute inset-0 bg-gradient-to-br from-brand-teal via-[#3FAFB0] to-brand-magenta" />
-          <div className="absolute top-0 left-0 w-full h-full opacity-20" style={{ 
-             backgroundImage: 'url("/noise.svg")',
-             filter: 'contrast(120%) brightness(120%)'
+          <div className="absolute top-0 left-0 w-full h-full opacity-20" style={{
+            backgroundImage: 'url("/noise.svg")',
+            filter: 'contrast(120%) brightness(120%)'
           }} />
 
           <div className="relative z-10 space-y-12">
@@ -119,13 +119,13 @@ export default function AdminLoginPage() {
           </div>
 
           <div className="relative z-10 space-y-4">
-             <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-white/10 backdrop-blur-md border border-white/20">
-                    <RiPulseFill className="w-3.5 h-3.5 text-white animate-pulse" />
-                    <span className="text-[9px] font-black text-white uppercase tracking-[0.3em]">{step === 0 ? 'Network Active' : 'Awaiting OTP Check'}</span>
-                </div>
-             </div>
-             <p className="text-[8px] font-black text-white/30 uppercase tracking-[0.5em]">Session.ID: {Math.random().toString(36).substring(7).toUpperCase()}</p>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-white/10 backdrop-blur-md border border-white/20">
+                <RiPulseFill className="w-3.5 h-3.5 text-white animate-pulse" />
+                <span className="text-[9px] font-black text-white uppercase tracking-[0.3em]">{step === 0 ? 'Network Active' : 'Awaiting OTP Check'}</span>
+              </div>
+            </div>
+            <p className="text-[8px] font-black text-white/30 uppercase tracking-[0.5em]">Session.ID: {Math.random().toString(36).substring(7).toUpperCase()}</p>
           </div>
         </div>
 
@@ -133,26 +133,26 @@ export default function AdminLoginPage() {
         <div className="w-full md:w-[55%] p-10 sm:p-16 lg:p-24 flex flex-col justify-center bg-white">
           <div className="max-w-[340px] mx-auto w-full space-y-12">
             <div className="space-y-3">
-               <div className="flex items-center gap-2">
-                 <RiShieldKeyholeLine className="text-brand-teal w-5 h-5" />
-                 <span className="text-[10px] font-black text-brand-teal uppercase tracking-[0.5em]">Auth Service</span>
-               </div>
-               <h2 className="text-4xl font-black text-[#0F172A] tracking-tighter uppercase leading-none">Console.</h2>
-               <p className="text-content-tertiary text-sm font-medium opacity-60">Initialize your administrative session.</p>
+              <div className="flex items-center gap-2">
+                <RiShieldKeyholeLine className="text-brand-teal w-5 h-5" />
+                <span className="text-[10px] font-black text-brand-teal uppercase tracking-[0.5em]">Auth Service</span>
+              </div>
+              <h2 className="text-4xl font-black text-[#0F172A] tracking-tighter uppercase leading-none">Console.</h2>
+              <p className="text-content-tertiary text-sm font-medium opacity-60">Initialize your administrative session.</p>
             </div>
 
             <form onSubmit={handleNext} className="space-y-8">
-              
+
               {step === 0 ? (
                 <div className="space-y-2.5 group">
                   <label className="text-[10px] font-black text-[#0F172A]/30 uppercase tracking-[0.3em] pl-1 group-focus-within:text-brand-teal transition-colors">Staff Identification</label>
                   <div className="relative">
                     <RiMailLine className="absolute left-0 top-1/2 -translate-y-1/2 text-content-tertiary group-focus-within:text-brand-teal transition-colors w-5 h-5" />
-                    <input 
+                    <input
                       type="text"
                       placeholder="staff@ogun.in"
                       value={formData.email}
-                      onChange={(e) => { setFormData({...formData, email: e.target.value}); setEmailError(''); }}
+                      onChange={(e) => { setFormData({ ...formData, email: e.target.value }); setEmailError(''); }}
                       className={`w-full h-12 pl-8 border-b-2 transition-all text-base font-bold text-[#0F172A] outline-none placeholder:text-gray-200 placeholder:font-normal ${emailError ? 'border-red-400' : 'border-gray-100 focus:border-brand-teal'}`}
                     />
                   </div>
@@ -162,8 +162,8 @@ export default function AdminLoginPage() {
                 <div className="space-y-2.5 group">
                   <div className="flex justify-between items-center px-1">
                     <label className="text-[10px] font-black text-[#0F172A]/30 uppercase tracking-[0.3em] group-focus-within:text-brand-pink transition-colors">Security Key (OTP)</label>
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       onClick={() => setStep(0)}
                       className="text-[10px] font-black text-brand-teal uppercase tracking-widest border-b border-brand-teal/20 pb-0.5"
                     >
@@ -172,12 +172,12 @@ export default function AdminLoginPage() {
                   </div>
                   <div className="relative">
                     <RiFingerprintLine className="absolute left-0 top-1/2 -translate-y-1/2 text-content-tertiary group-focus-within:text-brand-pink transition-colors w-5 h-5" />
-                    <input 
+                    <input
                       type="text"
                       placeholder="Enter 6-digit code"
                       maxLength={6}
                       value={formData.otp}
-                      onChange={(e) => setFormData({...formData, otp: e.target.value.replace(/\D/g, '').slice(0, 6)})}
+                      onChange={(e) => setFormData({ ...formData, otp: e.target.value.replace(/\D/g, '').slice(0, 6) })}
                       className="w-full h-12 pl-8 border-b-2 border-gray-100 focus:border-brand-pink transition-all text-base font-bold text-[#0F172A] outline-none placeholder:text-gray-200 placeholder:font-normal"
                       required
                     />
@@ -185,7 +185,7 @@ export default function AdminLoginPage() {
                 </div>
               )}
 
-              <button 
+              <button
                 type="submit"
                 disabled={loading}
                 className={`w-full h-14 bg-[#0F172A] text-white font-black uppercase tracking-[0.4em] text-[11px] flex items-center justify-between px-8 relative overflow-hidden group shadow-2xl shadow-gray-200 transition-all ${loading ? 'opacity-80' : 'active:scale-[0.98]'}`}
@@ -197,12 +197,12 @@ export default function AdminLoginPage() {
             </form>
 
             <div className="pt-8 flex flex-col items-center gap-4 border-t border-gray-50">
-               <button 
+              <button
                 onClick={() => navigate('/login')}
                 className="flex items-center gap-2 text-[10px] font-black text-content-tertiary uppercase tracking-[0.3em] hover:text-brand-teal transition-all group opacity-60"
-               >
-                  <RiLayoutGridFill className="w-4 h-4 group-hover:rotate-90 transition-transform" /> Exit to Business Portal
-               </button>
+              >
+                <RiLayoutGridFill className="w-4 h-4 group-hover:rotate-90 transition-transform" /> Exit to Business Portal
+              </button>
             </div>
           </div>
         </div>

@@ -197,32 +197,31 @@ exports.updateRetailerOrderStatus = catchAsync(async (req, res, next) => {
             order.stockAddedToBuyer = true;
 
             // --- FINANCIAL LEDGER RECORDING ---
-            const Transaction = require('../models/transaction.model');
-            const txnId = `ORD-${order.orderId}-${Date.now()}`;
+            const FinanceService = require('../services/finance.service');
             
-            // 1. Record income for Distributor
-            await Transaction.create({
-                transactionId: `INC-${txnId}`,
+            // 1. Record income for Distributor (Seller)
+            await FinanceService.recordTransaction({
                 type: 'income',
                 category: 'order_payment',
                 description: `Sale to Retailer - Order ${order.orderId}`,
                 amount: order.totalAmount,
-                party: order.seller,
-                partyRole: 'distributor',
-                status: 'completed'
+                partyId: order.seller,
+                method: 'system'
             });
 
-            // 2. Record expense for Retailer
-            await Transaction.create({
-                transactionId: `EXP-${txnId}`,
+            // 2. Record expense for Retailer (Buyer)
+            await FinanceService.recordTransaction({
                 type: 'expense',
                 category: 'order_payment',
                 description: `Purchase from Distributor - Order ${order.orderId}`,
                 amount: order.totalAmount,
-                party: order.buyer,
-                partyRole: 'retailer',
-                status: 'completed'
+                partyId: order.buyer,
+                method: 'system'
             });
+
+            // 3. Generate Invoice
+            await FinanceService.generateInvoice(order);
+
 
             // --- REWARD POINTS FOR SELLER (Distributor) ---
             const RewardService = require('../services/rewardService');

@@ -5,7 +5,8 @@ import {
   RiCheckboxCircleLine, 
   RiCloseCircleLine,
   RiArrowUpLine,
-  RiArrowDownLine
+  RiArrowDownLine,
+  RiBox3Line
 } from 'react-icons/ri';
 import MetricCard from '../../../core/components/charts/MetricCard';
 import logisticsService from '../../../core/services/logisticsService';
@@ -151,13 +152,27 @@ export default function LogisticsDashboardPage() {
           </div>
 
           <div className="mt-8 p-4 bg-brand-teal/5 border border-brand-teal/20">
-            <h4 className="text-sm font-bold text-brand-teal mb-1">System Insight</h4>
-            <p className="text-xs text-content-secondary leading-relaxed">
-              Logistics flow is stable. 4 shipments are currently approaching "Delayed" status in the West region.
-            </p>
+            <h4 className="text-sm font-bold text-brand-teal mb-3">Operational Hub</h4>
+            <div className="grid grid-cols-2 gap-2">
+              <button 
+                onClick={() => window.location.href='/logistics/packaging'} 
+                className="p-2 bg-white border border-brand-teal/20 text-[10px] font-bold text-brand-teal hover:bg-brand-teal hover:text-white transition-all flex flex-col items-center"
+              >
+                <RiBox3Line className="mb-1 text-base" />
+                PACKAGING DESK
+              </button>
+              <button 
+                onClick={() => window.location.href='/logistics/dispatch'} 
+                className="p-2 bg-white border border-brand-teal/20 text-[10px] font-bold text-brand-teal hover:bg-brand-teal hover:text-white transition-all flex flex-col items-center"
+              >
+                <RiTruckLine className="mb-1 text-base" />
+                DISPATCH QUEUE
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 }
+

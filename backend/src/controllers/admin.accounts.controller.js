@@ -34,6 +34,36 @@ exports.getLedger = catchAsync(async (req, res, next) => {
 });
 
 /**
+ * @desc    Get ledger for a specific party
+ * @route   GET /api/v1/admin/accounts/ledger/:partyId
+ */
+exports.getPartyLedger = catchAsync(async (req, res, next) => {
+    const transactions = await Transaction.find({ party: req.params.partyId })
+        .sort('-createdAt');
+
+    const user = await User.findById(req.params.partyId).select('name businessName shopName ledgerBalance');
+
+    const totalCredits = transactions
+        .filter(t => t.type === 'income' && t.status === 'completed')
+        .reduce((acc, t) => acc + t.amount, 0);
+
+    const totalDebits = transactions
+        .filter(t => t.type === 'expense' && t.status === 'completed')
+        .reduce((acc, t) => acc + t.amount, 0);
+
+    return ApiResponse.success(res, {
+        user,
+        transactions,
+        stats: {
+            balance: user?.ledgerBalance || (totalCredits - totalDebits),
+            totalCredits,
+            totalDebits
+        }
+    }, 'Party ledger fetched successfully');
+});
+
+
+/**
  * @desc    Get all invoices
  * @route   GET /api/v1/admin/accounts/invoices
  */
@@ -80,18 +110,14 @@ exports.recordPayment = catchAsync(async (req, res, next) => {
 
     const txnId = `TXN-${uuidv4().substring(0, 8).toUpperCase()}`;
 
-    // 1. Create Transaction record
-    const transaction = await Transaction.create({
-        transactionId: txnId,
+    const FinanceService = require('../services/finance.service');
+    const transaction = await FinanceService.recordTransaction({
         type: 'income',
         category: 'order_payment',
         description: `Payment for Invoice ${invoice.invoiceId} ${note ? '- ' + note : ''}`,
         amount: amount,
-        party: invoice.buyer,
-        partyRole: 'distributor', // Assuming invoices are mostly for distributors
-        paymentMethod: method || 'bank_transfer',
-        status: 'completed',
-        createdBy: req.user._id
+        partyId: invoice.buyer,
+        method: method || 'bank_transfer'
     });
 
     // 2. Update Invoice
@@ -100,7 +126,7 @@ exports.recordPayment = catchAsync(async (req, res, next) => {
         amount,
         date: new Date(),
         method: method || 'bank_transfer',
-        transactionId: txnId
+        transactionId: transaction.transactionId
     });
 
     if (invoice.amountPaid >= invoice.totalAmount) {

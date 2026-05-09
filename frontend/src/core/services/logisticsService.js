@@ -49,7 +49,53 @@ const logisticsService = {
   onboardAgent: async (data) => {
     const response = await api.post('/logistics/agents', data);
     return response.data;
+  },
+
+  createShipmentFromOrder: async (data) => {
+    const response = await api.post('/logistics/shipments', data);
+    return response.data;
+  },
+
+  addPackagingDetails: async (id, data) => {
+    const response = await api.patch(`/logistics/shipments/${id}/packaging`, data);
+    return response.data;
+  },
+
+  selectCarrier: async (id, data) => {
+    const response = await api.patch(`/logistics/shipments/${id}/carrier`, data);
+    return response.data;
+  },
+
+  dispatchShipment: async (id) => {
+    const response = await api.patch(`/logistics/shipments/${id}/dispatch`);
+    return response.data;
+  },
+
+  addTrackingUpdate: async (id, data) => {
+    const response = await api.post(`/logistics/shipments/${id}/tracking`, data);
+    return response.data;
+  },
+
+  confirmDelivery: async (id, data) => {
+    const response = await api.patch(`/logistics/shipments/${id}/deliver`, data);
+    return response.data;
+  },
+
+  getPackagingQueue: async () => {
+    const response = await api.get('/logistics/packaging-queue');
+    return response.data;
+  },
+
+  getDispatchQueue: async () => {
+    const response = await api.get('/logistics/dispatch-queue');
+    return response.data;
+  },
+
+  getPublicTracking: async (identifier) => {
+    const response = await api.get(`/logistics/public/track/${identifier}`);
+    return response.data;
   }
 };
 
 export default logisticsService;
+

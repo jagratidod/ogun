@@ -43,7 +43,8 @@ import {
   PointsHistoryPage, ServiceRequestsPage, ServiceDetailPage,
   ServiceAnalyticsPage, DistributorListPage, RetailerListPage,
   CustomerListPage, AdminSettingsPage, PayslipsPage, DeductionsPage, OfferLettersPage, SocialGridManagerPage,
-  AdminProductQueriesPage, SalesRepsPage, TechniciansPage
+  AdminProductQueriesPage, SalesRepsPage, TechniciansPage,
+  CarrierManagementPage, ShipmentControlTowerPage, FreightAnalyticsPage, SparePartCenterPage
 } from '../modules/admin';
 
 import {
@@ -59,7 +60,7 @@ import {
   RetailerStockPage, RestockRequestPage, RetailerLedgerPage,
   RetailerCustomersPage, RetailerRewardsPage, RetailerAnalyticsPage,
   RetailerSettingsPage, BrowseDistributorProducts,
-  RetailerOrdersPage, RetailerSocialPage, RetailerSalesPage
+  RetailerOrdersPage, RetailerSocialPage, RetailerSalesPage, TrackShipmentPage
 } from '../modules/retailer';
 
 
@@ -83,11 +84,11 @@ import WarrantyExtensionPage from '../modules/customer/pages/WarrantyExtensionPa
 
 import { HRDashboardPage, HREmployeesPage, HRLeavesPage, HRMyLeavesPage, HRPayrollDashboardPage, HRSalarySetupPage, HRRunPayrollPage, HRPayslipsPage } from '../modules/hr';
 import { ServiceDashboardPage } from '../modules/service-center';
-import { 
-  LogisticsDashboardPage, AllShipmentsPage, CreateShipmentPage, 
-  OrderPipelinePage, TrackingPage, DeliveryAgentsPage, 
+import {
+  LogisticsDashboardPage, AllShipmentsPage, CreateShipmentPage,
+  OrderPipelinePage, TrackingPage, DeliveryAgentsPage,
   RestockRequestsPage as LogisticsRestockPage, LogisticsAnalyticsPage, LogisticsSettingsPage,
-  ShipmentDetailPage
+  ShipmentDetailPage, PackagingDeskPage, DispatchQueuePage
 } from '../modules/logistics';
 
 import TechnicianManagerLayout from '../core/components/layout/TechnicianManagerLayout';
@@ -109,13 +110,13 @@ const StockOverviewComp = () => <StockOverview />;
 const StockAlertsComp = () => <StockAlerts />;
 const OrderList = () => <OrderListPage />;
 const RestockRequests = () => <RestockRequestsPage />;
-const OrderDetailPage = Stub('Order Detail'); 
+const OrderDetailPage = Stub('Order Detail');
 const Ledger = () => <LedgerPage />;
 const Invoices = () => <InvoicesPage />;
 const Payments = () => <PaymentsPage />;
 const FinancialReport = () => <FinancialReportPage />;
 const Employees = () => <EmployeesPage />;
-const EmployeeDetailPage = Stub('Employee Detail'); 
+const EmployeeDetailPage = Stub('Employee Detail');
 const OfferLetters = () => <OfferLettersPage />;
 const Departments = () => <DepartmentsPage />;
 const PayrollDashboard = () => <PayrollDashboardPage />;
@@ -130,11 +131,11 @@ const ServiceRequests = () => <ServiceRequestsPage />;
 const ServiceDetail = () => <ServiceDetailPage />;
 const ServiceAnalytics = () => <ServiceAnalyticsPage />;
 const DistributorList = () => <DistributorListPage />;
-const DistributorDetailPage = Stub('Distributor Detail'); 
+const DistributorDetailPage = Stub('Distributor Detail');
 const RetailerList = () => <RetailerListPage />;
-const RetailerDetailPage = Stub('Retailer Detail'); 
+const RetailerDetailPage = Stub('Retailer Detail');
 const CustomerList = () => <CustomerListPage />;
-const CustomerDetailPage = Stub('Customer Detail'); 
+const CustomerDetailPage = Stub('Customer Detail');
 const AdminSettings = () => <AdminSettingsPage />;
 const SocialGridManager = () => <SocialGridManagerPage />;
 const AdminProductQueries = () => <AdminProductQueriesPage />;
@@ -148,7 +149,7 @@ const IncomingReqs = () => <IncomingRequestsPage />;
 const Dispatch = () => <DispatchPage />;
 const DistOrders = () => <DistOrderHistoryPage />;
 const MyRetailers = () => <MyRetailersPage />;
-const MyRetailerDetailPage = Stub('Retailer Detail'); 
+const MyRetailerDetailPage = Stub('Retailer Detail');
 const DistLedger = () => <DistLedgerPage />;
 const DistPayments = () => <DistPaymentsPage />;
 const DistRewards = () => <DistRewardsPage />;
@@ -185,14 +186,16 @@ const CustomerSocial = () => <CustomerSocialPage />;
 const CustomerWarranty = () => <WarrantyExtensionPage />;
 
 
+import PublicTrackingPage from '../modules/public/pages/PublicTrackingPage';
+
 function RootRedirect() {
   const { isAuthenticated, user, loading } = useAuthContext();
-  
+
   if (loading) return null; // Wait for auth initialization
-  
+
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   switch (user?.role) {
-    case 'admin': 
+    case 'admin':
       if (user?.subRole === SUB_ROLES.HR_MANAGER) return <Navigate to="/hr" replace />;
       if (user?.subRole === SUB_ROLES.SERVICE_MANAGER) return <Navigate to="/technician" replace />;
       if (user?.subRole === SUB_ROLES.TECHNICIAN_MANAGER) return <Navigate to="/tech-manager" replace />;
@@ -217,10 +220,11 @@ export default function AppRouter() {
 
         {/* Auth Pages */}
         <Route path="/login" element={<AuthPortalPage />} />
+        <Route path="/track" element={<PublicTrackingPage />} />
         <Route path="/admin/login" element={<AdminLoginPage />} />
         <Route path="/admin/signup" element={<AdminSignUpPage />} />
         <Route path="/admin/forgot-password" element={<AdminForgotPasswordPage />} />
-        
+
         {/* Distributor Auth */}
         <Route path="/distributor/login" element={<DistributorLoginPage />} />
         <Route path="/distributor/signup" element={<DistributorSignUpPage />} />
@@ -231,7 +235,7 @@ export default function AppRouter() {
 
         <Route path="/sales/login" element={<SalesLoginPage />} />
         <Route path="/hr/login" element={<HRLoginPage />} />
-         <Route path="/technician/login" element={<ServiceLoginPage />} />
+        <Route path="/technician/login" element={<ServiceLoginPage />} />
         <Route path="/logistics/login" element={<LogisticsLoginPage />} />
         <Route path="/technician/signup" element={<TechnicianSignupPage />} />
 
@@ -239,7 +243,7 @@ export default function AppRouter() {
         <Route path="/customer/register" element={<CustomerRegisterPage />} />
         <Route path="/customer/forgot-password" element={<CustomerForgotPasswordPage />} />
         <Route path="/splash" element={<SplashPage />} />
-        
+
         {/* Error Pages */}
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
         <Route path="/admin/unauthorized" element={<UnauthorizedPage isAdmin />} />
@@ -290,6 +294,10 @@ export default function AppRouter() {
           <Route path="service/:id" element={<ServiceDetail />} />
           <Route path="service/analytics" element={<ServiceAnalytics />} />
           <Route path="technicians" element={<Technicians />} />
+          <Route path="logistics/carriers" element={<CarrierManagementPage />} />
+          <Route path="logistics/control-tower" element={<ShipmentControlTowerPage />} />
+          <Route path="logistics/freight-analytics" element={<FreightAnalyticsPage />} />
+          <Route path="logistics/spare-parts" element={<SparePartCenterPage />} />
           <Route path="content/social-grid" element={<SocialGridManager />} />
           <Route path="settings" element={<AdminSettings />} />
         </Route>
@@ -340,6 +348,7 @@ export default function AppRouter() {
           <Route path="customers" element={<RetailerCustomersPage />} />
           <Route path="rewards" element={<RetailRewards />} />
           <Route path="analytics" element={<RetailerAnalyticsPage />} />
+          <Route path="tracking" element={<TrackShipmentPage />} />
           <Route path="social" element={<RetailerSocial />} />
           <Route path="settings" element={<RetailSettings />} />
         </Route>
@@ -436,6 +445,8 @@ export default function AppRouter() {
           <Route path="agents" element={<DeliveryAgentsPage />} />
           <Route path="analytics" element={<LogisticsAnalyticsPage />} />
           <Route path="restock" element={<LogisticsRestockPage />} />
+          <Route path="packaging" element={<PackagingDeskPage />} />
+          <Route path="dispatch" element={<DispatchQueuePage />} />
           <Route path="settings" element={<LogisticsSettingsPage />} />
         </Route>
 

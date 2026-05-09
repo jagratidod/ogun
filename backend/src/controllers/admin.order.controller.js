@@ -232,5 +232,15 @@ exports.updateOrderStatus = catchAsync(async (req, res, next) => {
     console.error('Socket emission failed:', err.message);
   }
 
+  // Trigger Inventory Intelligence update if order is completed
+  if (order.status === 'Completed') {
+    try {
+      const InventoryService = require('../services/inventory.service');
+      await InventoryService.updateIntelligence();
+    } catch (invErr) {
+      console.error('Failed to update inventory intelligence:', invErr.message);
+    }
+  }
+
   return ApiResponse.success(res, order, 'Order updated successfully');
 });

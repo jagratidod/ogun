@@ -48,6 +48,12 @@ const techManagerNav = [
 const logisticsNav = [
   { label: 'Dashboard', icon: RiDashboardLine, path: '/logistics' },
   {
+    label: 'Operations', icon: RiStackLine, children: [
+      { label: 'Packaging Desk', path: '/logistics/packaging' },
+      { label: 'Dispatch Queue', path: '/logistics/dispatch' },
+    ]
+  },
+  {
     label: 'Shipments', icon: RiTruckLine, children: [
       { label: 'All Shipments', path: '/logistics/shipments' },
       { label: 'Create Shipment', path: '/logistics/shipments/create' },
@@ -96,17 +102,17 @@ const adminNav = [
   },
   {
     label: 'HR Management', icon: RiTeamLine, permission: 'hr', children: [
-      { label: 'Directory', path: '/hr/employees' },
-      { label: 'Leave Review', path: '/hr/leaves' },
-      { label: 'Departments', path: '/hr/departments' },
+      { label: 'Directory', path: '/admin/hr/employees' },
+      { label: 'Leave Review', path: '/admin/leaves' },
+      { label: 'Departments', path: '/admin/hr/departments' },
     ],
   },
   {
     label: 'Payroll Control', icon: RiWalletLine, permission: 'payroll', children: [
-      { label: 'Overview', path: '/hr/payroll' },
-      { label: 'Setup', path: '/hr/payroll/setup' },
-      { label: 'Monthly Run', path: '/hr/payroll/run' },
-      { label: 'History', path: '/hr/payroll/history' },
+      { label: 'Overview', path: '/admin/payroll' },
+      { label: 'Monthly Run', path: '/admin/payroll/process' },
+      { label: 'Payslips', path: '/admin/payroll/payslips' },
+      { label: 'Deductions', path: '/admin/payroll/deductions' },
     ],
   },
 
@@ -134,8 +140,11 @@ const adminNav = [
     ],
   },
   {
-    label: 'Content', icon: RiImage2Line, permission: 'content', children: [
-      { label: 'Social Grid', path: '/admin/content/social-grid' },
+    label: 'Logistics Intel', icon: RiTruckLine, children: [
+      { label: 'Control Tower', path: '/admin/logistics/control-tower' },
+      { label: 'Carriers', path: '/admin/logistics/carriers' },
+      { label: 'Spare Parts', path: '/admin/logistics/spare-parts' },
+      { label: 'Freight Stats', path: '/admin/logistics/freight-analytics' },
     ],
   },
   { label: 'Settings', icon: RiSettings3Line, path: '/admin/settings' },
@@ -164,6 +173,18 @@ const distributorNav = [
   { label: 'Rewards', icon: RiTrophyLine, path: '/distributor/rewards' },
   { label: 'Analytics', icon: RiBarChartBoxLine, path: '/distributor/analytics' },
   { label: 'Settings', icon: RiSettings3Line, path: '/distributor/settings' },
+];
+
+const retailerNav = [
+  { label: 'Dashboard', icon: RiDashboardLine, path: '/retailer' },
+  { label: 'Marketplace', icon: RiStore2Line, path: '/retailer/marketplace' },
+  { label: 'My Stock', icon: RiBox3Line, path: '/retailer/stock' },
+  { label: 'My Orders', icon: RiShoppingCartLine, path: '/retailer/orders' },
+  { label: 'Track Shipment', icon: RiTruckLine, path: '/retailer/tracking' },
+  { label: 'Customers', icon: RiUserLine, path: '/retailer/customers' },
+  { label: 'Ledger', icon: RiMoneyDollarCircleLine, path: '/retailer/accounts' },
+  { label: 'Analytics', icon: RiBarChartBoxLine, path: '/retailer/analytics' },
+  { label: 'Settings', icon: RiSettings3Line, path: '/retailer/settings' },
 ];
 
 export function getNavItems(role, subRole, permissions) {
@@ -329,12 +350,12 @@ export default function Sidebar({ role = 'admin' }) {
         {!isCollapsed && (
           <div className="p-4 border-t border-border space-y-3">
             <div className="flex flex-col items-center gap-1.5">
-               <span className="text-[10px] font-black text-brand-teal uppercase tracking-widest bg-brand-teal/5 px-3 py-1 border border-brand-teal/20">
-                 {user?.subRole ? user.subRole.replace('_', ' ') : user?.role || 'Guest'}
-               </span>
+              <span className="text-[10px] font-black text-brand-teal uppercase tracking-widest bg-brand-teal/5 px-3 py-1 border border-brand-teal/20">
+                {user?.subRole ? user.subRole.replace('_', ' ') : user?.role || 'Guest'}
+              </span>
             </div>
             {location.pathname.startsWith('/logistics') && (
-              <button 
+              <button
                 onClick={logout}
                 className="w-full py-2 text-[10px] font-black text-state-danger uppercase tracking-widest border border-state-danger/20 hover:bg-state-danger/5 transition-colors flex items-center justify-center gap-2"
               >

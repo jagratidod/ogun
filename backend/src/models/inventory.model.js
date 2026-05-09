@@ -28,6 +28,14 @@ const inventorySchema = new mongoose.Schema({
   sellingPrice: {
     type: Number,
     default: 0
+  },
+  stockVelocity: {
+    type: Number, // units sold per day
+    default: 0
+  },
+  predictionDays: {
+    type: Number, // estimated days until stock out
+    default: 999
   }
 }, {
   timestamps: true
