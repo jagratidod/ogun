@@ -1,5 +1,6 @@
 // Exporting all Admin modules from consolidated pages
 export { default as AdminDashboardPage } from './pages/AdminDashboardPage';
+export { default as AttendanceDashboardPage } from './pages/AttendanceDashboardPage';
 export { default as AdminSettingsPage } from './pages/AdminSettingsPage';
 export { default as CustomerListPage } from './pages/CustomerListPage';
 export { default as DepartmentsPage } from './pages/DepartmentsPage';

@@ -1,4 +1,5 @@
 const User = require('../models/user.model');
+const Attendance = require('../models/attendance.model');
 const ApiResponse = require('../utils/apiResponse');
 
 // @desc    Get all users (Sub-admins, Distributors, Retailers, Customers)
@@ -343,6 +344,85 @@ exports.reviewHRLeave = async (req, res, next) => {
         await leave.save();
 
         return ApiResponse.success(res, leave, `HR leave request ${status} successfully`);
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * @desc    Get daily attendance for all sales executives
+ * @route   GET /api/v1/admin/attendance/daily
+ */
+exports.getDailyAttendance = async (req, res, next) => {
+    try {
+        const { date } = req.query; // Expecting YYYY-MM-DD
+        const searchDate = date || new Intl.DateTimeFormat('en-IN', {
+            timeZone: 'Asia/Kolkata',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        }).format(new Date()).split('/').reverse().join('-');
+
+        const salesExecs = await User.find({ role: 'sales_executive' }).select('name email salesExecutiveData');
+        
+        const attendanceRecords = await Attendance.find({ date: searchDate });
+        
+        const report = salesExecs.map(exec => {
+            const record = attendanceRecords.find(r => r.salesPerson.toString() === exec._id.toString());
+            return {
+                id: exec._id,
+                name: exec.name,
+                email: exec.email,
+                assignedArea: exec.salesExecutiveData?.assignedArea || 'N/A',
+                appActiveTime: record ? record.appActiveTime : 0,
+                shopVisitTime: record ? record.shopVisitTime : 0,
+                visitCount: record ? record.visits.length : 0,
+                status: record ? (record.isFinalized ? 'Finalized' : 'Active') : 'No Data',
+                lastHeartbeat: record ? record.lastHeartbeat : null
+            };
+        });
+
+        return ApiResponse.success(res, report, 'Daily attendance fetched successfully');
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * @desc    Get detailed attendance history for a specific sales executive
+ * @route   GET /api/v1/admin/attendance/summary/:id
+ */
+exports.getSalesPersonAttendanceSummary = async (req, res, next) => {
+    try {
+        const userId = req.params.id;
+        const records = await Attendance.find({ salesPerson: userId }).sort({ date: -1 });
+        
+        return ApiResponse.success(res, records, 'Attendance summary fetched');
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * @desc    Finalize attendance for the day (Admin manual trigger or automated)
+ * @route   POST /api/v1/admin/attendance/finalize
+ */
+exports.finalizeAttendance = async (req, res, next) => {
+    try {
+        const { date } = req.body;
+        const targetDate = date || new Intl.DateTimeFormat('en-IN', {
+            timeZone: 'Asia/Kolkata',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        }).format(new Date()).split('/').reverse().join('-');
+
+        const result = await Attendance.updateMany(
+            { date: targetDate, isFinalized: false },
+            { $set: { isFinalized: true } }
+        );
+
+        return ApiResponse.success(res, result, `Attendance finalized for ${targetDate}`);
     } catch (error) {
         next(error);
     }

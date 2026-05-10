@@ -43,7 +43,7 @@ import {
   PointsHistoryPage, ServiceRequestsPage, ServiceDetailPage,
   ServiceAnalyticsPage, DistributorListPage, RetailerListPage,
   CustomerListPage, AdminSettingsPage, PayslipsPage, DeductionsPage, OfferLettersPage, SocialGridManagerPage,
-  AdminProductQueriesPage, SalesRepsPage, TechniciansPage,
+  AdminProductQueriesPage, SalesRepsPage, AttendanceDashboardPage, TechniciansPage,
   CarrierManagementPage, ShipmentControlTowerPage, FreightAnalyticsPage, SparePartCenterPage
 } from '../modules/admin';
 
@@ -290,6 +290,7 @@ export default function AppRouter() {
           <Route path="customers" element={<CustomerList />} />
           <Route path="customers/:id" element={<CustomerDetailPage />} />
           <Route path="sales-reps" element={<SalesReps />} />
+          <Route path="attendance" element={<AttendanceDashboardPage />} />
           <Route path="service" element={<ServiceRequests />} />
           <Route path="service/:id" element={<ServiceDetail />} />
           <Route path="service/analytics" element={<ServiceAnalytics />} />

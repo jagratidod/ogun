@@ -44,6 +44,9 @@ router.delete('/reward-config/targets/:id', rewardConfigController.deleteTarget)
 const salesRepsController = require('../controllers/admin.salesReps.controller');
 router.get('/sales-reps/leaderboard', salesRepsController.getLeaderboard);
 router.get('/sales-reps', salesRepsController.getSalesReps);
+router.get('/attendance/daily', adminController.getDailyAttendance);
+router.get('/attendance/summary/:id', adminController.getSalesPersonAttendanceSummary);
+router.post('/attendance/finalize', adminController.finalizeAttendance);
 
 router.post('/sales-reps', salesRepsController.createSalesRep);
 router.get('/sales-reps/:id', salesRepsController.getSalesRepDetail);

@@ -51,6 +51,17 @@ const executiveService = {
   requestRedemption: async (data) => {
     const response = await api.post('/rewards/redemptions/request', data);
     return response.data;
+  },
+
+  // Attendance & Tracking
+  sendHeartbeat: async (data) => {
+    const response = await api.post('/sales-executive/heartbeat', data);
+    return response.data;
+  },
+
+  getAttendanceSummary: async () => {
+    const response = await api.get('/sales-executive/attendance/summary');
+    return response.data;
   }
 };
 

@@ -10,6 +10,7 @@ router.use(protect);
 router.use(restrictTo('sales_executive'));
 
 router.get('/stats', salesExecutiveController.getStats);
+router.post('/heartbeat', salesExecutiveController.processHeartbeat);
 router.post('/retailers', salesExecutiveController.onboardRetailer);
 router.get('/retailers', salesExecutiveController.getMyRetailers);
 router.post('/orders', salesExecutiveController.placeOrder);

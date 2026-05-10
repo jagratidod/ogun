@@ -13,7 +13,8 @@ export default function AddRetailerPage() {
     shopName: '',
     location: '',
     phone: '',
-    distributorId: ''
+    distributorId: '',
+    coordinates: { lat: null, lng: null }
   });
   const [distributors, setDistributors] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -101,6 +102,31 @@ export default function AddRetailerPage() {
             value={formData.location}
             onChange={(e) => setFormData({ ...formData, location: e.target.value })}
           />
+
+          <div className="flex flex-col gap-2">
+            <label className="text-[10px] font-black text-content-tertiary uppercase tracking-widest ml-1">Pin Location on Map</label>
+            <Button 
+                type="button" 
+                variant="secondary" 
+                className="w-full border-dashed" 
+                icon={RiMapPinLine}
+                onClick={() => {
+                    // Open Map Picker (Mocking map picker for now as script load takes time)
+                    // In real app, this would open a Google Map Modal.
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition((pos) => {
+                            setFormData(p => ({
+                                ...p,
+                                coordinates: { lat: pos.coords.latitude, lng: pos.coords.longitude }
+                            }));
+                            toast.success("Location pinned to your current GPS position!");
+                        });
+                    }
+                }}
+            >
+                {formData.coordinates.lat ? 'Location Pinned ✅' : 'Use Current GPS Position'}
+            </Button>
+          </div>
           <Select
             label="Assign Distributor"
             required

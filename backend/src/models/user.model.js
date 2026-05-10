@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema({
         default: null,
         trim: true
     },
+    coordinates: {
+        lat: { type: Number, default: null },
+        lng: { type: Number, default: null }
+    },
     phone: {
         type: String,
         default: null,

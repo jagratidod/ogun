@@ -8,6 +8,7 @@ import { SidebarProvider } from '../../context/SidebarContext';
 import { useAuthContext } from '../../context/AuthContext';
 import { useNotificationContext } from '../../context/NotificationContext';
 import { APP_NAME } from '../../utils/constants';
+import useAttendanceTracking from '../../hooks/useAttendanceTracking';
 
 const bottomNavItems = [
   { label: 'Home', icon: RiDashboardLine, path: '/sales', exact: true },
@@ -19,6 +20,7 @@ const bottomNavItems = [
 ];
 
 export default function SalesLayout() {
+  useAttendanceTracking();
   const { user } = useAuthContext();
   const { unreadCount } = useNotificationContext();
   const navigate = useNavigate();

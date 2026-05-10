@@ -130,7 +130,12 @@ const adminNav = [
   },
   { label: 'Distributors', icon: RiTruckLine, path: '/admin/distributors', permission: 'distributors' },
   { label: 'Retailers', icon: RiStore2Line, path: '/admin/retailers', permission: 'retailers' },
-  { label: 'Sales Representatives', icon: RiUserLine, path: '/admin/sales-reps', permission: 'sales_reps' },
+  {
+    label: 'Sales Force', icon: RiUserLine, permission: 'sales_reps', children: [
+      { label: 'Directory', path: '/admin/sales-reps' },
+      { label: 'Attendance Reports', path: '/admin/attendance' },
+    ]
+  },
   { label: 'Customers', icon: RiUserLine, path: '/admin/customers', permission: 'customers' },
   { label: 'Technicians', icon: RiToolsLine, path: '/admin/technicians', permission: 'service' },
   {

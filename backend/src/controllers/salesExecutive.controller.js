@@ -7,6 +7,9 @@ const ServiceRequest = require('../models/serviceRequest.model');
 const RewardService = require('../services/rewardService');
 const ApiResponse = require('../utils/apiResponse');
 const catchAsync = require('../utils/catchAsync');
+const Attendance = require('../models/attendance.model');
+const ActiveVisit = require('../models/activeVisit.model');
+const { calculateDistance } = require('../utils/geo');
 const { v4: uuidv4 } = require('uuid');
 
 // Helper: get sales executive earning rules from DB
@@ -260,3 +263,123 @@ exports.updateTicketStatus = catchAsync(async (req, res) => {
 
     return ApiResponse.success(res, ticket, 'Ticket status updated successfully');
 });
+
+/**
+ * @desc    Process Sales Executive Heartbeat (Geofencing + App Usage)
+ * @route   POST /api/v1/sales-executive/heartbeat
+ */
+exports.processHeartbeat = catchAsync(async (req, res) => {
+    const { lat, lng, isAppVisible } = req.body;
+    const userId = req.user._id;
+
+    // 1. Get current date in IST (YYYY-MM-DD)
+    const now = new Date();
+    const istDate = new Intl.DateTimeFormat('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).format(now).split('/').reverse().join('-');
+
+    // 2. Find or Create Daily Attendance Record
+    let attendance = await Attendance.findOne({ salesPerson: userId, date: istDate });
+    if (!attendance) {
+        attendance = await Attendance.create({ salesPerson: userId, date: istDate });
+    }
+
+    if (attendance.isFinalized) {
+        return ApiResponse.success(res, null, 'Attendance already finalized for today');
+    }
+
+    const intervalSeconds = 60; // Expected heartbeat interval
+
+    // 3. Increment App Active Time
+    if (isAppVisible) {
+        attendance.appActiveTime += intervalSeconds;
+    }
+
+    // 4. Geofencing Logic
+    if (lat && lng) {
+        // Find nearby retailers (within 10km for query optimization, then check 50m)
+        // In a real production app with thousands of retailers, we'd use $near index.
+        // For now, we'll fetch retailers assigned to/onboarded by this user or active ones nearby.
+        const retailers = await User.find({ 
+            role: 'retailer', 
+            isActive: true, 
+            'coordinates.lat': { $exists: true } 
+        }).select('name shopName coordinates');
+
+        let currentRetailer = null;
+        for (const retailer of retailers) {
+            const dist = calculateDistance(lat, lng, retailer.coordinates.lat, retailer.coordinates.lng);
+            if (dist <= 50) { // 50 meters radius
+                currentRetailer = retailer;
+                break;
+            }
+        }
+
+        const activeVisit = await ActiveVisit.findOne({ salesPerson: userId });
+
+        if (currentRetailer) {
+            if (activeVisit) {
+                if (activeVisit.retailer.toString() === currentRetailer._id.toString()) {
+                    // Continuing visit
+                    const visitDuration = Math.round((now - activeVisit.lastSeenAt) / 1000);
+                    if (visitDuration > 0 && visitDuration < 300) { // Safety check for jumps
+                        attendance.shopVisitTime += visitDuration;
+                    }
+                    activeVisit.lastSeenAt = now;
+                    await activeVisit.save();
+                } else {
+                    // Switched shop directly? (Rare but possible)
+                    // Close old, start new
+                    await closeActiveVisit(activeVisit, attendance);
+                    await ActiveVisit.create({
+                        salesPerson: userId,
+                        retailer: currentRetailer._id,
+                        startTime: now,
+                        lastSeenAt: now
+                    });
+                }
+            } else {
+                // New visit started
+                await ActiveVisit.create({
+                    salesPerson: userId,
+                    retailer: currentRetailer._id,
+                    startTime: now,
+                    lastSeenAt: now
+                });
+            }
+        } else if (activeVisit) {
+            // Exited shop
+            await closeActiveVisit(activeVisit, attendance);
+        }
+    }
+
+    attendance.lastHeartbeat = now;
+    await attendance.save();
+
+    return ApiResponse.success(res, {
+        appActiveTime: attendance.appActiveTime,
+        shopVisitTime: attendance.shopVisitTime
+    }, 'Heartbeat processed');
+});
+
+// Helper to close an active visit and record it in attendance
+async function closeActiveVisit(activeVisit, attendance) {
+    const duration = Math.round((activeVisit.lastSeenAt - activeVisit.startTime) / 1000);
+    
+    if (duration > 30) { // Only record if spent more than 30 seconds
+        const retailer = await User.findById(activeVisit.retailer);
+        attendance.visits.push({
+            retailer: activeVisit.retailer,
+            retailerName: retailer?.shopName || retailer?.name || 'Unknown Shop',
+            startTime: activeVisit.startTime,
+            endTime: activeVisit.lastSeenAt,
+            duration
+        });
+        attendance.shopVisitTime += 0; // Already incremented during heartbeat for real-time tracking
+    }
+    
+    await ActiveVisit.deleteOne({ _id: activeVisit._id });
+}

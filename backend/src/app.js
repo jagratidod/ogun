@@ -5,9 +5,13 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const compression = require('compression');
 const errorHandler = require('./middleware/error.middleware');
+const initCronJobs = require('./cron');
 const ApiResponse = require('./utils/apiResponse');
 
 const app = express();
+
+// Init cron jobs
+initCronJobs();
 
 // Middlewares
 app.use(helmet({
