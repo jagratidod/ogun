@@ -378,7 +378,8 @@ exports.getDailyAttendance = async (req, res, next) => {
                 shopVisitTime: record ? record.shopVisitTime : 0,
                 visitCount: record ? record.visits.length : 0,
                 status: record ? (record.isFinalized ? 'Finalized' : 'Active') : 'No Data',
-                lastHeartbeat: record ? record.lastHeartbeat : null
+                lastHeartbeat: record ? record.lastHeartbeat : null,
+                visits: record ? record.visits : []
             };
         });
 

@@ -72,9 +72,14 @@ const userSchema = new mongoose.Schema({
         targets: [{
             month: String, // e.g., "2026-04"
             salesTarget: { type: Number, default: 0 },
+            distributorsTarget: { type: Number, default: 0 },
             retailersTarget: { type: Number, default: 0 },
             achievedSales: { type: Number, default: 0 },
-            achievedRetailers: { type: Number, default: 0 }
+            achievedDistributors: { type: Number, default: 0 },
+            achievedRetailers: { type: Number, default: 0 },
+            primarySales: { type: Number, default: 0 },
+            secondarySales: { type: Number, default: 0 },
+            tertiarySales: { type: Number, default: 0 }
         }]
     },
     permissions: [{
@@ -136,6 +141,48 @@ const userSchema = new mongoose.Schema({
     ledgerBalance: {
         type: Number,
         default: 0
+    },
+    // Sales Team Hierarchy
+    salesRole: {
+        type: String,
+        enum: ['nsm', 'zonal_head', 'rsm', 'asm', 'tsm', 'so'],
+        default: null
+    },
+    salesRegion: {
+        type: String,
+        enum: ['North', 'South', 'East', 'West'],
+        default: null
+    },
+    salesArea: {
+        type: String,
+        default: null,
+        trim: true
+    },
+    salesTerritory: {
+        type: String,
+        default: null,
+        trim: true
+    },
+    // Service Team Hierarchy
+    serviceRole: {
+        type: String,
+        enum: ['head_of_service', 'regional_head', 'area_manager', 'service_supervisor', 'service_engineer'],
+        default: null
+    },
+    serviceRegion: {
+        type: String,
+        enum: ['North', 'South', 'East', 'West'],
+        default: null
+    },
+    serviceArea: {
+        type: String,
+        default: null,
+        trim: true
+    },
+    reportsTo: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: null
     }
 }, {
     timestamps: true

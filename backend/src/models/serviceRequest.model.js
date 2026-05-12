@@ -87,6 +87,19 @@ const serviceRequestSchema = new mongoose.Schema({
   },
   feedback: {
     type: String
+  },
+  // Service Revenue Tracking
+  serviceCharge: { type: Number, default: 0 },
+  partsCharge: { type: Number, default: 0 },
+  // Performance Timestamps
+  firstResponseAt: { type: Date, default: null },
+  reachedSiteAt: { type: Date, default: null },
+  // Quality Assessment (by supervisor)
+  qualityAudit: {
+    score: { type: Number, min: 0, max: 100 },
+    auditedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    auditedAt: { type: Date },
+    remarks: { type: String }
   }
 }, {
   timestamps: true

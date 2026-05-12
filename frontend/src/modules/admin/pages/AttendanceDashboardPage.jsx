@@ -4,7 +4,7 @@ import {
   RiPulseLine, RiArrowRightSLine, RiHistoryLine, 
   RiTimerFlashLine, RiMapPin2Line 
 } from 'react-icons/ri';
-import { PageHeader, Card, DataTable, Badge, Button, Avatar, Input, Select, formatCurrency } from '../../../core';
+import { PageHeader, Card, DataTable, Badge, Button, Avatar, Input, Select, formatCurrency, Modal, EmptyState } from '../../../core';
 import api from '../../../core/api';
 import { toast } from 'react-hot-toast';
 
@@ -13,6 +13,8 @@ export default function AttendanceDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [stats, setStats] = useState({ totalActive: 0, totalHours: 0, totalVisits: 0 });
+
+  const [selectedRep, setSelectedRep] = useState(null);
 
   const fetchAttendance = async () => {
     try {
@@ -48,18 +50,29 @@ export default function AttendanceDashboardPage() {
     return h > 0 ? `${h}h ${m}m` : `${m}m`;
   };
 
+  const getDisplayName = (row) => {
+    if (row.name && row.name.toLowerCase() !== 'executive') return row.name;
+    return row.email.split('@')[0].split(/[._]/).map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
+  };
+
   const columns = [
     {
       key: 'name', label: 'Sales Representative',
-      render: (val, row) => (
-        <div className="flex items-center gap-3">
-          <Avatar name={val} size="sm" className="ring-2 ring-brand-teal/20" />
-          <div>
-            <p className="font-bold text-content-primary text-sm">{val}</p>
-            <p className="text-[10px] text-content-tertiary uppercase tracking-tighter font-black">{row.assignedArea}</p>
+      render: (val, row) => {
+        const displayName = getDisplayName(row);
+        return (
+          <div className="flex items-center gap-3">
+            <Avatar name={displayName} size="sm" className="ring-2 ring-brand-teal/20" />
+            <div>
+              <p className="font-bold text-content-primary text-sm">{displayName}</p>
+              <div className="flex flex-col">
+                <p className="text-[10px] text-content-tertiary uppercase tracking-tighter font-black">{row.assignedArea}</p>
+                <p className="text-[10px] text-brand-teal/70 font-bold">{row.email}</p>
+              </div>
+            </div>
           </div>
-        </div>
-      )
+        );
+      }
     },
     {
       key: 'appActiveTime', label: 'App Usage',
@@ -107,7 +120,7 @@ export default function AttendanceDashboardPage() {
     {
       key: 'actions', label: '', align: 'right',
       render: (_v, row) => (
-        <Button size="xs" variant="ghost" icon={RiArrowRightSLine} onClick={() => toast.success(`Viewing detail for ${row.name}`)}>
+        <Button size="xs" variant="ghost" icon={RiArrowRightSLine} onClick={() => setSelectedRep(row)}>
             View Timeline
         </Button>
       )
@@ -186,6 +199,74 @@ export default function AttendanceDashboardPage() {
             <div className="w-2 h-2 rounded-full bg-brand-teal" /> Field Time (At Shop)
         </div>
       </div>
+
+      {/* Timeline Modal */}
+      <Modal 
+        isOpen={!!selectedRep} 
+        onClose={() => setSelectedRep(null)} 
+        title={`Visit Timeline — ${selectedRep ? getDisplayName(selectedRep) : ''}`}
+        size="md"
+      >
+        {selectedRep && (
+            <div className="space-y-6">
+                {/* Day Summary */}
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="p-3 bg-surface-secondary rounded-xl border border-border/50">
+                        <p className="text-[10px] font-black text-content-tertiary uppercase mb-1">Total App Usage</p>
+                        <p className="text-xl font-black text-brand-magenta">{formatSeconds(selectedRep.appActiveTime)}</p>
+                    </div>
+                    <div className="p-3 bg-surface-secondary rounded-xl border border-border/50">
+                        <p className="text-[10px] font-black text-content-tertiary uppercase mb-1">Total Field Time</p>
+                        <p className="text-xl font-black text-brand-teal">{formatSeconds(selectedRep.shopVisitTime)}</p>
+                    </div>
+                </div>
+
+                {/* Timeline List */}
+                <div>
+                    <h4 className="text-xs font-black text-content-primary uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <RiHistoryLine className="text-brand-teal" /> Activity sequence
+                    </h4>
+                    
+                    {selectedRep.visits && selectedRep.visits.length > 0 ? (
+                        <div className="space-y-0 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-border/50">
+                            {selectedRep.visits.map((visit, idx) => (
+                                <div key={idx} className="relative pl-8 pb-6 last:pb-0">
+                                    {/* Timeline Node */}
+                                    <div className="absolute left-0 top-1 w-6 h-6 rounded-full bg-surface-primary border-2 border-brand-teal flex items-center justify-center z-10">
+                                        <RiMapPin2Line className="w-3 h-3 text-brand-teal" />
+                                    </div>
+                                    
+                                    <div className="p-3 bg-surface-elevated rounded-xl border border-border/30 hover:border-brand-teal/30 transition-colors">
+                                        <div className="flex justify-between items-start mb-1">
+                                            <p className="font-bold text-sm text-content-primary">{visit.retailerName}</p>
+                                            <Badge variant="ghost" size="xs" className="bg-brand-teal/10 text-brand-teal">
+                                                {formatSeconds(visit.duration)}
+                                            </Badge>
+                                        </div>
+                                        <div className="flex items-center gap-3 text-[10px] font-bold text-content-tertiary uppercase">
+                                            <span className="flex items-center gap-1"><RiTimeLine /> {new Date(visit.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                            <span>—</span>
+                                            <span className="flex items-center gap-1"><RiTimeLine /> {new Date(visit.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <EmptyState 
+                            title="No shop visits recorded" 
+                            description="This representative has not checked into any retailer locations yet today."
+                            icon={RiMapPin2Line}
+                        />
+                    )}
+                </div>
+
+                <div className="pt-4 border-t border-border/50 flex justify-end">
+                    <Button variant="secondary" onClick={() => setSelectedRep(null)}>Close Timeline</Button>
+                </div>
+            </div>
+        )}
+      </Modal>
     </div>
   );
 }

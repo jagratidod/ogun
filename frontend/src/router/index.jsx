@@ -44,7 +44,8 @@ import {
   ServiceAnalyticsPage, DistributorListPage, RetailerListPage,
   CustomerListPage, AdminSettingsPage, PayslipsPage, DeductionsPage, OfferLettersPage, SocialGridManagerPage,
   AdminProductQueriesPage, SalesRepsPage, AttendanceDashboardPage, TechniciansPage,
-  CarrierManagementPage, ShipmentControlTowerPage, FreightAnalyticsPage, SparePartCenterPage
+  CarrierManagementPage, ShipmentControlTowerPage, FreightAnalyticsPage, SparePartCenterPage,
+  ServiceTeamPage, ServicePerformancePage, ServiceTargetPage, ServiceLeaderboardPage
 } from '../modules/admin';
 
 import {
@@ -291,10 +292,14 @@ export default function AppRouter() {
           <Route path="customers/:id" element={<CustomerDetailPage />} />
           <Route path="sales-reps" element={<SalesReps />} />
           <Route path="attendance" element={<AttendanceDashboardPage />} />
-          <Route path="service" element={<ServiceRequests />} />
-          <Route path="service/:id" element={<ServiceDetail />} />
-          <Route path="service/analytics" element={<ServiceAnalytics />} />
-          <Route path="technicians" element={<Technicians />} />
+          <Route path="service" element={<ServiceRequestsPage />} />
+          <Route path="service/:id" element={<ServiceDetailPage />} />
+          <Route path="service/analytics" element={<ServiceAnalyticsPage />} />
+          <Route path="service-team" element={<ServiceTeamPage />} />
+          <Route path="service-team/performance" element={<ServicePerformancePage />} />
+          <Route path="service-team/targets" element={<ServiceTargetPage />} />
+          <Route path="service-team/leaderboard" element={<ServiceLeaderboardPage />} />
+          <Route path="technicians" element={<TechniciansPage />} />
           <Route path="logistics/carriers" element={<CarrierManagementPage />} />
           <Route path="logistics/control-tower" element={<ShipmentControlTowerPage />} />
           <Route path="logistics/freight-analytics" element={<FreightAnalyticsPage />} />

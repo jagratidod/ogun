@@ -17,6 +17,8 @@ export default function AddRetailerPage() {
     coordinates: { lat: null, lng: null }
   });
   const [distributors, setDistributors] = useState([]);
+  const [fetchingAddr, setFetchingAddr] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -45,6 +47,60 @@ export default function AddRetailerPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchAddress = async (lat, lng) => {
+    try {
+      setFetchingAddr(true);
+      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`
+      );
+      const data = await response.json();
+      
+      console.log("Geocoding response:", data);
+      
+      if (data.status === 'OK' && data.results.length > 0) {
+        const address = data.results[0].formatted_address;
+        setFormData(p => ({ ...p, location: address }));
+        toast.success("Address auto-filled from GPS!");
+      } else if (data.status === 'ZERO_RESULTS') {
+        toast.error("Google could not find a specific address for this GPS location. Please enter it manually.");
+      } else if (data.status === 'REQUEST_DENIED') {
+        console.error("Geocoding API not enabled:", data.error_message);
+        toast.error("Geocoding API still restricted. Please ensure 'Geocoding API' is enabled in your Google Console.");
+      } else {
+        toast.error(`Geocoding issue: ${data.status}. Please enter address manually.`);
+      }
+    } catch (err) {
+      console.error("Geocoding error:", err);
+      toast.error("Connection error while fetching address. Coordinates are pinned.");
+    } finally {
+      setFetchingAddr(false);
+    }
+  };
+
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) {
+        return toast.error("Geolocation is not supported by your browser");
+    }
+
+    setFetchingAddr(true);
+    navigator.geolocation.getCurrentPosition(
+        (pos) => {
+            const { latitude, longitude } = pos.coords;
+            setFormData(p => ({
+                ...p,
+                coordinates: { lat: latitude, lng: longitude }
+            }));
+            fetchAddress(latitude, longitude);
+        },
+        (err) => {
+            setFetchingAddr(false);
+            toast.error("Failed to get your current location. Please enable GPS.");
+        },
+        { enableHighAccuracy: true }
+    );
   };
 
   return (
@@ -110,19 +166,8 @@ export default function AddRetailerPage() {
                 variant="secondary" 
                 className="w-full border-dashed" 
                 icon={RiMapPinLine}
-                onClick={() => {
-                    // Open Map Picker (Mocking map picker for now as script load takes time)
-                    // In real app, this would open a Google Map Modal.
-                    if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition((pos) => {
-                            setFormData(p => ({
-                                ...p,
-                                coordinates: { lat: pos.coords.latitude, lng: pos.coords.longitude }
-                            }));
-                            toast.success("Location pinned to your current GPS position!");
-                        });
-                    }
-                }}
+                loading={fetchingAddr}
+                onClick={handleGetLocation}
             >
                 {formData.coordinates.lat ? 'Location Pinned ✅' : 'Use Current GPS Position'}
             </Button>
