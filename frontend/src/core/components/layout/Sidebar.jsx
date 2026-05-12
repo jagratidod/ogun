@@ -142,6 +142,10 @@ const adminNav = [
     label: 'Service', icon: RiCustomerServiceLine, permission: 'service', children: [
       { label: 'Requests', path: '/admin/service' },
       { label: 'Analytics', path: '/admin/service/analytics' },
+      { label: 'Team Hierarchy', path: '/admin/service-team' },
+      { label: 'Performance', path: '/admin/service-team/performance' },
+      { label: 'Set Targets', path: '/admin/service-team/targets' },
+      { label: 'Leaderboard', path: '/admin/service-team/leaderboard' },
     ],
   },
   {

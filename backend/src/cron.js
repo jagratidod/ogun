@@ -51,6 +51,48 @@ const initCronJobs = () => {
             console.error('Attendance cron failed:', err);
         }
     });
+
+    // ─── Service Team KPI Computation — Runs at 11 PM IST daily ───
+    // 5:30 PM UTC
+    cron.schedule('30 17 * * *', async () => {
+        console.log('Running Service Team KPI Computation...');
+        const ServiceTarget = require('./models/serviceTarget.model');
+        const { computeActuals, computeRollup } = require('./services/serviceTeam.service');
+        const User = require('./models/user.model');
+
+        try {
+            const currentPeriod = new Date().toISOString().slice(0, 7); // "2026-05"
+            const targets = await ServiceTarget.find({ period: currentPeriod, status: 'Active' });
+
+            if (!targets.length) {
+                console.log('No active service targets found for current period.');
+                return;
+            }
+
+            // Phase 1: Compute leaf-level (engineers) first
+            const engineers = targets.filter(t => t.serviceRole === 'service_engineer');
+            for (const target of engineers) {
+                target.actuals = await computeActuals(target.assignedTo, currentPeriod);
+                target.lastComputedAt = new Date();
+                await target.save();
+            }
+
+            // Phase 2: Roll up through hierarchy levels
+            const roles = ['service_supervisor', 'area_manager', 'regional_head', 'head_of_service'];
+            for (const role of roles) {
+                const managers = targets.filter(t => t.serviceRole === role);
+                for (const target of managers) {
+                    target.actuals = await computeRollup(target.assignedTo, currentPeriod);
+                    target.lastComputedAt = new Date();
+                    await target.save();
+                }
+            }
+
+            console.log(`Successfully computed Service KPIs for ${targets.length} members`);
+        } catch (err) {
+            console.error('Service KPI cron failed:', err);
+        }
+    });
 };
 
 module.exports = initCronJobs;

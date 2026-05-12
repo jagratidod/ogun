@@ -110,3 +110,22 @@ export const STATUS_COLORS = {
 };
 
 export const APP_NAME = 'OGUN CRM';
+
+// Service Team Hierarchy Roles
+export const SERVICE_ROLES = {
+    HEAD_OF_SERVICE: 'head_of_service',
+    REGIONAL_HEAD: 'regional_head',
+    AREA_MANAGER: 'area_manager',
+    SERVICE_SUPERVISOR: 'service_supervisor',
+    SERVICE_ENGINEER: 'service_engineer',
+};
+
+export const SERVICE_REGIONS = ['North', 'South', 'East', 'West'];
+
+export const SERVICE_ROLE_LABELS = {
+    head_of_service: 'Head of Service',
+    regional_head: 'Regional Service Head',
+    area_manager: 'Area Service Manager',
+    service_supervisor: 'Service Supervisor',
+    service_engineer: 'Service Engineer',
+};

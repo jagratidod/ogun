@@ -110,6 +110,18 @@ const serviceConfigController = require('../controllers/admin.serviceConfig.cont
 router.get('/service-config', checkPermission('service'), serviceConfigController.getServiceConfig);
 router.put('/service-config', checkPermission('service'), serviceConfigController.updateServiceConfig);
 
+// ─── Service Team Hierarchy & Performance ───────────────────────────────────
+const serviceTeamController = require('../controllers/admin.serviceTeam.controller');
+router.get('/service-team/hierarchy', checkPermission('service'), serviceTeamController.getHierarchy);
+router.get('/service-team/members', checkPermission('service'), serviceTeamController.getMembers);
+router.patch('/service-team/members/:id/assign', checkPermission('service'), serviceTeamController.assignServiceRole);
+router.patch('/service-team/members/:id/remove', checkPermission('service'), serviceTeamController.removeFromHierarchy);
+router.post('/service-team/targets', checkPermission('service'), serviceTeamController.setTargets);
+router.get('/service-team/targets', checkPermission('service'), serviceTeamController.getTargets);
+router.get('/service-team/performance', checkPermission('service'), serviceTeamController.getPerformanceDashboard);
+router.get('/service-team/performance/:id', checkPermission('service'), serviceTeamController.getIndividualPerformance);
+router.get('/service-team/leaderboard', checkPermission('service'), serviceTeamController.getLeaderboard);
+
 // ─── Explore Section (Reels / Images / Videos) ───────────────────────────────
 // Uses local disk storage (NOT Cloudinary) – files saved to backend/uploads/explore/
 const exploreController = require('../controllers/admin.explore.controller');

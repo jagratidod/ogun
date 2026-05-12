@@ -112,9 +112,9 @@ export default function Select({
               ))}
             </Listbox.Options>
           </Transition>
-
         </div>
       </Listbox>
+      {props.name && <input type="hidden" name={props.name} value={value || ''} />}
 
       {error && <p className="text-[10px] font-bold text-state-danger mt-1 px-1">{error}</p>}
     </div>

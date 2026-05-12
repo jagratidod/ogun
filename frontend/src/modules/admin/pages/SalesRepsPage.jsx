@@ -16,6 +16,22 @@ const MONTHS = Array.from({ length: 12 }, (_, i) => {
   };
 });
 
+const SALES_ROLES = [
+  { label: 'National Sales Manager (NSM)', value: 'nsm' },
+  { label: 'Zonal Head', value: 'zonal_head' },
+  { label: 'Regional Sales Manager (RSM)', value: 'rsm' },
+  { label: 'Area Sales Manager (ASM)', value: 'asm' },
+  { label: 'Territory Sales Manager (TSM)', value: 'tsm' },
+  { label: 'Sales Officer (SO)', value: 'so' },
+];
+
+const REGIONS = [
+  { label: 'North', value: 'North' },
+  { label: 'South', value: 'South' },
+  { label: 'East', value: 'East' },
+  { label: 'West', value: 'West' },
+];
+
 export default function SalesRepsPage() {
   const [reps, setReps] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,8 +44,14 @@ export default function SalesRepsPage() {
   const [detailModal, setDetailModal] = useState(null); // rep detail data
 
   // Forms
-  const [addForm, setAddForm] = useState({ name: '', email: '', assignedArea: '' });
-  const [targetForm, setTargetForm] = useState({ month: MONTHS[0].value, salesTarget: '', retailersTarget: '' });
+  const [addForm, setAddForm] = useState({ 
+    name: '', email: '', salesRole: 'so', salesRegion: 'North', 
+    salesArea: '', salesTerritory: '', assignedArea: '' 
+  });
+  const [targetForm, setTargetForm] = useState({ 
+    month: MONTHS[0].value, salesTarget: '', distributorsTarget: '', 
+    retailersTarget: '', primarySales: '', secondarySales: '', tertiarySales: '' 
+  });
   const [saving, setSaving] = useState(false);
 
   const fetchReps = async () => {
@@ -71,7 +93,10 @@ export default function SalesRepsPage() {
       await api.post('/admin/sales-reps', addForm);
       toast.success('Sales rep created');
       setAddModal(false);
-      setAddForm({ name: '', email: '', assignedArea: '' });
+      setAddForm({ 
+        name: '', email: '', salesRole: 'so', salesRegion: 'North', 
+        salesArea: '', salesTerritory: '', assignedArea: '' 
+      });
       fetchReps();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to create rep');
@@ -87,7 +112,11 @@ export default function SalesRepsPage() {
       await api.post(`/admin/sales-reps/${targetModal.id}/targets`, {
         month: targetForm.month,
         salesTarget: Number(targetForm.salesTarget),
+        distributorsTarget: Number(targetForm.distributorsTarget),
         retailersTarget: Number(targetForm.retailersTarget),
+        primarySales: Number(targetForm.primarySales),
+        secondarySales: Number(targetForm.secondarySales),
+        tertiarySales: Number(targetForm.tertiarySales),
       });
       toast.success('Target set successfully');
       setTargetModal(null);
@@ -122,11 +151,22 @@ export default function SalesRepsPage() {
       )
     },
     {
-      key: 'assignedArea', label: 'Area',
+      key: 'salesRole', label: 'Role',
       render: (val) => (
-        <div className="flex items-center gap-1 text-sm text-content-secondary">
-          <RiMapPinLine className="text-brand-teal w-4 h-4" />
-          {val || '—'}
+        <Badge variant="outline" className="uppercase text-[10px]">{val?.replace('_', ' ')}</Badge>
+      )
+    },
+    {
+      key: 'salesRegion', label: 'Area/Region',
+      render: (_v, row) => (
+        <div className="flex flex-col gap-0.5">
+          <div className="flex items-center gap-1 text-xs text-content-primary font-medium">
+            <RiMapPinLine className="text-brand-teal w-3 h-3" />
+            {row.salesArea || row.assignedArea || '—'}
+          </div>
+          <div className="text-[10px] text-content-tertiary px-4">
+            {row.salesRegion} {row.salesTerritory && `· ${row.salesTerritory}`}
+          </div>
         </div>
       )
     },
@@ -185,34 +225,66 @@ export default function SalesRepsPage() {
       </Card>
 
       {/* ── Add Rep Modal ── */}
-      <Modal isOpen={addModal} onClose={() => setAddModal(false)} title="Add Sales Representative">
+      <Modal isOpen={addModal} onClose={() => setAddModal(false)} title="Add Sales Representative" size="lg">
         <div className="space-y-4">
-          <Input label="Full Name" placeholder="e.g. Rahul Sharma" value={addForm.name} onChange={e => setAddForm(p => ({ ...p, name: e.target.value }))} />
-          <Input label="Work Email" placeholder="rahul@ogun.in" value={addForm.email} onChange={e => setAddForm(p => ({ ...p, email: e.target.value }))} />
-          <Input label="Assigned Area" placeholder="e.g. Mumbai North" value={addForm.assignedArea} onChange={e => setAddForm(p => ({ ...p, assignedArea: e.target.value }))} />
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="grid grid-cols-2 gap-4">
+            <Input label="Full Name" placeholder="e.g. Rahul Sharma" value={addForm.name} onChange={e => setAddForm(p => ({ ...p, name: e.target.value }))} />
+            <Input label="Work Email" placeholder="rahul@ogun.in" value={addForm.email} onChange={e => setAddForm(p => ({ ...p, email: e.target.value }))} />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Select label="Sales Role" options={SALES_ROLES} value={addForm.salesRole} onChange={e => setAddForm(p => ({ ...p, salesRole: e.target.value }))} />
+            <Select label="Region" options={REGIONS} value={addForm.salesRegion} onChange={e => setAddForm(p => ({ ...p, salesRegion: e.target.value }))} />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Input label="Area" placeholder="e.g. Mumbai North" value={addForm.salesArea} onChange={e => setAddForm(p => ({ ...p, salesArea: e.target.value }))} />
+            <Input label="Territory" placeholder="e.g. Malad" value={addForm.salesTerritory} onChange={e => setAddForm(p => ({ ...p, salesTerritory: e.target.value }))} />
+          </div>
+          <div className="flex justify-end gap-2 pt-2 border-t border-border mt-4">
             <Button variant="secondary" onClick={() => setAddModal(false)}>Cancel</Button>
-            <Button icon={RiCheckLine} loading={saving} onClick={handleAdd}>Create</Button>
+            <Button icon={RiCheckLine} loading={saving} onClick={handleAdd}>Create Representative</Button>
           </div>
         </div>
       </Modal>
 
       {/* ── Set Target Modal ── */}
-      <Modal isOpen={!!targetModal} onClose={() => setTargetModal(null)} title={`Set Target — ${targetModal?.name}`}>
-        <div className="space-y-4">
-          <Select
-            label="Month"
-            options={MONTHS}
-            value={targetForm.month}
-            onChange={e => setTargetForm(p => ({ ...p, month: e.target.value }))}
-          />
-          <Input label="Sales Target (₹)" type="number" placeholder="e.g. 500000" value={targetForm.salesTarget}
-            onChange={e => setTargetForm(p => ({ ...p, salesTarget: e.target.value }))} />
-          <Input label="Retailers to Onboard" type="number" placeholder="e.g. 10" value={targetForm.retailersTarget}
-            onChange={e => setTargetForm(p => ({ ...p, retailersTarget: e.target.value }))} />
-          <div className="flex justify-end gap-2 pt-2">
+      <Modal isOpen={!!targetModal} onClose={() => setTargetModal(null)} title={`Set Performance Targets — ${targetModal?.name}`} size="lg">
+        <div className="space-y-6">
+          <div className="flex items-center gap-4 bg-surface-secondary p-3 rounded-lg">
+             <div className="flex-1">
+               <Select
+                label="Target Month"
+                options={MONTHS}
+                value={targetForm.month}
+                onChange={e => setTargetForm(p => ({ ...p, month: e.target.value }))}
+               />
+             </div>
+             <div className="text-xs text-content-tertiary italic">Setting targets for: {MONTHS.find(m => m.value === targetForm.month)?.label}</div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <Input label="Sales (₹)" type="number" placeholder="0" value={targetForm.salesTarget}
+              onChange={e => setTargetForm(p => ({ ...p, salesTarget: e.target.value }))} />
+            <Input label="Distributors" type="number" placeholder="0" value={targetForm.distributorsTarget}
+              onChange={e => setTargetForm(p => ({ ...p, distributorsTarget: e.target.value }))} />
+            <Input label="Retailers" type="number" placeholder="0" value={targetForm.retailersTarget}
+              onChange={e => setTargetForm(p => ({ ...p, retailersTarget: e.target.value }))} />
+          </div>
+
+          <div>
+            <p className="text-xs font-bold text-content-tertiary uppercase tracking-wider mb-3">PST Metrics Achievement</p>
+            <div className="grid grid-cols-3 gap-4 p-4 bg-surface-elevated rounded-xl border border-border">
+              <Input label="Primary (P)" type="number" placeholder="0" value={targetForm.primarySales}
+                onChange={e => setTargetForm(p => ({ ...p, primarySales: e.target.value }))} />
+              <Input label="Secondary (S)" type="number" placeholder="0" value={targetForm.secondarySales}
+                onChange={e => setTargetForm(p => ({ ...p, secondarySales: e.target.value }))} />
+              <Input label="Tertiary (T)" type="number" placeholder="0" value={targetForm.tertiarySales}
+                onChange={e => setTargetForm(p => ({ ...p, tertiarySales: e.target.value }))} />
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2 border-t border-border">
             <Button variant="secondary" onClick={() => setTargetModal(null)}>Cancel</Button>
-            <Button icon={RiFocus3Line} loading={saving} onClick={handleSetTarget}>Save Target</Button>
+            <Button icon={RiFocus3Line} loading={saving} onClick={handleSetTarget}>Save Monthly Targets</Button>
           </div>
         </div>
       </Modal>
@@ -239,43 +311,56 @@ export default function SalesRepsPage() {
             {/* Targets */}
             {detailModal.rep?.targets?.length > 0 && (
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-content-tertiary mb-2">Monthly Targets</p>
-                <div className="space-y-2 max-h-48 overflow-y-auto">
+                <p className="text-xs font-bold uppercase tracking-widest text-content-tertiary mb-2">Performance Breakdown</p>
+                <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
                   {detailModal.rep.targets.slice().reverse().map((t, i) => {
                     const salesPct = t.salesTarget ? Math.min(100, Math.round(((t.achievedSales || 0) / t.salesTarget) * 100)) : 0;
                     const retailerPct = t.retailersTarget ? Math.min(100, Math.round(((t.achievedRetailers || 0) / t.retailersTarget) * 100)) : 0;
+                    const distributorPct = t.distributorsTarget ? Math.min(100, Math.round(((t.achievedDistributors || 0) / t.distributorsTarget) * 100)) : 0;
+                    
                     return (
-                      <div key={i} className="border border-border rounded-lg p-3 space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-black text-content-primary">{t.month}</span>
-                          <span className="text-[10px] text-content-tertiary">Assigned by Admin</span>
-                        </div>
-                        {/* Sales target row */}
-                        <div>
-                          <div className="flex justify-between text-[10px] font-bold mb-1">
-                            <span className="text-content-tertiary">Sales</span>
-                            <span>
-                              <span className="text-brand-teal">₹{(t.achievedSales || 0).toLocaleString()}</span>
-                              <span className="text-content-tertiary"> / ₹{(t.salesTarget || 0).toLocaleString()}</span>
-                              <span className="text-state-warning ml-2">Left: ₹{Math.max(0, (t.salesTarget || 0) - (t.achievedSales || 0)).toLocaleString()}</span>
-                            </span>
-                          </div>
-                          <div className="h-1.5 bg-surface-elevated rounded-full overflow-hidden">
-                            <div className="h-full bg-brand-teal rounded-full transition-all" style={{ width: `${salesPct}%` }} />
+                      <div key={i} className="border border-border rounded-xl p-4 space-y-4 bg-surface-secondary">
+                        <div className="flex items-center justify-between border-b border-border pb-2">
+                          <span className="text-sm font-black text-content-primary">{t.month}</span>
+                          <div className="flex gap-2">
+                            <Badge variant="outline" className="text-[10px]">P: ₹{t.primarySales?.toLocaleString()}</Badge>
+                            <Badge variant="outline" className="text-[10px]">S: ₹{t.secondarySales?.toLocaleString()}</Badge>
+                            <Badge variant="outline" className="text-[10px]">T: ₹{t.tertiarySales?.toLocaleString()}</Badge>
                           </div>
                         </div>
-                        {/* Retailers target row */}
-                        <div>
-                          <div className="flex justify-between text-[10px] font-bold mb-1">
-                            <span className="text-content-tertiary">Retailers</span>
-                            <span>
-                              <span className="text-brand-magenta">{t.achievedRetailers || 0}</span>
-                              <span className="text-content-tertiary"> / {t.retailersTarget || 0} shops</span>
-                              <span className="text-state-warning ml-2">Left: {Math.max(0, (t.retailersTarget || 0) - (t.achievedRetailers || 0))}</span>
-                            </span>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {/* Sales target */}
+                          <div>
+                            <div className="flex justify-between text-[10px] font-bold mb-1">
+                              <span className="text-content-tertiary uppercase">Revenue (S)</span>
+                              <span>₹{(t.achievedSales || 0).toLocaleString()} / ₹{(t.salesTarget || 0).toLocaleString()}</span>
+                            </div>
+                            <div className="h-1.5 bg-surface-elevated rounded-full overflow-hidden">
+                              <div className="h-full bg-brand-teal rounded-full transition-all" style={{ width: `${salesPct}%` }} />
+                            </div>
                           </div>
-                          <div className="h-1.5 bg-surface-elevated rounded-full overflow-hidden">
-                            <div className="h-full bg-brand-magenta rounded-full transition-all" style={{ width: `${retailerPct}%` }} />
+
+                          {/* Distributors target */}
+                          <div>
+                            <div className="flex justify-between text-[10px] font-bold mb-1">
+                              <span className="text-content-tertiary uppercase">Distributors (D)</span>
+                              <span>{t.achievedDistributors || 0} / {t.distributorsTarget || 0}</span>
+                            </div>
+                            <div className="h-1.5 bg-surface-elevated rounded-full overflow-hidden">
+                              <div className="h-full bg-indigo-500 rounded-full transition-all" style={{ width: `${distributorPct}%` }} />
+                            </div>
+                          </div>
+
+                          {/* Retailers target */}
+                          <div className="md:col-span-2">
+                            <div className="flex justify-between text-[10px] font-bold mb-1">
+                              <span className="text-content-tertiary uppercase">Retailers (R)</span>
+                              <span>{t.achievedRetailers || 0} / {t.retailersTarget || 0}</span>
+                            </div>
+                            <div className="h-1.5 bg-surface-elevated rounded-full overflow-hidden">
+                              <div className="h-full bg-brand-magenta rounded-full transition-all" style={{ width: `${retailerPct}%` }} />
+                            </div>
                           </div>
                         </div>
                       </div>

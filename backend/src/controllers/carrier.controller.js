@@ -59,8 +59,10 @@ exports.deleteCarrier = catchAsync(async (req, res, next) => {
  */
 exports.calculateFreight = catchAsync(async (req, res, next) => {
   const { weight, length, width, height, zone, mode } = req.query;
+  console.log('Rate Engine Query:', req.query);
 
   if (!weight || !length || !width || !height || !zone) {
+    console.log('Missing parameters:', { weight, length, width, height, zone });
     return ApiResponse.error(res, 'Missing parameters: weight, length, width, height, zone', 400);
   }
 
@@ -69,16 +71,24 @@ exports.calculateFreight = catchAsync(async (req, res, next) => {
   const billedWeight = Math.max(actualWeight, volumetricWeight);
 
   const carriers = await Carrier.find({ isActive: true });
+  console.log(`Analyzing ${carriers.length} active carriers for zone: ${zone}`);
   
   const recommendations = carriers.map(carrier => {
     // Filter by mode if provided
-    if (mode && carrier.type !== mode) return null;
+    if (mode && carrier.type !== mode) {
+        console.log(`Carrier ${carrier.name} rejected: Mode mismatch (${carrier.type} vs ${mode})`);
+        return null;
+    }
 
     const zonePrice = carrier.pricingZones.find(p => p.zone.toLowerCase() === zone.toLowerCase());
-    if (!zonePrice) return null;
+    if (!zonePrice) {
+        console.log(`Carrier ${carrier.name} rejected: Zone ${zone} not found in pricingZones`);
+        return null;
+    }
 
     // SLA Adjustment logic (Simulated)
     const totalCost = zonePrice.basePrice + (billedWeight * zonePrice.pricePerKg);
+    console.log(`Carrier ${carrier.name} accepted: Cost ${totalCost}`);
     
     return {
       carrierId: carrier._id,
@@ -87,10 +97,12 @@ exports.calculateFreight = catchAsync(async (req, res, next) => {
       cost: totalCost,
       sla: carrier.deliverySLA,
       billedWeight,
-      reliabilityScore: 4.5, // Placeholder for future data
-      isBestValue: false // Will be set below
+      reliabilityScore: 4.5,
+      isBestValue: false
     };
   }).filter(Boolean).sort((a, b) => a.cost - b.cost);
+
+  console.log(`Final recommendations count: ${recommendations.length}`);
 
   // Mark the cheapest as best value
   if (recommendations.length > 0) {
