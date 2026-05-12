@@ -16,6 +16,10 @@ exports.getSalesReps = async (req, res, next) => {
             name: u.name,
             email: u.email,
             assignedArea: u.salesExecutiveData?.assignedArea || '—',
+            salesRole: u.salesRole || '—',
+            salesRegion: u.salesRegion || '—',
+            salesArea: u.salesArea || '—',
+            salesTerritory: u.salesTerritory || '—',
             totalPoints: u.salesExecutiveData?.totalPoints || 0,
             targets: u.salesExecutiveData?.targets || [],
             status: u.isActive ? 'active' : 'inactive',
@@ -33,7 +37,7 @@ exports.getSalesReps = async (req, res, next) => {
 // @route   POST /api/v1/admin/sales-reps
 exports.createSalesRep = async (req, res, next) => {
     try {
-        const { name, email, assignedArea } = req.body;
+        const { name, email, assignedArea, salesRole, salesRegion, salesArea, salesTerritory } = req.body;
 
         if (!name || !email) {
             return ApiResponse.error(res, 'Name and Email are required', 400);
@@ -48,9 +52,13 @@ exports.createSalesRep = async (req, res, next) => {
             name,
             email: email.toLowerCase().trim(),
             role: 'sales_executive',
+            salesRole,
+            salesRegion,
+            salesArea,
+            salesTerritory,
             isActive: true,
             salesExecutiveData: {
-                assignedArea: assignedArea || 'General',
+                assignedArea: assignedArea || salesArea || 'General',
                 totalPoints: 0,
                 targets: [],
             },
@@ -60,7 +68,7 @@ exports.createSalesRep = async (req, res, next) => {
             id: rep._id,
             name: rep.name,
             email: rep.email,
-            assignedArea: rep.salesExecutiveData.assignedArea,
+            salesRole: rep.salesRole,
             status: 'active',
         }, 'Sales representative created successfully', 201);
     } catch (error) {
@@ -72,13 +80,17 @@ exports.createSalesRep = async (req, res, next) => {
 // @route   PUT /api/v1/admin/sales-reps/:id
 exports.updateSalesRep = async (req, res, next) => {
     try {
-        const { name, assignedArea, status } = req.body;
+        const { name, assignedArea, status, salesRole, salesRegion, salesArea, salesTerritory } = req.body;
         const rep = await User.findOne({ _id: req.params.id, role: 'sales_executive' });
 
         if (!rep) return ApiResponse.error(res, 'Sales representative not found', 404);
 
         if (name) rep.name = name;
         if (status) rep.isActive = status === 'active';
+        if (salesRole) rep.salesRole = salesRole;
+        if (salesRegion) rep.salesRegion = salesRegion;
+        if (salesArea) rep.salesArea = salesArea;
+        if (salesTerritory) rep.salesTerritory = salesTerritory;
         if (assignedArea) {
             rep.salesExecutiveData = rep.salesExecutiveData || {};
             rep.salesExecutiveData.assignedArea = assignedArea;
@@ -95,10 +107,10 @@ exports.updateSalesRep = async (req, res, next) => {
 // @route   POST /api/v1/admin/sales-reps/:id/targets
 exports.setTarget = async (req, res, next) => {
     try {
-        const { month, salesTarget, retailersTarget } = req.body;
+        const { month, salesTarget, distributorsTarget, retailersTarget, primarySales, secondarySales, tertiarySales } = req.body;
 
-        if (!month || salesTarget == null || retailersTarget == null) {
-            return ApiResponse.error(res, 'month, salesTarget, and retailersTarget are required', 400);
+        if (!month) {
+            return ApiResponse.error(res, 'Month is required', 400);
         }
 
         const rep = await User.findOne({ _id: req.params.id, role: 'sales_executive' });
@@ -108,11 +120,20 @@ exports.setTarget = async (req, res, next) => {
         if (!rep.salesExecutiveData.targets) rep.salesExecutiveData.targets = [];
 
         const idx = rep.salesExecutiveData.targets.findIndex(t => t.month === month);
+        const targetData = {
+            month,
+            salesTarget: Number(salesTarget) || 0,
+            distributorsTarget: Number(distributorsTarget) || 0,
+            retailersTarget: Number(retailersTarget) || 0,
+            primarySales: Number(primarySales) || 0,
+            secondarySales: Number(secondarySales) || 0,
+            tertiarySales: Number(tertiarySales) || 0,
+        };
+
         if (idx >= 0) {
-            rep.salesExecutiveData.targets[idx].salesTarget = salesTarget;
-            rep.salesExecutiveData.targets[idx].retailersTarget = retailersTarget;
+            Object.assign(rep.salesExecutiveData.targets[idx], targetData);
         } else {
-            rep.salesExecutiveData.targets.push({ month, salesTarget, retailersTarget, achievedSales: 0, achievedRetailers: 0 });
+            rep.salesExecutiveData.targets.push({ ...targetData, achievedSales: 0, achievedDistributors: 0, achievedRetailers: 0 });
         }
 
         rep.markModified('salesExecutiveData');
@@ -135,6 +156,9 @@ exports.getSalesRepDetail = async (req, res, next) => {
         const retailers = await User.find({ role: 'retailer', onboardedBy: rep._id })
             .select('name email shopName location isActive createdAt');
 
+        // Distributors onboarded by this rep
+        const distributorCount = await User.countDocuments({ role: 'distributor', onboardedBy: rep._id });
+
         // Orders placed by this rep
         const orders = await ProductOrder.find({ createdBy: rep._id })
             .populate('buyer', 'name shopName')
@@ -150,6 +174,7 @@ exports.getSalesRepDetail = async (req, res, next) => {
         const monthIdx = targets.findIndex(t => t.month === currentMonth);
         if (monthIdx >= 0) {
             targets[monthIdx].achievedRetailers = retailers.length;
+            targets[monthIdx].achievedDistributors = distributorCount;
             targets[monthIdx].achievedSales = totalSales;
             rep.salesExecutiveData.targets = targets;
             rep.markModified('salesExecutiveData');
@@ -161,6 +186,10 @@ exports.getSalesRepDetail = async (req, res, next) => {
                 id: rep._id,
                 name: rep.name,
                 email: rep.email,
+                salesRole: rep.salesRole || '—',
+                salesRegion: rep.salesRegion || '—',
+                salesArea: rep.salesArea || '—',
+                salesTerritory: rep.salesTerritory || '—',
                 assignedArea: rep.salesExecutiveData?.assignedArea || '—',
                 totalPoints: rep.salesExecutiveData?.totalPoints || 0,
                 targets: rep.salesExecutiveData?.targets || [],
@@ -187,16 +216,27 @@ exports.getLeaderboard = async (req, res, next) => {
         
         const leaderboard = await Promise.all(reps.map(async (rep) => {
             const retailerCount = await User.countDocuments({ role: 'retailer', onboardedBy: rep._id });
+            const distributorCount = await User.countDocuments({ role: 'distributor', onboardedBy: rep._id });
             const orders = await ProductOrder.find({ createdBy: rep._id, status: 'Completed' });
             const salesVolume = orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+
+            // Get current month targets for PST metrics
+            const now = new Date();
+            const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            const target = rep.salesExecutiveData?.targets?.find(t => t.month === currentMonth) || {};
 
             return {
                id: rep._id,
                name: rep.name,
-               area: rep.salesExecutiveData?.assignedArea || 'N/A',
-               points: rep.rewardPoints || 0,
+               role: rep.salesRole || 'SO',
+               area: rep.salesArea || rep.salesExecutiveData?.assignedArea || 'N/A',
+               points: rep.salesExecutiveData?.totalPoints || 0,
                retailers: retailerCount,
-               sales: salesVolume
+               distributors: distributorCount,
+               sales: salesVolume,
+               primary: target.primarySales || 0,
+               secondary: target.secondarySales || 0,
+               tertiary: target.tertiarySales || 0
             };
         }));
 

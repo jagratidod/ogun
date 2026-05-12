@@ -69,7 +69,7 @@ exports.getStats = catchAsync(async (req, res) => {
  * @route   POST /api/v1/sales-executive/retailers
  */
 exports.onboardRetailer = catchAsync(async (req, res) => {
-    const { name, email, shopName, location, phone, distributorId } = req.body;
+    const { name, email, shopName, location, phone, distributorId, coordinates } = req.body;
 
     if (!name || !email || !shopName) {
         return ApiResponse.error(res, "Name, Email, and Shop Name are required", 400);
@@ -86,6 +86,7 @@ exports.onboardRetailer = catchAsync(async (req, res) => {
         shopName,
         location,
         phone,
+        coordinates,
         role: 'retailer',
         distributor: distributorId || null,
         isActive: false, // Requires Admin approval

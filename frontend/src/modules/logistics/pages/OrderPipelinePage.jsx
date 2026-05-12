@@ -175,12 +175,38 @@ export default function OrderPipelinePage() {
                </div>
             </div>
          </Card>
-
          <Modal
             isOpen={isOpen}
             onClose={close}
             size="lg"
             title={`Order Audit: ${selectedOrder?.orderId}`}
+            footer={
+               selectedOrder && !selectedOrder.shipmentCreated && (
+                  <div className="flex gap-2">
+                     <Button variant="secondary" onClick={close}>Cancel</Button>
+                     <Button 
+                        icon={RiTruckLine} 
+                        onClick={async () => {
+                           try {
+                              toast.loading('Initializing shipment intelligence...');
+                              const res = await logisticsService.createShipmentFromOrder({ orderId: selectedOrder._id });
+                              if (res.success) {
+                                 toast.dismiss();
+                                 toast.success('Shipment created! View in Packaging Desk.');
+                                 fetchOrders();
+                                 close();
+                              }
+                           } catch (error) {
+                              toast.dismiss();
+                              toast.error('Failed to create shipment');
+                           }
+                        }}
+                     >
+                        Initialize Shipment
+                     </Button>
+                  </div>
+               )
+            }
          >
             <div className="space-y-6 py-2">
                {/* Supply Chain Chain */}
@@ -215,6 +241,12 @@ export default function OrderPipelinePage() {
                         <div className="flex justify-between text-xs">
                            <span className="text-content-tertiary">Order Date</span>
                            <span className="text-content-primary font-medium">{formatDateTime(selectedOrder?.createdAt)}</span>
+                        </div>
+                        <div className="flex justify-between text-xs">
+                           <span className="text-content-tertiary">Shipment Status</span>
+                           <Badge variant={selectedOrder?.shipmentCreated ? 'success' : 'warning'}>
+                              {selectedOrder?.shipmentCreated ? 'Shipment Initialized' : 'Ready for Logistics'}
+                           </Badge>
                         </div>
                         <div className="flex justify-between text-xs">
                            <span className="text-content-tertiary">Stock Status</span>
@@ -263,6 +295,7 @@ export default function OrderPipelinePage() {
                </div>
             </div>
          </Modal>
+
       </div>
    );
 }

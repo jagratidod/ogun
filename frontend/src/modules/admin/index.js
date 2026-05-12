@@ -39,4 +39,8 @@ export { default as CarrierManagementPage } from './pages/CarrierManagementPage'
 export { default as ShipmentControlTowerPage } from './pages/ShipmentControlTowerPage';
 export { default as FreightAnalyticsPage } from './pages/FreightAnalyticsPage';
 export { default as SparePartCenterPage } from './pages/SparePartCenterPage';
+export { default as ServiceTeamPage } from './pages/ServiceTeamPage';
+export { default as ServicePerformancePage } from './pages/ServicePerformancePage';
+export { default as ServiceTargetPage } from './pages/ServiceTargetPage';
+export { default as ServiceLeaderboardPage } from './pages/ServiceLeaderboardPage';
 
